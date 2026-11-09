@@ -1,0 +1,64 @@
+@page "{id?}"
+@model test_application_for_development_team.Pages.Admin.Users.EditModel
+@{
+    ViewData["Title"] = Model.Id is null ? L["New user"] : L["Edit user"];
+}
+<h1 class="h3 mb-3">@ViewData["Title"]</h1>
+@if (TempData["Error"] is string error) { <div class="alert alert-danger">@error</div> }
+<form method="post" class="col-md-6">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="mb-2">
+        <label asp-for="UserName" class="form-label"></label>
+        <input asp-for="UserName" class="form-control" readonly="@(Model.Id is not null)" />
+    </div>
+    <div class="mb-2">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    @if (Model.Id is null)
+    {
+        <div class="mb-2">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" class="form-control" autocomplete="new-password" />
+        </div>
+    }
+    <div class="mb-2">
+        <label class="form-label">@L["Roles"]</label>
+        @foreach (var role in Model.AllRoles)
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="Roles" value="@role" id="role_@role" checked="@Model.Roles.Contains(role)" />
+                <label class="form-check-label" for="role_@role">@role</label>
+            </div>
+        }
+    </div>
+    <div class="mb-2">
+        <label asp-for="OwnerId" class="form-label"></label>
+        <select asp-for="OwnerId" asp-items="Model.Owners" class="form-select"><option value="">--</option></select>
+        <div class="form-text">@L["Only for users who may see their own data only."]</div>
+    </div>
+    @if (Model.Id is not null)
+    {
+        <div class="form-check mb-3">
+            <input asp-for="LockedOut" class="form-check-input" />
+            <label asp-for="LockedOut" class="form-check-label"></label>
+        </div>
+    }
+    <button type="submit" class="btn btn-primary">@L["Save"]</button>
+    <a asp-page="Index" class="btn btn-link">@L["Cancel"]</a>
+</form>
+@if (Model.Id is string id)
+{
+    <div class="d-flex gap-2 mt-4">
+        @if (Model.Existing?.TwoFactorEnabled == true)
+        {
+            <form method="post" asp-page-handler="ResetTwoFactor" asp-route-id="@id"><button class="btn btn-outline-warning">@L["Reset two-factor sign-in"]</button></form>
+        }
+        <form method="post" asp-page-handler="SignOut" asp-route-id="@id"><button class="btn btn-outline-secondary">@L["Sign out everywhere"]</button></form>
+        <form method="post" asp-page-handler="Delete" asp-route-id="@id" onsubmit="return confirm('@L["Are you sure?"]');"><button class="btn btn-outline-danger">@L["Delete"]</button></form>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

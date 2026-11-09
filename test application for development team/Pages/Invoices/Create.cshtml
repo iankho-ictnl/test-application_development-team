@@ -1,0 +1,44 @@
+@page
+@model test_application_for_development_team.Pages.Invoices.CreateModel
+@{
+    ViewData["Title"] = L["New invoice"];
+}
+<h1 class="h3 mb-3">@L["New invoice"]</h1>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select asp-for="OwnerId" asp-items="Model.Owners" class="form-select" onchange="this.form.submit()"><option value="0">-- @L["Choose owner"] --</option></select>
+    </div>
+</form>
+@if (Model.Uninvoiced is { } u)
+{
+    <h2 class="h5">@L["Activities to invoice"]</h2>
+    <partial name="_ActivityTable" model="u.Activities" />
+    <h2 class="h5">@L["Expenses to re-invoice"]</h2>
+    <partial name="_ExpenseTable" model="u.Expenses" />
+    var total = u.Activities.Sum(a => a.AmountInclVat) + u.Expenses.Sum(e => e.AmountInclVat);
+    <p class="fw-bold">@L["Total incl. VAT"]: @total.ToString("C")</p>
+    @if (u.Activities.Count + u.Expenses.Count > 0)
+    {
+        <form method="post" class="row g-2 align-items-end">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <input type="hidden" asp-for="OwnerId" />
+            <div class="col-auto">
+                <label asp-for="Date" class="form-label"></label>
+                <input asp-for="Date" class="form-control" />
+            </div>
+            <div class="col-auto">
+                <label asp-for="PaymentTermDays" class="form-label"></label>
+                <input asp-for="PaymentTermDays" class="form-control" />
+            </div>
+            <div class="col-auto"><button type="submit" class="btn btn-primary">@L["Create invoice"]</button></div>
+        </form>
+    }
+    else
+    {
+        <p>@L["Nothing to invoice for this owner."]</p>
+    }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

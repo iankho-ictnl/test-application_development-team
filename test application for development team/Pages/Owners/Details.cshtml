@@ -1,0 +1,25 @@
+@page "{id:int}"
+@model test_application_for_development_team.Pages.Owners.DetailsModel
+@{
+    ViewData["Title"] = Model.Owner.Name;
+}
+<h1 class="h3">@Model.Owner.Name</h1>
+<p>
+    @Model.Owner.Address<br />
+    @Model.Owner.PostalCode @Model.Owner.City<br />
+    @Model.Owner.Email @Model.Owner.Phone
+</p>
+
+<h2 class="h5 mt-4">@L["Assets"]</h2>
+<table class="table table-sm">
+    <thead><tr><th>@L["Name"]</th><th>@L["Type"]</th><th>@L["Address"]</th></tr></thead>
+    <tbody>
+        @foreach (var a in Model.Assets)
+        {
+            <tr><td><a asp-page="/Assets/Details" asp-route-id="@a.Id">@a.Name</a></td><td>@L[a.Type.ToString()]</td><td>@a.Address, @a.City</td></tr>
+        }
+    </tbody>
+</table>
+
+<h2 class="h5 mt-4">@L["Invoices"]</h2>
+<partial name="_InvoiceTable" model="Model.Invoices" />

@@ -1,0 +1,33 @@
+@model IEnumerable<ExpenseDto>
+@{
+    var canEdit = User.Has(Permissions.ExpensesActivities);
+}
+<table class="table table-sm table-striped">
+    <thead>
+        <tr><th>@L["Date"]</th><th>@L["Asset"]</th><th>@L["Description"]</th><th>@L["Category"]</th><th class="text-end">@L["Amount excl. VAT"]</th><th class="text-end">@L["VAT"]</th><th class="text-end">@L["Incl. VAT"]</th><th>@L["Re-invoice"]</th><th></th></tr>
+    </thead>
+    <tbody>
+        @foreach (var e in Model)
+        {
+            <tr>
+                <td>@e.Date.ToShortDateString()</td>
+                <td>@e.AssetName</td>
+                <td>@e.Description</td>
+                <td>@e.Category</td>
+                <td class="text-end">@e.AmountExclVat.ToString("C")</td>
+                <td class="text-end">@e.VatAmount.ToString("C") <small class="text-muted">(@e.VatPercentage.ToString("0.##")%)</small></td>
+                <td class="text-end">@e.AmountInclVat.ToString("C")</td>
+                <td>
+                    @if (e.InvoiceId is int inv) { <a asp-page="/Invoices/Details" asp-route-id="@inv">@L["Invoiced"]</a> }
+                    else if (e.Reinvoiceable) { @L["Yes"] }
+                </td>
+                <td class="text-end">
+                    @if (canEdit && e.InvoiceId is null)
+                    {
+                        <a asp-page="/Expenses/Edit" asp-route-id="@e.Id" class="btn btn-sm btn-outline-secondary">@L["Edit"]</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

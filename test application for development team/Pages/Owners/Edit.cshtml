@@ -1,0 +1,19 @@
+@page "{id:int?}"
+@model test_application_for_development_team.Pages.Owners.EditModel
+@{
+    ViewData["Title"] = Model.Id is null ? L["New owner"] : L["Edit owner"];
+}
+<h1 class="h3 mb-3">@ViewData["Title"]</h1>
+<form method="post" class="col-md-6">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    @foreach (var field in new[] { "Name", "Email", "Phone", "Address", "PostalCode", "City" })
+    {
+        <div class="mb-2">
+            <label for="Input_@field" class="form-label">@Html.DisplayName("Input." + field)</label>
+            @Html.TextBox("Input." + field, null, new { @class = "form-control" })
+            @Html.ValidationMessage("Input." + field, null, new { @class = "text-danger" })
+        </div>
+    }
+    <button type="submit" class="btn btn-primary">@L["Save"]</button>
+    <a asp-page="Index" class="btn btn-link">@L["Cancel"]</a>
+</form>

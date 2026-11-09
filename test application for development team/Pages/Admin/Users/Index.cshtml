@@ -1,0 +1,24 @@
+@page
+@model test_application_for_development_team.Pages.Admin.Users.IndexModel
+@{
+    ViewData["Title"] = L["Users"];
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">@L["Users"]</h1>
+    <a asp-page="Edit" class="btn btn-primary">@L["New user"]</a>
+</div>
+<table class="table table-sm table-striped">
+    <thead><tr><th>@L["User name"]</th><th>@L["Email"]</th><th>@L["Roles"]</th><th>@L["Two-factor"]</th><th>@L["Status"]</th></tr></thead>
+    <tbody>
+        @foreach (var u in Model.Items)
+        {
+            <tr>
+                <td><a asp-page="Edit" asp-route-id="@u.Id">@u.UserName</a></td>
+                <td>@u.Email</td>
+                <td>@string.Join(", ", u.Roles)</td>
+                <td>@(u.TwoFactorEnabled ? L["On"] : L["Off"])</td>
+                <td>@if (u.LockedOut) { <span class="badge bg-danger">@L["Blocked"]</span> }</td>
+            </tr>
+        }
+    </tbody>
+</table>

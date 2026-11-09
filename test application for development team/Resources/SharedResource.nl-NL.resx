@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Access denied" xml:space="preserve"><value>Geen toegang</value></data>
+  <data name="Activities" xml:space="preserve"><value>Activiteiten</value></data>
+  <data name="Activities to invoice" xml:space="preserve"><value>Te factureren activiteiten</value></data>
+  <data name="Address" xml:space="preserve"><value>Adres</value></data>
+  <data name="All assets" xml:space="preserve"><value>Alle objecten</value></data>
+  <data name="All owners" xml:space="preserve"><value>Alle eigenaren</value></data>
+  <data name="All statuses" xml:space="preserve"><value>Alle statussen</value></data>
+  <data name="Amount excl. VAT" xml:space="preserve"><value>Bedrag excl. btw</value></data>
+  <data name="Amounts excl. VAT." xml:space="preserve"><value>Bedragen excl. btw.</value></data>
+  <data name="Are you sure?" xml:space="preserve"><value>Weet u het zeker?</value></data>
+  <data name="Asset" xml:space="preserve"><value>Object</value></data>
+  <data name="Assets" xml:space="preserve"><value>Objecten</value></data>
+  <data name="Authentication code" xml:space="preserve"><value>Verificatiecode</value></data>
+  <data name="Authentication code or recovery code" xml:space="preserve"><value>Verificatiecode of herstelcode</value></data>
+  <data name="Back to home" xml:space="preserve"><value>Terug naar start</value></data>
+  <data name="Between 0 and 100" xml:space="preserve"><value>Tussen 0 en 100</value></data>
+  <data name="Blocked" xml:space="preserve"><value>Geblokkeerd</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Annuleren</value></data>
+  <data name="Category" xml:space="preserve"><value>Categorie</value></data>
+  <data name="Change password" xml:space="preserve"><value>Wachtwoord wijzigen</value></data>
+  <data name="Choose owner" xml:space="preserve"><value>Kies eigenaar</value></data>
+  <data name="City" xml:space="preserve"><value>Plaats</value></data>
+  <data name="Create invoice" xml:space="preserve"><value>Factuur maken</value></data>
+  <data name="Current" xml:space="preserve"><value>Huidig</value></data>
+  <data name="Current password" xml:space="preserve"><value>Huidig wachtwoord</value></data>
+  <data name="Date" xml:space="preserve"><value>Datum</value></data>
+  <data name="Delete" xml:space="preserve"><value>Verwijderen</value></data>
+  <data name="Description" xml:space="preserve"><value>Omschrijving</value></data>
+  <data name="Download PDF" xml:space="preserve"><value>PDF downloaden</value></data>
+  <data name="Due date" xml:space="preserve"><value>Vervaldatum</value></data>
+  <data name="Edit" xml:space="preserve"><value>Bewerken</value></data>
+  <data name="Edit activity" xml:space="preserve"><value>Activiteit bewerken</value></data>
+  <data name="Edit asset" xml:space="preserve"><value>Object bewerken</value></data>
+  <data name="Edit expense" xml:space="preserve"><value>Uitgave bewerken</value></data>
+  <data name="Edit owner" xml:space="preserve"><value>Eigenaar bewerken</value></data>
+  <data name="Edit role" xml:space="preserve"><value>Rol bewerken</value></data>
+  <data name="Edit user" xml:space="preserve"><value>Gebruiker bewerken</value></data>
+  <data name="Edit VAT rate" xml:space="preserve"><value>Btw-tarief bewerken</value></data>
+  <data name="Email" xml:space="preserve"><value>E-mail</value></data>
+  <data name="Enter the code from your authenticator app." xml:space="preserve"><value>Voer de code uit uw authenticator-app in.</value></data>
+  <data name="Expenses" xml:space="preserve"><value>Uitgaven</value></data>
+  <data name="Expenses to re-invoice" xml:space="preserve"><value>Door te belasten uitgaven</value></data>
+  <data name="Filter" xml:space="preserve"><value>Filteren</value></data>
+  <data name="Fixed" xml:space="preserve"><value>Vast</value></data>
+  <data name="Fixed price" xml:space="preserve"><value>Vaste prijs</value></data>
+  <data name="From" xml:space="preserve"><value>Van</value></data>
+  <data name="Hourly rate" xml:space="preserve"><value>Uurtarief</value></data>
+  <data name="Hours" xml:space="preserve"><value>Uren</value></data>
+  <data name="Incl. VAT" xml:space="preserve"><value>Incl. btw</value></data>
+  <data name="Income" xml:space="preserve"><value>Inkomsten</value></data>
+  <data name="Invalid email address" xml:space="preserve"><value>Ongeldig e-mailadres</value></data>
+  <data name="Invalid user name or password, or the account is locked." xml:space="preserve"><value>Ongeldige gebruikersnaam of wachtwoord, of het account is geblokkeerd.</value></data>
+  <data name="Invoice" xml:space="preserve"><value>Factuur</value></data>
+  <data name="Invoice date" xml:space="preserve"><value>Factuurdatum</value></data>
+  <data name="Invoiced" xml:space="preserve"><value>Gefactureerd</value></data>
+  <data name="Invoices" xml:space="preserve"><value>Facturen</value></data>
+  <data name="Key" xml:space="preserve"><value>Sleutel</value></data>
+  <data name="Kind" xml:space="preserve"><value>Soort</value></data>
+  <data name="Language" xml:space="preserve"><value>Taal</value></data>
+  <data name="Linked owner" xml:space="preserve"><value>Gekoppelde eigenaar</value></data>
+  <data name="Management" xml:space="preserve"><value>Beheer</value></data>
+  <data name="Mark as paid" xml:space="preserve"><value>Markeren als betaald</value></data>
+  <data name="My profile" xml:space="preserve"><value>Mijn profiel</value></data>
+  <data name="Name" xml:space="preserve"><value>Naam</value></data>
+  <data name="New activity" xml:space="preserve"><value>Nieuwe activiteit</value></data>
+  <data name="New asset" xml:space="preserve"><value>Nieuw object</value></data>
+  <data name="New expense" xml:space="preserve"><value>Nieuwe uitgave</value></data>
+  <data name="New invoice" xml:space="preserve"><value>Nieuwe factuur</value></data>
+  <data name="New owner" xml:space="preserve"><value>Nieuwe eigenaar</value></data>
+  <data name="New password" xml:space="preserve"><value>Nieuw wachtwoord</value></data>
+  <data name="New role" xml:space="preserve"><value>Nieuwe rol</value></data>
+  <data name="New user" xml:space="preserve"><value>Nieuwe gebruiker</value></data>
+  <data name="New VAT rate" xml:space="preserve"><value>Nieuw btw-tarief</value></data>
+  <data name="Nothing to invoice for this owner." xml:space="preserve"><value>Niets te factureren voor deze eigenaar.</value></data>
+  <data name="Number" xml:space="preserve"><value>Nummer</value></data>
+  <data name="Off" xml:space="preserve"><value>Uit</value></data>
+  <data name="On" xml:space="preserve"><value>Aan</value></data>
+  <data name="Only for users who may see their own data only." xml:space="preserve"><value>Alleen voor gebruikers die alleen hun eigen gegevens mogen zien.</value></data>
+  <data name="Open amount" xml:space="preserve"><value>Openstaand bedrag</value></data>
+  <data name="Open invoices" xml:space="preserve"><value>Openstaande facturen</value></data>
+  <data name="over" xml:space="preserve"><value>over</value></data>
+  <data name="Overview per owner" xml:space="preserve"><value>Overzicht per eigenaar</value></data>
+  <data name="Owner" xml:space="preserve"><value>Eigenaar</value></data>
+  <data name="Owners" xml:space="preserve"><value>Eigenaren</value></data>
+  <data name="Password" xml:space="preserve"><value>Wachtwoord</value></data>
+  <data name="Payment term (days)" xml:space="preserve"><value>Betalingstermijn (dagen)</value></data>
+  <data name="Percentage" xml:space="preserve"><value>Percentage</value></data>
+  <data name="perm." xml:space="preserve"><value>rechten</value></data>
+  <data name="Phone" xml:space="preserve"><value>Telefoon</value></data>
+  <data name="Postal code" xml:space="preserve"><value>Postcode</value></data>
+  <data name="Pricing" xml:space="preserve"><value>Prijsbepaling</value></data>
+  <data name="Property administration" xml:space="preserve"><value>Vastgoedbeheer</value></data>
+  <data name="Re-invoice" xml:space="preserve"><value>Doorbelasten</value></data>
+  <data name="Re-invoice to owner" xml:space="preserve"><value>Doorbelasten aan eigenaar</value></data>
+  <data name="Reports" xml:space="preserve"><value>Rapportages</value></data>
+  <data name="Required" xml:space="preserve"><value>Verplicht</value></data>
+  <data name="Reset two-factor sign-in" xml:space="preserve"><value>Tweestapsaanmelding resetten</value></data>
+  <data name="Result" xml:space="preserve"><value>Resultaat</value></data>
+  <data name="Result per asset" xml:space="preserve"><value>Resultaat per object</value></data>
+  <data name="Role" xml:space="preserve"><value>Rol</value></data>
+  <data name="Roles" xml:space="preserve"><value>Rollen</value></data>
+  <data name="Roles and permissions" xml:space="preserve"><value>Rollen en rechten</value></data>
+  <data name="Save" xml:space="preserve"><value>Opslaan</value></data>
+  <data name="Scan the QR code with an authenticator app (for example Microsoft Authenticator) and enter the code." xml:space="preserve"><value>Scan de QR-code met een authenticator-app (bijvoorbeeld Microsoft Authenticator) en voer de code in.</value></data>
+  <data name="Sign in" xml:space="preserve"><value>Aanmelden</value></data>
+  <data name="Sign in again" xml:space="preserve"><value>Opnieuw aanmelden</value></data>
+  <data name="Sign out" xml:space="preserve"><value>Afmelden</value></data>
+  <data name="Sign out everywhere" xml:space="preserve"><value>Overal afmelden</value></data>
+  <data name="Something went wrong." xml:space="preserve"><value>Er is iets misgegaan.</value></data>
+  <data name="Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Store these recovery codes in a safe place. Each code can be used once if you lose your authenticator app." xml:space="preserve"><value>Bewaar deze herstelcodes op een veilige plek. Elke code kan eenmaal worden gebruikt als u uw authenticator-app kwijtraakt.</value></data>
+  <data name="The code is invalid or has expired. Sign in again." xml:space="preserve"><value>De code is ongeldig of verlopen. Meld u opnieuw aan.</value></data>
+  <data name="The code is invalid." xml:space="preserve"><value>De code is ongeldig.</value></data>
+  <data name="To" xml:space="preserve"><value>Tot en met</value></data>
+  <data name="To change a rate, end the current period and add a new rate with the same name from the next day." xml:space="preserve"><value>Wilt u een tarief wijzigen, beëindig dan de huidige periode en voeg vanaf de volgende dag een nieuw tarief met dezelfde naam toe.</value></data>
+  <data name="Toggle navigation" xml:space="preserve"><value>Navigatie tonen of verbergen</value></data>
+  <data name="Total" xml:space="preserve"><value>Totaal</value></data>
+  <data name="Total excl. VAT" xml:space="preserve"><value>Totaal excl. btw</value></data>
+  <data name="Total incl. VAT" xml:space="preserve"><value>Totaal incl. btw</value></data>
+  <data name="Total VAT" xml:space="preserve"><value>Totaal btw</value></data>
+  <data name="Turn off" xml:space="preserve"><value>Uitschakelen</value></data>
+  <data name="Turn on" xml:space="preserve"><value>Inschakelen</value></data>
+  <data name="Two-factor" xml:space="preserve"><value>Tweestaps</value></data>
+  <data name="Two-factor sign-in" xml:space="preserve"><value>Tweestapsaanmelding</value></data>
+  <data name="Two-factor sign-in is turned off. Sign in again." xml:space="preserve"><value>Tweestapsaanmelding is uitgeschakeld. Meld u opnieuw aan.</value></data>
+  <data name="Two-factor sign-in is turned on" xml:space="preserve"><value>Tweestapsaanmelding is ingeschakeld</value></data>
+  <data name="Two-factor sign-in is turned on." xml:space="preserve"><value>Tweestapsaanmelding is ingeschakeld.</value></data>
+  <data name="Type" xml:space="preserve"><value>Type</value></data>
+  <data name="User name" xml:space="preserve"><value>Gebruikersnaam</value></data>
+  <data name="Users" xml:space="preserve"><value>Gebruikers</value></data>
+  <data name="Valid from" xml:space="preserve"><value>Geldig vanaf</value></data>
+  <data name="Valid to" xml:space="preserve"><value>Geldig tot en met</value></data>
+  <data name="VAT" xml:space="preserve"><value>Btw</value></data>
+  <data name="VAT rate" xml:space="preserve"><value>Btw-tarief</value></data>
+  <data name="VAT rates" xml:space="preserve"><value>Btw-tarieven</value></data>
+  <data name="Yes" xml:space="preserve"><value>Ja</value></data>
+  <data name="You do not have permission for this action." xml:space="preserve"><value>U hebt geen toestemming voor deze actie.</value></data>
+  <data name="You do not have permission for this page." xml:space="preserve"><value>U hebt geen toestemming voor deze pagina.</value></data>
+  <data name="Your password has been changed. Sign in again." xml:space="preserve"><value>Uw wachtwoord is gewijzigd. Meld u opnieuw aan.</value></data>
+</root>

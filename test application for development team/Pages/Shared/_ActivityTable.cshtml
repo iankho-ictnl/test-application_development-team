@@ -1,0 +1,31 @@
+@model IEnumerable<ActivityDto>
+@{
+    var canEdit = User.Has(Permissions.ExpensesActivities);
+}
+<table class="table table-sm table-striped">
+    <thead>
+        <tr><th>@L["Date"]</th><th>@L["Asset"]</th><th>@L["Kind"]</th><th>@L["Description"]</th><th>@L["Pricing"]</th><th class="text-end">@L["Amount excl. VAT"]</th><th class="text-end">@L["VAT"]</th><th class="text-end">@L["Incl. VAT"]</th><th>@L["Invoice"]</th><th></th></tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model)
+        {
+            <tr>
+                <td>@a.Date.ToShortDateString()</td>
+                <td>@a.AssetName</td>
+                <td>@L[a.Kind.ToString()]</td>
+                <td>@a.Description</td>
+                <td>@(a.PricingType == PricingType.Hourly ? $"{a.Hours:0.##} x {a.HourlyRate:C}" : L["Fixed"].Value)</td>
+                <td class="text-end">@a.AmountExclVat.ToString("C")</td>
+                <td class="text-end">@a.VatAmount.ToString("C") <small class="text-muted">(@a.VatPercentage.ToString("0.##")%)</small></td>
+                <td class="text-end">@a.AmountInclVat.ToString("C")</td>
+                <td>@if (a.InvoiceId is int inv) { <a asp-page="/Invoices/Details" asp-route-id="@inv">@L["Invoiced"]</a> }</td>
+                <td class="text-end">
+                    @if (canEdit && a.InvoiceId is null)
+                    {
+                        <a asp-page="/Activities/Edit" asp-route-id="@a.Id" class="btn btn-sm btn-outline-secondary">@L["Edit"]</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

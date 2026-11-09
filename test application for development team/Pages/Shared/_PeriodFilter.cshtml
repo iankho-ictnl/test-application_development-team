@@ -1,0 +1,24 @@
+@model (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> Assets, int? AssetId, DateOnly? From, DateOnly? To)
+<form method="get" class="row g-2 mb-3 align-items-end">
+    <div class="col-auto">
+        <label class="form-label" for="AssetId">@L["Asset"]</label>
+        <select id="AssetId" name="AssetId" class="form-select">
+            <option value="">@L["All assets"]</option>
+            @foreach (var a in Model.Assets)
+            {
+                <option value="@a.Value" selected="@(a.Value == Model.AssetId?.ToString())">@a.Text</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <label class="form-label" for="From">@L["From"]</label>
+        <input id="From" name="From" type="date" class="form-control" value="@Model.From?.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto">
+        <label class="form-label" for="To">@L["To"]</label>
+        <input id="To" name="To" type="date" class="form-control" value="@Model.To?.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">@L["Filter"]</button>
+    </div>
+</form>

@@ -1,0 +1,52 @@
+@page "{id:int}"
+@model test_application_for_development_team.Pages.Invoices.DetailsModel
+@{
+    var i = Model.Invoice;
+    ViewData["Title"] = $"{L["Invoice"]} {i.Number}";
+    var canEdit = User.Has(Permissions.Invoices);
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">@L["Invoice"] @i.Number</h1>
+    <a asp-page-handler="Pdf" asp-route-id="@i.Id" class="btn btn-outline-primary">@L["Download PDF"]</a>
+</div>
+<div asp-validation-summary="All" class="text-danger"></div>
+<dl class="row">
+    <dt class="col-sm-3">@L["Owner"]</dt><dd class="col-sm-9"><a asp-page="/Owners/Details" asp-route-id="@i.OwnerId">@i.OwnerName</a></dd>
+    <dt class="col-sm-3">@L["Date"]</dt><dd class="col-sm-9">@i.Date.ToShortDateString()</dd>
+    <dt class="col-sm-3">@L["Due date"]</dt><dd class="col-sm-9">@i.DueDate.ToShortDateString()</dd>
+    <dt class="col-sm-3">@L["Status"]</dt><dd class="col-sm-9">@L[i.Status.ToString()] @(i.PaidDate?.ToShortDateString())</dd>
+</dl>
+<table class="table table-sm">
+    <thead><tr><th>@L["Description"]</th><th class="text-end">@L["Amount excl. VAT"]</th><th class="text-end">@L["VAT"] %</th><th class="text-end">@L["VAT"]</th><th class="text-end">@L["Incl. VAT"]</th></tr></thead>
+    <tbody>
+        @foreach (var line in i.Lines)
+        {
+            <tr><td>@line.Description</td><td class="text-end">@line.AmountExclVat.ToString("C")</td><td class="text-end">@line.VatPercentage.ToString("0.##")</td><td class="text-end">@line.VatAmount.ToString("C")</td><td class="text-end">@line.AmountInclVat.ToString("C")</td></tr>
+        }
+    </tbody>
+    <tfoot>
+        @foreach (var v in i.VatSummary)
+        {
+            <tr class="text-muted"><td colspan="4" class="text-end">@L["VAT"] @v.VatPercentage.ToString("0.##")% @L["over"] @v.Base.ToString("C")</td><td class="text-end">@v.VatAmount.ToString("C")</td></tr>
+        }
+        <tr><th colspan="4" class="text-end">@L["Total excl. VAT"]</th><th class="text-end">@i.TotalExclVat.ToString("C")</th></tr>
+        <tr><th colspan="4" class="text-end">@L["Total VAT"]</th><th class="text-end">@i.TotalVat.ToString("C")</th></tr>
+        <tr><th colspan="4" class="text-end">@L["Total incl. VAT"]</th><th class="text-end">@i.TotalInclVat.ToString("C")</th></tr>
+    </tfoot>
+</table>
+@if (canEdit && i.Status == InvoiceStatus.Open)
+{
+    <div class="d-flex gap-3">
+        <form method="post" asp-page-handler="Pay" asp-route-id="@i.Id" class="row g-2">
+            <div class="col-auto"><input asp-for="PaidDate" class="form-control" /></div>
+            <div class="col-auto"><button type="submit" class="btn btn-success">@L["Mark as paid"]</button></div>
+        </form>
+        <form method="post" asp-page-handler="Delete" asp-route-id="@i.Id" onsubmit="return confirm('@L["Are you sure?"]');">
+            <button type="submit" class="btn btn-outline-danger">@L["Delete"]</button>
+        </form>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

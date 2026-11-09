@@ -1,0 +1,15 @@
+@page
+@model test_application_for_development_team.Pages.Activities.IndexModel
+@{
+    ViewData["Title"] = L["Activities"];
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">@L["Activities"]</h1>
+    @if (User.Has(Permissions.ExpensesActivities))
+    {
+        <a asp-page="Edit" asp-route-assetId="@Model.AssetId" class="btn btn-primary">@L["New activity"]</a>
+    }
+</div>
+<partial name="_PeriodFilter" model="(Model.Assets, Model.AssetId, Model.From, Model.To)" />
+<partial name="_ActivityTable" model="Model.Items" />
+<p class="fw-bold">@L["Total excl. VAT"]: @Model.Items.Sum(i => i.AmountExclVat).ToString("C")</p>

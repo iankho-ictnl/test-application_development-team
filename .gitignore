@@ -1,0 +1,6 @@
+.team/
+.env
+bin/
+obj/
+.vs/
+*.user

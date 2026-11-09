@@ -1,0 +1,19 @@
+@model IEnumerable<InvoiceDto>
+<table class="table table-sm table-striped">
+    <thead>
+        <tr><th>@L["Number"]</th><th>@L["Owner"]</th><th>@L["Date"]</th><th>@L["Due date"]</th><th>@L["Status"]</th><th class="text-end">@L["Total incl. VAT"]</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var i in Model)
+        {
+            <tr>
+                <td><a asp-page="/Invoices/Details" asp-route-id="@i.Id">@i.Number</a></td>
+                <td>@i.OwnerName</td>
+                <td>@i.Date.ToShortDateString()</td>
+                <td>@i.DueDate.ToShortDateString()</td>
+                <td><span class="badge @(i.Status == InvoiceStatus.Paid ? "bg-success" : "bg-warning text-dark")">@L[i.Status.ToString()]</span></td>
+                <td class="text-end">@i.TotalInclVat.ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+</table>

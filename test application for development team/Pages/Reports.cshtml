@@ -1,0 +1,37 @@
+@page
+@model test_application_for_development_team.Pages.ReportsModel
+@{
+    ViewData["Title"] = L["Reports"];
+}
+<h1 class="h3 mb-3">@L["Reports"]</h1>
+<form method="get" class="row g-2 mb-3 align-items-end">
+    <div class="col-auto"><label asp-for="From" class="form-label">@L["From"]</label><input asp-for="From" class="form-control" /></div>
+    <div class="col-auto"><label asp-for="To" class="form-label">@L["To"]</label><input asp-for="To" class="form-control" /></div>
+    <div class="col-auto"><button type="submit" class="btn btn-outline-primary">@L["Filter"]</button></div>
+</form>
+
+<h2 class="h5">@L["Result per asset"]</h2>
+<table class="table table-sm table-striped">
+    <thead><tr><th>@L["Asset"]</th><th>@L["Owner"]</th><th class="text-end">@L["Income"]</th><th class="text-end">@L["Expenses"]</th><th class="text-end">@L["Result"]</th></tr></thead>
+    <tbody>
+        @foreach (var a in Model.Assets)
+        {
+            <tr><td><a asp-page="/Assets/Details" asp-route-id="@a.AssetId">@a.AssetName</a></td><td>@a.OwnerName</td><td class="text-end">@a.Income.ToString("C")</td><td class="text-end">@a.Expenses.ToString("C")</td><td class="text-end @(a.Result < 0 ? "text-danger" : "")">@a.Result.ToString("C")</td></tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr class="fw-bold"><td colspan="2">@L["Total"]</td><td class="text-end">@Model.Assets.Sum(a => a.Income).ToString("C")</td><td class="text-end">@Model.Assets.Sum(a => a.Expenses).ToString("C")</td><td class="text-end">@Model.Assets.Sum(a => a.Result).ToString("C")</td></tr>
+    </tfoot>
+</table>
+<p class="small text-muted">@L["Amounts excl. VAT."]</p>
+
+<h2 class="h5 mt-4">@L["Overview per owner"]</h2>
+<table class="table table-sm table-striped">
+    <thead><tr><th>@L["Owner"]</th><th class="text-end">@L["Assets"]</th><th class="text-end">@L["Income"]</th><th class="text-end">@L["Expenses"]</th><th class="text-end">@L["Open invoices"]</th><th class="text-end">@L["Open amount"]</th></tr></thead>
+    <tbody>
+        @foreach (var o in Model.Owners)
+        {
+            <tr><td><a asp-page="/Owners/Details" asp-route-id="@o.OwnerId">@o.OwnerName</a></td><td class="text-end">@o.AssetCount</td><td class="text-end">@o.Income.ToString("C")</td><td class="text-end">@o.Expenses.ToString("C")</td><td class="text-end">@o.OpenInvoiceCount</td><td class="text-end">@o.OpenInvoiceAmount.ToString("C")</td></tr>
+        }
+    </tbody>
+</table>

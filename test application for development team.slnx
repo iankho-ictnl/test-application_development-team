@@ -1,0 +1,25 @@
+<Solution>
+  <Folder Name="/.team/">
+    <File Path=".team/HELP.md" />
+    <File Path=".team/project.md" />
+    <File Path=".team/analysis.md" />
+    <File Path=".team/architecture.md" />
+    <File Path=".team/design.md" />
+    <File Path=".team/testing.md" />
+    <File Path=".team/reviews/sanity-reviews.md" />
+    <File Path=".team/reviews/security-assessments.md" />
+    <File Path=".team/decisions.md" />
+    <File Path=".team/RULES.md" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".env.example" />
+    <File Path=".gitignore" />
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Project Path="PropertyAdmin.Api/PropertyAdmin.Api.csproj" />
+  <Project Path="PropertyAdmin.Contracts/PropertyAdmin.Contracts.csproj" />
+  <Project Path="PropertyAdmin.Data/PropertyAdmin.Data.csproj" />
+  <Project Path="PropertyAdmin.Logic/PropertyAdmin.Logic.csproj" />
+  <Project Path="PropertyAdmin.Tests/PropertyAdmin.Tests.csproj" />
+  <Project Path="test application for development team/test application for development team.csproj" />
+</Solution>

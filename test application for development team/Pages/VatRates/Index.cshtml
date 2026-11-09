@@ -1,0 +1,48 @@
+@page
+@model test_application_for_development_team.Pages.VatRates.IndexModel
+@{
+    ViewData["Title"] = L["VAT rates"];
+    var today = DateOnly.FromDateTime(DateTime.Today);
+}
+<h1 class="h3 mb-3">@L["VAT rates"]</h1>
+<div asp-validation-summary="All" class="text-danger"></div>
+<table class="table table-sm table-striped">
+    <thead><tr><th>@L["Name"]</th><th class="text-end">%</th><th>@L["Valid from"]</th><th>@L["Valid to"]</th><th></th><th></th></tr></thead>
+    <tbody>
+        @foreach (var v in Model.Items)
+        {
+            var active = v.ValidFrom <= today && (v.ValidTo is null || v.ValidTo >= today);
+            <tr>
+                <td>@v.Name</td>
+                <td class="text-end">@v.Percentage.ToString("0.##")</td>
+                <td>@v.ValidFrom.ToShortDateString()</td>
+                <td>@v.ValidTo?.ToShortDateString()</td>
+                <td>@if (active) { <span class="badge bg-success">@L["Current"]</span> }</td>
+                <td class="text-end">
+                    <a asp-route-edit="@v.Id" class="btn btn-sm btn-outline-secondary">@L["Edit"]</a>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@v.Id" class="d-inline" onsubmit="return confirm('@L["Are you sure?"]');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">@L["Delete"]</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2 class="h5 mt-4">@(Model.EditId is null ? L["New VAT rate"] : L["Edit VAT rate"])</h2>
+<p class="small text-muted">@L["To change a rate, end the current period and add a new rate with the same name from the next day."]</p>
+<form method="post" class="row g-2 align-items-end">
+    <input type="hidden" asp-for="EditId" />
+    <div class="col-auto"><label asp-for="Input.Name" class="form-label"></label><input asp-for="Input.Name" class="form-control" /></div>
+    <div class="col-auto"><label asp-for="Input.Percentage" class="form-label"></label><input asp-for="Input.Percentage" class="form-control" inputmode="decimal" /></div>
+    <div class="col-auto"><label asp-for="Input.ValidFrom" class="form-label"></label><input asp-for="Input.ValidFrom" class="form-control" /></div>
+    <div class="col-auto"><label asp-for="Input.ValidTo" class="form-label"></label><input asp-for="Input.ValidTo" class="form-control" /></div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">@L["Save"]</button>
+        @if (Model.EditId is not null) { <a asp-page="Index" class="btn btn-link">@L["Cancel"]</a> }
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

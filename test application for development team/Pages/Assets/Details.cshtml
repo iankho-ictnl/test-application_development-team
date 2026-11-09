@@ -1,0 +1,26 @@
+@page "{id:int}"
+@model test_application_for_development_team.Pages.Assets.DetailsModel
+@{
+    ViewData["Title"] = Model.Asset.Name;
+    var canRecord = User.Has(Permissions.ExpensesActivities);
+}
+<h1 class="h3">@Model.Asset.Name <small class="text-muted">(@L[Model.Asset.Type.ToString()])</small></h1>
+<p>@Model.Asset.Address, @Model.Asset.PostalCode @Model.Asset.City &middot; @L["Owner"]: <a asp-page="/Owners/Details" asp-route-id="@Model.Asset.OwnerId">@Model.Asset.OwnerName</a></p>
+
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <h2 class="h5">@L["Activities"]</h2>
+    @if (canRecord)
+    {
+        <a asp-page="/Activities/Edit" asp-route-assetId="@Model.Asset.Id" class="btn btn-sm btn-primary">@L["New activity"]</a>
+    }
+</div>
+<partial name="_ActivityTable" model="Model.Activities" />
+
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <h2 class="h5">@L["Expenses"]</h2>
+    @if (canRecord)
+    {
+        <a asp-page="/Expenses/Edit" asp-route-assetId="@Model.Asset.Id" class="btn btn-sm btn-primary">@L["New expense"]</a>
+    }
+</div>
+<partial name="_ExpenseTable" model="Model.Expenses" />

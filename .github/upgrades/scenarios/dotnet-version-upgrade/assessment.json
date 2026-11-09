@@ -1,0 +1,2574 @@
+{
+  "settings": {
+    "components": {
+      "code": true,
+      "binaries": false
+    },
+    "targetId": "net10.0",
+    "targetDisplayName": ".NETCoreApp,Version=v10.0"
+  },
+  "analysisStartTime": "2026-11-06T14:15:51.4754835Z",
+  "analysisEndTime": "2026-11-06T14:15:53.2980362Z",
+  "privacyModeHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2270980",
+  "stats": {
+    "summary": {
+      "projects": 4,
+      "issues": 8,
+      "incidents": 88,
+      "effort": 88
+    },
+    "charts": {
+      "severity": {
+        "Mandatory": 41,
+        "Optional": 2,
+        "Potential": 45,
+        "Information": 0
+      },
+      "category": {
+        "Project": 4,
+        "NuGet": 6,
+        "Api": 78
+      }
+    }
+  },
+  "projects": [
+    {
+      "path": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+      "startingProject": true,
+      "issues": 5,
+      "storyPoints": 50,
+      "properties": {
+        "appName": "PropertyAdmin.Api",
+        "projectKind": "AspNetCore",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 21,
+        "numberOfCodeFiles": 19,
+        "linesTotal": 3554,
+        "linesOfCode": 3533,
+        "totalApiScanned": 6610,
+        "minLinesOfCodeToChange": 46,
+        "maxLinesOfCodeToChange": 46
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "70cbb083-f119-4f1b-94db-8a4f176a00c8",
+          "ruleId": "NuGet.0002",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.11\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Authentication.JwtBearer, and replace with new package Microsoft.AspNetCore.Authentication.JwtBearer 10.0.14",
+              "protected": "Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.11\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Authentication.JwtBearer, and replace with new package Microsoft.AspNetCore.Authentication.JwtBearer 10.0.14"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+            "snippet": "Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.11\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Authentication.JwtBearer, and replace with new package Microsoft.AspNetCore.Authentication.JwtBearer 10.0.14",
+            "protectedSnippet": "Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.11\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Authentication.JwtBearer, and replace with new package Microsoft.AspNetCore.Authentication.JwtBearer 10.0.14",
+            "label": "Microsoft.AspNetCore.Authentication.JwtBearer 8.0.11",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageVersion": "8.0.11",
+              "PackageNewVersion": "10.0.14",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "8eafd5ae-d07d-444a-88e6-791ece7b2597",
+          "ruleId": "NuGet.0002",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.AspNetCore.Identity.EntityFrameworkCore, 8.0.11\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.14",
+              "protected": "Microsoft.AspNetCore.Identity.EntityFrameworkCore, 8.0.11\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.14"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+            "snippet": "Microsoft.AspNetCore.Identity.EntityFrameworkCore, 8.0.11\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.14",
+            "protectedSnippet": "Microsoft.AspNetCore.Identity.EntityFrameworkCore, 8.0.11\n\nRecommendation:\n\nRemove Microsoft.AspNetCore.Identity.EntityFrameworkCore, and replace with new package Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.14",
+            "label": "Microsoft.AspNetCore.Identity.EntityFrameworkCore 8.0.11",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Identity.EntityFrameworkCore",
+              "PackageVersion": "8.0.11",
+              "PackageNewVersion": "10.0.14",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "f4212cb2-8743-4c8c-b31e-befc10a2708e",
+          "ruleId": "NuGet.0002",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.EntityFrameworkCore.Design, 8.0.11\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Design, and replace with new package Microsoft.EntityFrameworkCore.Design 10.0.14",
+              "protected": "Microsoft.EntityFrameworkCore.Design, 8.0.11\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Design, and replace with new package Microsoft.EntityFrameworkCore.Design 10.0.14"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+            "snippet": "Microsoft.EntityFrameworkCore.Design, 8.0.11\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Design, and replace with new package Microsoft.EntityFrameworkCore.Design 10.0.14",
+            "protectedSnippet": "Microsoft.EntityFrameworkCore.Design, 8.0.11\n\nRecommendation:\n\nRemove Microsoft.EntityFrameworkCore.Design, and replace with new package Microsoft.EntityFrameworkCore.Design 10.0.14",
+            "label": "Microsoft.EntityFrameworkCore.Design 8.0.11",
+            "properties": {
+              "PackageId": "Microsoft.EntityFrameworkCore.Design",
+              "PackageVersion": "8.0.11",
+              "PackageNewVersion": "10.0.14",
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "16236c99-20d2-4f43-a63f-cebd108f77e8",
+          "ruleId": "Project.0002",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        },
+        {
+          "incidentId": "fd40511d-fa22-439a-bd96-1b50ab0677cc",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "JwtRegisteredClaimNames.Sub",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\Policies.cs",
+            "snippet": "JwtRegisteredClaimNames.Sub",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "properties": {
+              "CharCount": "1503"
+            },
+            "line": 25,
+            "column": 83
+          }
+        },
+        {
+          "incidentId": "692bfb4c-b266-457e-bf5f-310cf3ec6caa",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "JwtRegisteredClaimNames.Sub",
+              "protected": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\Policies.cs",
+            "snippet": "JwtRegisteredClaimNames.Sub",
+            "protectedSnippet": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub",
+            "label": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub",
+            "properties": {
+              "CharCount": "1503"
+            },
+            "line": 25,
+            "column": 83
+          }
+        },
+        {
+          "incidentId": "89964429-851f-4e73-ac33-d7873117b0a0",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "return new JwtSecurityTokenHandler().WriteToken(token);",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "return new JwtSecurityTokenHandler().WriteToken(token);",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 121,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "6bac36f6-f4cd-46a6-bfea-7b020726437d",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "return new JwtSecurityTokenHandler().WriteToken(token);",
+              "protected": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.#ctor"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "return new JwtSecurityTokenHandler().WriteToken(token);",
+            "protectedSnippet": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.#ctor",
+            "label": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.#ctor",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 121,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "07fb38dd-c1d5-426d-ad7f-d12fbc8ef79b",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "return new JwtSecurityTokenHandler().WriteToken(token);",
+              "protected": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.WriteToken(Microsoft.IdentityModel.Tokens.SecurityToken)"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "return new JwtSecurityTokenHandler().WriteToken(token);",
+            "protectedSnippet": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.WriteToken(Microsoft.IdentityModel.Tokens.SecurityToken)",
+            "label": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.WriteToken(Microsoft.IdentityModel.Tokens.SecurityToken)",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 121,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "fec8a644-28c1-4c97-9203-a9ebb80384b7",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var token = new JwtSecurityToken(_o.Issuer, audience, claims, DateTime.UtcNow, expires, creds);",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityToken"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var token = new JwtSecurityToken(_o.Issuer, audience, claims, DateTime.UtcNow, expires, creds);",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityToken",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityToken",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 120,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "161f5ad1-61b8-42da-be5b-88cbcdb6a973",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var token = new JwtSecurityToken(_o.Issuer, audience, claims, DateTime.UtcNow, expires, creds);",
+              "protected": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityToken.#ctor(System.String,System.String,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.Nullable{System.DateTime},System.Nullable{System.DateTime},Microsoft.IdentityModel.Tokens.SigningCredentials)"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var token = new JwtSecurityToken(_o.Issuer, audience, claims, DateTime.UtcNow, expires, creds);",
+            "protectedSnippet": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityToken.#ctor(System.String,System.String,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.Nullable{System.DateTime},System.Nullable{System.DateTime},Microsoft.IdentityModel.Tokens.SigningCredentials)",
+            "label": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityToken.#ctor(System.String,System.String,System.Collections.Generic.IEnumerable{System.Security.Claims.Claim},System.Nullable{System.DateTime},System.Nullable{System.DateTime},Microsoft.IdentityModel.Tokens.SigningCredentials)",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 120,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "ce236e40-a521-4a8a-8069-3bb373da1a7e",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "return principal.FindFirstValue(JwtRegisteredClaimNames.Sub);",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "return principal.FindFirstValue(JwtRegisteredClaimNames.Sub);",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 105,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "2af49aef-2a9d-4e4a-9823-cdb71e4fae1e",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "return principal.FindFirstValue(JwtRegisteredClaimNames.Sub);",
+              "protected": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "return principal.FindFirstValue(JwtRegisteredClaimNames.Sub);",
+            "protectedSnippet": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub",
+            "label": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 105,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "7816f0f0-619b-4871-b6f8-05b517567a65",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var jti = principal.FindFirstValue(JwtRegisteredClaimNames.Jti);",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var jti = principal.FindFirstValue(JwtRegisteredClaimNames.Jti);",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 100,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "f3bec46f-b3df-486f-8ed1-190ff43e593d",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var jti = principal.FindFirstValue(JwtRegisteredClaimNames.Jti);",
+              "protected": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var jti = principal.FindFirstValue(JwtRegisteredClaimNames.Jti);",
+            "protectedSnippet": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti",
+            "label": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 100,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "f41b78b2-ec9e-42d6-9983-37c4b8b6493f",
+          "ruleId": "Api.0002",
+          "description": "Breaking change: New TimeSpan.From*() overloads that take integers ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var principal = new JwtSecurityTokenHandler { MapInboundClaims = false }.ValidateToken(token, new TokenValidationParameters\r\n            {\r\n                ValidIssuer = _o.Issuer,\r\n                ValidAudience = _o.Audience \u002B \u0022.2fa\u0022,\r\n                IssuerSigningKey = CreateKey(_o.Key),\r\n                ClockSkew = TimeSpan.FromSeconds(30),\r\n            }, out var validated);",
+              "protected": "M:System.TimeSpan.FromSeconds(System.Double)"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var principal = new JwtSecurityTokenHandler { MapInboundClaims = false }.ValidateToken(token, new TokenValidationParameters\r\n            {\r\n                ValidIssuer = _o.Issuer,\r\n                ValidAudience = _o.Audience \u002B \u0022.2fa\u0022,\r\n                IssuerSigningKey = CreateKey(_o.Key),\r\n                ClockSkew = TimeSpan.FromSeconds(30),\r\n            }, out var validated);",
+            "protectedSnippet": "M:System.TimeSpan.FromSeconds(System.Double)",
+            "label": "M:System.TimeSpan.FromSeconds(System.Double)",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/9.0/timespan-from-overloads.md",
+                "isCustom": false
+              }
+            ],
+            "line": 91,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "ea16022d-8f1e-4fb0-a74c-31f6b9411ef3",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var principal = new JwtSecurityTokenHandler { MapInboundClaims = false }.ValidateToken(token, new TokenValidationParameters\r\n            {\r\n                ValidIssuer = _o.Issuer,\r\n                ValidAudience = _o.Audience \u002B \u0022.2fa\u0022,\r\n                IssuerSigningKey = CreateKey(_o.Key),\r\n                ClockSkew = TimeSpan.FromSeconds(30),\r\n            }, out var validated);",
+              "protected": "P:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.MapInboundClaims"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var principal = new JwtSecurityTokenHandler { MapInboundClaims = false }.ValidateToken(token, new TokenValidationParameters\r\n            {\r\n                ValidIssuer = _o.Issuer,\r\n                ValidAudience = _o.Audience \u002B \u0022.2fa\u0022,\r\n                IssuerSigningKey = CreateKey(_o.Key),\r\n                ClockSkew = TimeSpan.FromSeconds(30),\r\n            }, out var validated);",
+            "protectedSnippet": "P:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.MapInboundClaims",
+            "label": "P:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.MapInboundClaims",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 91,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "c65790d9-cb82-45a2-8f39-a9d614dfc50d",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var principal = new JwtSecurityTokenHandler { MapInboundClaims = false }.ValidateToken(token, new TokenValidationParameters\r\n            {\r\n                ValidIssuer = _o.Issuer,\r\n                ValidAudience = _o.Audience \u002B \u0022.2fa\u0022,\r\n                IssuerSigningKey = CreateKey(_o.Key),\r\n                ClockSkew = TimeSpan.FromSeconds(30),\r\n            }, out var validated);",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var principal = new JwtSecurityTokenHandler { MapInboundClaims = false }.ValidateToken(token, new TokenValidationParameters\r\n            {\r\n                ValidIssuer = _o.Issuer,\r\n                ValidAudience = _o.Audience \u002B \u0022.2fa\u0022,\r\n                IssuerSigningKey = CreateKey(_o.Key),\r\n                ClockSkew = TimeSpan.FromSeconds(30),\r\n            }, out var validated);",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 91,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "66889850-09e6-400e-85c3-680b6e418045",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var principal = new JwtSecurityTokenHandler { MapInboundClaims = false }.ValidateToken(token, new TokenValidationParameters\r\n            {\r\n                ValidIssuer = _o.Issuer,\r\n                ValidAudience = _o.Audience \u002B \u0022.2fa\u0022,\r\n                IssuerSigningKey = CreateKey(_o.Key),\r\n                ClockSkew = TimeSpan.FromSeconds(30),\r\n            }, out var validated);",
+              "protected": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.#ctor"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var principal = new JwtSecurityTokenHandler { MapInboundClaims = false }.ValidateToken(token, new TokenValidationParameters\r\n            {\r\n                ValidIssuer = _o.Issuer,\r\n                ValidAudience = _o.Audience \u002B \u0022.2fa\u0022,\r\n                IssuerSigningKey = CreateKey(_o.Key),\r\n                ClockSkew = TimeSpan.FromSeconds(30),\r\n            }, out var validated);",
+            "protectedSnippet": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.#ctor",
+            "label": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.#ctor",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 91,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "cd97ce2f-d616-4d37-af23-fecc5f6d0634",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var principal = new JwtSecurityTokenHandler { MapInboundClaims = false }.ValidateToken(token, new TokenValidationParameters\r\n            {\r\n                ValidIssuer = _o.Issuer,\r\n                ValidAudience = _o.Audience \u002B \u0022.2fa\u0022,\r\n                IssuerSigningKey = CreateKey(_o.Key),\r\n                ClockSkew = TimeSpan.FromSeconds(30),\r\n            }, out var validated);",
+              "protected": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.ValidateToken(System.String,Microsoft.IdentityModel.Tokens.TokenValidationParameters,Microsoft.IdentityModel.Tokens.SecurityToken@)"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var principal = new JwtSecurityTokenHandler { MapInboundClaims = false }.ValidateToken(token, new TokenValidationParameters\r\n            {\r\n                ValidIssuer = _o.Issuer,\r\n                ValidAudience = _o.Audience \u002B \u0022.2fa\u0022,\r\n                IssuerSigningKey = CreateKey(_o.Key),\r\n                ClockSkew = TimeSpan.FromSeconds(30),\r\n            }, out var validated);",
+            "protectedSnippet": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.ValidateToken(System.String,Microsoft.IdentityModel.Tokens.TokenValidationParameters,Microsoft.IdentityModel.Tokens.SecurityToken@)",
+            "label": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.ValidateToken(System.String,Microsoft.IdentityModel.Tokens.TokenValidationParameters,Microsoft.IdentityModel.Tokens.SecurityToken@)",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 91,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "fd43646a-bb61-4ede-92cd-473181dadc6d",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.TwoFactorPurpose),\r\n        };",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.TwoFactorPurpose),\r\n        };",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 76,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "484558b4-bfb5-4341-9155-19d26aeabc9b",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.TwoFactorPurpose),\r\n        };",
+              "protected": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.TwoFactorPurpose),\r\n        };",
+            "protectedSnippet": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti",
+            "label": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 76,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "c6a35d21-e55b-4a9b-b9c9-b90963b95649",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.TwoFactorPurpose),\r\n        };",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.TwoFactorPurpose),\r\n        };",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 76,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "82b1787d-93b2-494a-b86f-8966826d8592",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.TwoFactorPurpose),\r\n        };",
+              "protected": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.TwoFactorPurpose),\r\n        };",
+            "protectedSnippet": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub",
+            "label": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 76,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "27fc4631-22d7-48d3-abca-d1a775f16478",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(ClaimTypes.Name, user.UserName ?? \u0022\u0022),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.AccessPurpose),\r\n        };",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(ClaimTypes.Name, user.UserName ?? \u0022\u0022),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.AccessPurpose),\r\n        };",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 48,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "53152281-e42d-4e03-92d4-b7a2c007dcc3",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(ClaimTypes.Name, user.UserName ?? \u0022\u0022),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.AccessPurpose),\r\n        };",
+              "protected": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(ClaimTypes.Name, user.UserName ?? \u0022\u0022),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.AccessPurpose),\r\n        };",
+            "protectedSnippet": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti",
+            "label": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 48,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "a6f2b4f2-4d81-4617-8449-ce3ad62d1d4a",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(ClaimTypes.Name, user.UserName ?? \u0022\u0022),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.AccessPurpose),\r\n        };",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(ClaimTypes.Name, user.UserName ?? \u0022\u0022),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.AccessPurpose),\r\n        };",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 48,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "0cdd5f1d-f0e4-4b46-b870-1ae97b7876d6",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(ClaimTypes.Name, user.UserName ?? \u0022\u0022),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.AccessPurpose),\r\n        };",
+              "protected": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Auth\\TokenService.cs",
+            "snippet": "var claims = new List\u003CClaim\u003E\r\n        {\r\n            new(JwtRegisteredClaimNames.Sub, user.Id),\r\n            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),\r\n            new(ClaimTypes.Name, user.UserName ?? \u0022\u0022),\r\n            new(AppClaims.SecurityStamp, user.SecurityStamp ?? \u0022\u0022),\r\n            new(AppClaims.Purpose, AppClaims.AccessPurpose),\r\n        };",
+            "protectedSnippet": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub",
+            "label": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub",
+            "properties": {
+              "CharCount": "4988"
+            },
+            "line": 48,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "c9a79783-65ab-495a-9a00-33c9a38e6e12",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: Exception diagnostics are suppressed when IExceptionHandler.TryHandleAsync returns true ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "app.UseExceptionHandler();",
+              "protected": "M:Microsoft.AspNetCore.Builder.ExceptionHandlerExtensions.UseExceptionHandler(Microsoft.AspNetCore.Builder.IApplicationBuilder)"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "app.UseExceptionHandler();",
+            "protectedSnippet": "M:Microsoft.AspNetCore.Builder.ExceptionHandlerExtensions.UseExceptionHandler(Microsoft.AspNetCore.Builder.IApplicationBuilder)",
+            "label": "M:Microsoft.AspNetCore.Builder.ExceptionHandlerExtensions.UseExceptionHandler(Microsoft.AspNetCore.Builder.IApplicationBuilder)",
+            "properties": {
+              "CharCount": "3937"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/aspnet-core/10/exception-handler-diagnostics-suppressed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 97,
+            "column": 4
+          }
+        },
+        {
+          "incidentId": "1b3a7751-e455-4e7a-a6b7-8259a2636731",
+          "ruleId": "Api.0001",
+          "description": "Breaking change: DynamicallyAccessedMembers annotation removed from trim-unsafe configuration APIs ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services.Configure\u003CCompanyOptions\u003E(builder.Configuration.GetSection(\u0022Company\u0022));",
+              "protected": "M:Microsoft.Extensions.DependencyInjection.OptionsConfigurationServiceCollectionExtensions.Configure\u0060\u00601(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "builder.Services.Configure\u003CCompanyOptions\u003E(builder.Configuration.GetSection(\u0022Company\u0022));",
+            "protectedSnippet": "M:Microsoft.Extensions.DependencyInjection.OptionsConfigurationServiceCollectionExtensions.Configure\u0060\u00601(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)",
+            "label": "M:Microsoft.Extensions.DependencyInjection.OptionsConfigurationServiceCollectionExtensions.Configure\u0060\u00601(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)",
+            "properties": {
+              "CharCount": "3937"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/extensions/10.0/dynamically-accessed-members-configuration.md",
+                "isCustom": false
+              }
+            ],
+            "line": 73,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "799332bf-e462-4541-bcad-2d8ad333106c",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "properties": {
+              "CharCount": "3937"
+            },
+            "line": 55,
+            "column": 16
+          }
+        },
+        {
+          "incidentId": "46911a59-8f56-464f-8a27-dadb35579569",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);",
+              "protected": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);",
+            "protectedSnippet": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub",
+            "label": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub",
+            "properties": {
+              "CharCount": "3937"
+            },
+            "line": 55,
+            "column": 16
+          }
+        },
+        {
+          "incidentId": "d96faa13-e36f-4321-a749-655e9dded43f",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6. Add package reference to Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };",
+              "protected": "P:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents.OnTokenValidated"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };",
+            "protectedSnippet": "P:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents.OnTokenValidated",
+            "label": "P:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents.OnTokenValidated",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 44,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "d217dc89-0581-45d0-8dcd-50b6a9814283",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6. Add package reference to Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };",
+              "protected": "T:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };",
+            "protectedSnippet": "T:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents",
+            "label": "T:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 44,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "4c85ef74-e2d8-4d6c-a854-640a3ea040c9",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6. Add package reference to Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };",
+              "protected": "M:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents.#ctor"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };",
+            "protectedSnippet": "M:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents.#ctor",
+            "label": "M:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents.#ctor",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 44,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "2586aa88-bca1-4936-bccb-53bb20e42a56",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6. Add package reference to Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };",
+              "protected": "T:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };",
+            "protectedSnippet": "T:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents",
+            "label": "T:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 44,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "77f3589a-1a08-4363-80de-44e634770331",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6. Add package reference to Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };",
+              "protected": "P:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerOptions.Events"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };",
+            "protectedSnippet": "P:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerOptions.Events",
+            "label": "P:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerOptions.Events",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 44,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "ca5b7a27-4ab4-4bde-9916-9f4c1c70862a",
+          "ruleId": "Api.0002",
+          "description": "Breaking change: New TimeSpan.From*() overloads that take integers ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "o.TokenValidationParameters = new TokenValidationParameters\r\n        {\r\n            ValidIssuer = jwt.Issuer,\r\n            ValidAudience = jwt.Audience,\r\n            IssuerSigningKey = TokenService.CreateKey(jwt.Key),\r\n            NameClaimType = ClaimTypes.Name,\r\n            RoleClaimType = ClaimTypes.Role,\r\n            ClockSkew = TimeSpan.FromSeconds(30),\r\n        };",
+              "protected": "M:System.TimeSpan.FromSeconds(System.Double)"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "o.TokenValidationParameters = new TokenValidationParameters\r\n        {\r\n            ValidIssuer = jwt.Issuer,\r\n            ValidAudience = jwt.Audience,\r\n            IssuerSigningKey = TokenService.CreateKey(jwt.Key),\r\n            NameClaimType = ClaimTypes.Name,\r\n            RoleClaimType = ClaimTypes.Role,\r\n            ClockSkew = TimeSpan.FromSeconds(30),\r\n        };",
+            "protectedSnippet": "M:System.TimeSpan.FromSeconds(System.Double)",
+            "label": "M:System.TimeSpan.FromSeconds(System.Double)",
+            "properties": {
+              "CharCount": "3937"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/9.0/timespan-from-overloads.md",
+                "isCustom": false
+              }
+            ],
+            "line": 35,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "767027f3-4746-4774-ac41-72da9deaff54",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6. Add package reference to Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "o.TokenValidationParameters = new TokenValidationParameters\r\n        {\r\n            ValidIssuer = jwt.Issuer,\r\n            ValidAudience = jwt.Audience,\r\n            IssuerSigningKey = TokenService.CreateKey(jwt.Key),\r\n            NameClaimType = ClaimTypes.Name,\r\n            RoleClaimType = ClaimTypes.Role,\r\n            ClockSkew = TimeSpan.FromSeconds(30),\r\n        };",
+              "protected": "P:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerOptions.TokenValidationParameters"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "o.TokenValidationParameters = new TokenValidationParameters\r\n        {\r\n            ValidIssuer = jwt.Issuer,\r\n            ValidAudience = jwt.Audience,\r\n            IssuerSigningKey = TokenService.CreateKey(jwt.Key),\r\n            NameClaimType = ClaimTypes.Name,\r\n            RoleClaimType = ClaimTypes.Role,\r\n            ClockSkew = TimeSpan.FromSeconds(30),\r\n        };",
+            "protectedSnippet": "P:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerOptions.TokenValidationParameters",
+            "label": "P:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerOptions.TokenValidationParameters",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 35,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "ab0dffb8-8bd1-49a2-8e3d-4930fd34f7c2",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6. Add package reference to Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "o.MapInboundClaims = false;",
+              "protected": "P:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerOptions.MapInboundClaims"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "o.MapInboundClaims = false;",
+            "protectedSnippet": "P:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerOptions.MapInboundClaims",
+            "label": "P:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerOptions.MapInboundClaims",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 34,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "faacd353-d1fc-4569-b288-e508fb2cf619",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6. Add package reference to Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services.AddOptions\u003CJwtBearerOptions\u003E(JwtBearerDefaults.AuthenticationScheme)\r\n    .Configure\u003CMicrosoft.Extensions.Options.IOptions\u003CJwtOptions\u003E\u003E((o, jwtOptions) =\u003E\r\n    {\r\n        var jwt = jwtOptions.Value;\r\n        o.MapInboundClaims = false;\r\n        o.TokenValidationParameters = new TokenValidationParameters\r\n        {\r\n            ValidIssuer = jwt.Issuer,\r\n            ValidAudience = jwt.Audience,\r\n            IssuerSigningKey = TokenService.CreateKey(jwt.Key),\r\n            NameClaimType = ClaimTypes.Name,\r\n            RoleClaimType = ClaimTypes.Role,\r\n            ClockSkew = TimeSpan.FromSeconds(30),\r\n        };\r\n        o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };\r\n    });",
+              "protected": "T:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "builder.Services.AddOptions\u003CJwtBearerOptions\u003E(JwtBearerDefaults.AuthenticationScheme)\r\n    .Configure\u003CMicrosoft.Extensions.Options.IOptions\u003CJwtOptions\u003E\u003E((o, jwtOptions) =\u003E\r\n    {\r\n        var jwt = jwtOptions.Value;\r\n        o.MapInboundClaims = false;\r\n        o.TokenValidationParameters = new TokenValidationParameters\r\n        {\r\n            ValidIssuer = jwt.Issuer,\r\n            ValidAudience = jwt.Audience,\r\n            IssuerSigningKey = TokenService.CreateKey(jwt.Key),\r\n            NameClaimType = ClaimTypes.Name,\r\n            RoleClaimType = ClaimTypes.Role,\r\n            ClockSkew = TimeSpan.FromSeconds(30),\r\n        };\r\n        o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };\r\n    });",
+            "protectedSnippet": "T:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults",
+            "label": "T:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 30,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "8c2d7ee6-fcbd-422a-bba3-2aeff558f7e6",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6. Add package reference to Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services.AddOptions\u003CJwtBearerOptions\u003E(JwtBearerDefaults.AuthenticationScheme)\r\n    .Configure\u003CMicrosoft.Extensions.Options.IOptions\u003CJwtOptions\u003E\u003E((o, jwtOptions) =\u003E\r\n    {\r\n        var jwt = jwtOptions.Value;\r\n        o.MapInboundClaims = false;\r\n        o.TokenValidationParameters = new TokenValidationParameters\r\n        {\r\n            ValidIssuer = jwt.Issuer,\r\n            ValidAudience = jwt.Audience,\r\n            IssuerSigningKey = TokenService.CreateKey(jwt.Key),\r\n            NameClaimType = ClaimTypes.Name,\r\n            RoleClaimType = ClaimTypes.Role,\r\n            ClockSkew = TimeSpan.FromSeconds(30),\r\n        };\r\n        o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };\r\n    });",
+              "protected": "F:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "builder.Services.AddOptions\u003CJwtBearerOptions\u003E(JwtBearerDefaults.AuthenticationScheme)\r\n    .Configure\u003CMicrosoft.Extensions.Options.IOptions\u003CJwtOptions\u003E\u003E((o, jwtOptions) =\u003E\r\n    {\r\n        var jwt = jwtOptions.Value;\r\n        o.MapInboundClaims = false;\r\n        o.TokenValidationParameters = new TokenValidationParameters\r\n        {\r\n            ValidIssuer = jwt.Issuer,\r\n            ValidAudience = jwt.Audience,\r\n            IssuerSigningKey = TokenService.CreateKey(jwt.Key),\r\n            NameClaimType = ClaimTypes.Name,\r\n            RoleClaimType = ClaimTypes.Role,\r\n            ClockSkew = TimeSpan.FromSeconds(30),\r\n        };\r\n        o.Events = new JwtBearerEvents\r\n        {\r\n            OnTokenValidated = async ctx =\u003E\r\n            {\r\n                var principal = ctx.Principal!;\r\n                if (principal.FindFirstValue(AppClaims.Purpose) != AppClaims.AccessPurpose)\r\n                {\r\n                    ctx.Fail(\u0022Invalid token purpose.\u0022);\r\n                    return;\r\n                }\r\n                var users = ctx.HttpContext.RequestServices.GetRequiredService\u003CUserManager\u003CApplicationUser\u003E\u003E();\r\n                var user = await users.FindByIdAsync(principal.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? \u0022\u0022);\r\n                if (user is null\r\n                    || user.SecurityStamp != principal.FindFirstValue(AppClaims.SecurityStamp)\r\n                    || await users.IsLockedOutAsync(user))\r\n                {\r\n                    ctx.Fail(\u0022Token revoked.\u0022);\r\n                }\r\n            },\r\n        };\r\n    });",
+            "protectedSnippet": "F:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme",
+            "label": "F:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 30,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "89674bbf-0a29-489b-8e1d-c084d345cc0b",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6. Add package reference to Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();",
+              "protected": "T:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();",
+            "protectedSnippet": "T:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults",
+            "label": "T:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 29,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "1f5e1d46-65de-4c51-bf99-c1e9dfa02692",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6. Add package reference to Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();",
+              "protected": "F:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();",
+            "protectedSnippet": "F:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme",
+            "label": "F:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 29,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "29fda6db-1a96-46e9-8102-1be642c0f810",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6. Add package reference to Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();",
+              "protected": "T:Microsoft.Extensions.DependencyInjection.JwtBearerExtensions"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();",
+            "protectedSnippet": "T:Microsoft.Extensions.DependencyInjection.JwtBearerExtensions",
+            "label": "T:Microsoft.Extensions.DependencyInjection.JwtBearerExtensions",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 29,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "f99155e2-5b20-4a08-a782-e5751315806b",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6. Add package reference to Microsoft.AspNetCore.Authentication.JwtBearer, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();",
+              "protected": "M:Microsoft.Extensions.DependencyInjection.JwtBearerExtensions.AddJwtBearer(Microsoft.AspNetCore.Authentication.AuthenticationBuilder)"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();",
+            "protectedSnippet": "M:Microsoft.Extensions.DependencyInjection.JwtBearerExtensions.AddJwtBearer(Microsoft.AspNetCore.Authentication.AuthenticationBuilder)",
+            "label": "M:Microsoft.Extensions.DependencyInjection.JwtBearerExtensions.AddJwtBearer(Microsoft.AspNetCore.Authentication.AuthenticationBuilder)",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Authentication.JwtBearer",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 29,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "edec8de0-2b0f-42df-a310-28ce91607bc5",
+          "ruleId": "Api.0001",
+          "description": "Breaking change: DynamicallyAccessedMembers annotation removed from trim-unsafe configuration APIs ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services.Configure\u003CJwtOptions\u003E(builder.Configuration.GetSection(\u0022Jwt\u0022));",
+              "protected": "M:Microsoft.Extensions.DependencyInjection.OptionsConfigurationServiceCollectionExtensions.Configure\u0060\u00601(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "builder.Services.Configure\u003CJwtOptions\u003E(builder.Configuration.GetSection(\u0022Jwt\u0022));",
+            "protectedSnippet": "M:Microsoft.Extensions.DependencyInjection.OptionsConfigurationServiceCollectionExtensions.Configure\u0060\u00601(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)",
+            "label": "M:Microsoft.Extensions.DependencyInjection.OptionsConfigurationServiceCollectionExtensions.Configure\u0060\u00601(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)",
+            "properties": {
+              "CharCount": "3937"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/extensions/10.0/dynamically-accessed-members-configuration.md",
+                "isCustom": false
+              }
+            ],
+            "line": 27,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "90282a3a-8c56-4453-b802-f6bd0a59a0dd",
+          "ruleId": "Api.0002",
+          "description": "Breaking change: New TimeSpan.From*() overloads that take integers ",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);",
+              "protected": "M:System.TimeSpan.FromMinutes(System.Double)"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);",
+            "protectedSnippet": "M:System.TimeSpan.FromMinutes(System.Double)",
+            "label": "M:System.TimeSpan.FromMinutes(System.Double)",
+            "properties": {
+              "CharCount": "3937"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/9.0/timespan-from-overloads.md",
+                "isCustom": false
+              }
+            ],
+            "line": 20,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "fe42b81e-dedb-428d-a698-05e0a655e62e",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Identity.EntityFrameworkCore, 8.0.6. Add package reference to Microsoft.AspNetCore.Identity.EntityFrameworkCore, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services.AddIdentityCore\u003CApplicationUser\u003E(o =\u003E\r\n    {\r\n        o.User.RequireUniqueEmail = true;\r\n        o.Password.RequiredLength = 10;\r\n        o.Lockout.MaxFailedAccessAttempts = 5;\r\n        o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);\r\n        o.Lockout.AllowedForNewUsers = true;\r\n    })\r\n    .AddRoles\u003CIdentityRole\u003E()\r\n    .AddEntityFrameworkStores\u003CAppDbContext\u003E()\r\n    .AddDefaultTokenProviders();",
+              "protected": "T:Microsoft.Extensions.DependencyInjection.IdentityEntityFrameworkBuilderExtensions"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "builder.Services.AddIdentityCore\u003CApplicationUser\u003E(o =\u003E\r\n    {\r\n        o.User.RequireUniqueEmail = true;\r\n        o.Password.RequiredLength = 10;\r\n        o.Lockout.MaxFailedAccessAttempts = 5;\r\n        o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);\r\n        o.Lockout.AllowedForNewUsers = true;\r\n    })\r\n    .AddRoles\u003CIdentityRole\u003E()\r\n    .AddEntityFrameworkStores\u003CAppDbContext\u003E()\r\n    .AddDefaultTokenProviders();",
+            "protectedSnippet": "T:Microsoft.Extensions.DependencyInjection.IdentityEntityFrameworkBuilderExtensions",
+            "label": "T:Microsoft.Extensions.DependencyInjection.IdentityEntityFrameworkBuilderExtensions",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Identity.EntityFrameworkCore",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 15,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "b6998be2-6f86-48ed-8523-da67384b9a2f",
+          "ruleId": "Api.0002",
+          "description": "API is available in package Microsoft.AspNetCore.Identity.EntityFrameworkCore, 8.0.6. Add package reference to Microsoft.AspNetCore.Identity.EntityFrameworkCore, 8.0.6",
+          "projectPath": "PropertyAdmin.Api\\PropertyAdmin.Api.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services.AddIdentityCore\u003CApplicationUser\u003E(o =\u003E\r\n    {\r\n        o.User.RequireUniqueEmail = true;\r\n        o.Password.RequiredLength = 10;\r\n        o.Lockout.MaxFailedAccessAttempts = 5;\r\n        o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);\r\n        o.Lockout.AllowedForNewUsers = true;\r\n    })\r\n    .AddRoles\u003CIdentityRole\u003E()\r\n    .AddEntityFrameworkStores\u003CAppDbContext\u003E()\r\n    .AddDefaultTokenProviders();",
+              "protected": "M:Microsoft.Extensions.DependencyInjection.IdentityEntityFrameworkBuilderExtensions.AddEntityFrameworkStores\u0060\u00601(Microsoft.AspNetCore.Identity.IdentityBuilder)"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Api\\Program.cs",
+            "snippet": "builder.Services.AddIdentityCore\u003CApplicationUser\u003E(o =\u003E\r\n    {\r\n        o.User.RequireUniqueEmail = true;\r\n        o.Password.RequiredLength = 10;\r\n        o.Lockout.MaxFailedAccessAttempts = 5;\r\n        o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);\r\n        o.Lockout.AllowedForNewUsers = true;\r\n    })\r\n    .AddRoles\u003CIdentityRole\u003E()\r\n    .AddEntityFrameworkStores\u003CAppDbContext\u003E()\r\n    .AddDefaultTokenProviders();",
+            "protectedSnippet": "M:Microsoft.Extensions.DependencyInjection.IdentityEntityFrameworkBuilderExtensions.AddEntityFrameworkStores\u0060\u00601(Microsoft.AspNetCore.Identity.IdentityBuilder)",
+            "label": "M:Microsoft.Extensions.DependencyInjection.IdentityEntityFrameworkBuilderExtensions.AddEntityFrameworkStores\u0060\u00601(Microsoft.AspNetCore.Identity.IdentityBuilder)",
+            "properties": {
+              "PackageId": "Microsoft.AspNetCore.Identity.EntityFrameworkCore",
+              "PackageNewVersion": "8.0.6",
+              "CharCount": "3937"
+            },
+            "line": 15,
+            "column": 0
+          }
+        }
+      ],
+      "features": [
+        {
+          "featureId": "IdentityModel",
+          "incidents": [
+            "46911a59-8f56-464f-8a27-dadb35579569",
+            "799332bf-e462-4541-bcad-2d8ad333106c",
+            "0cdd5f1d-f0e4-4b46-b870-1ae97b7876d6",
+            "a6f2b4f2-4d81-4617-8449-ce3ad62d1d4a",
+            "53152281-e42d-4e03-92d4-b7a2c007dcc3",
+            "27fc4631-22d7-48d3-abca-d1a775f16478",
+            "82b1787d-93b2-494a-b86f-8966826d8592",
+            "c6a35d21-e55b-4a9b-b9c9-b90963b95649",
+            "484558b4-bfb5-4341-9155-19d26aeabc9b",
+            "fd43646a-bb61-4ede-92cd-473181dadc6d",
+            "cd97ce2f-d616-4d37-af23-fecc5f6d0634",
+            "66889850-09e6-400e-85c3-680b6e418045",
+            "c65790d9-cb82-45a2-8f39-a9d614dfc50d",
+            "ea16022d-8f1e-4fb0-a74c-31f6b9411ef3",
+            "f3bec46f-b3df-486f-8ed1-190ff43e593d",
+            "7816f0f0-619b-4871-b6f8-05b517567a65",
+            "2af49aef-2a9d-4e4a-9823-cdb71e4fae1e",
+            "ce236e40-a521-4a8a-8069-3bb373da1a7e",
+            "161f5ad1-61b8-42da-be5b-88cbcdb6a973",
+            "fec8a644-28c1-4c97-9203-a9ebb80384b7",
+            "07fb38dd-c1d5-426d-ad7f-d12fbc8ef79b",
+            "6bac36f6-f4cd-46a6-bfea-7b020726437d",
+            "89964429-851f-4e73-ac33-d7873117b0a0",
+            "692bfb4c-b266-457e-bf5f-310cf3ec6caa",
+            "fd40511d-fa22-439a-bd96-1b50ab0677cc"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "PropertyAdmin.Contracts\\PropertyAdmin.Contracts.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "PropertyAdmin.Contracts",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 2,
+        "numberOfCodeFiles": 2,
+        "linesTotal": 72,
+        "linesOfCode": 72,
+        "totalApiScanned": 1650,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "36ea25d6-bde0-4a0a-ae18-a10a5a6064a0",
+          "ruleId": "Project.0002",
+          "projectPath": "PropertyAdmin.Contracts\\PropertyAdmin.Contracts.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Contracts\\PropertyAdmin.Contracts.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "PropertyAdmin.Tests\\PropertyAdmin.Tests.csproj",
+      "startingProject": true,
+      "issues": 2,
+      "storyPoints": 2,
+      "properties": {
+        "appName": "PropertyAdmin.Tests",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": true,
+        "numberOfFiles": 2,
+        "numberOfCodeFiles": 0,
+        "linesTotal": 1775,
+        "linesOfCode": 0,
+        "totalApiScanned": 1,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "376eb72d-768e-45e3-8597-3e9eea1f92e5",
+          "ruleId": "NuGet.0005",
+          "projectPath": "PropertyAdmin.Tests\\PropertyAdmin.Tests.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "xunit, 2.5.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3",
+              "protected": "xunit, 2.5.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Tests\\PropertyAdmin.Tests.csproj",
+            "snippet": "xunit, 2.5.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3",
+            "protectedSnippet": "xunit, 2.5.3\n\nRecommendation:\n\nThis package will only be updated for security issues. All future feature work has moved onto v3.\n\nGuide for migrating from xUnit.net v2 to v3: https://xunit.net/docs/getting-started/v3/migration\nRemove xunit, and replace with new package xunit, 2.9.3",
+            "label": "xunit 2.5.3",
+            "properties": {
+              "PackageId": "xunit",
+              "PackageVersion": "2.5.3",
+              "PackageNewVersion": null,
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "e620bc61-b268-422f-b554-8dec7e5dac68",
+          "ruleId": "Project.0002",
+          "projectPath": "PropertyAdmin.Tests\\PropertyAdmin.Tests.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "PropertyAdmin.Tests\\PropertyAdmin.Tests.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "test application for development team\\test application for development team.csproj",
+      "startingProject": true,
+      "issues": 6,
+      "storyPoints": 35,
+      "properties": {
+        "appName": "test application for development team",
+        "projectKind": "AspNetCore",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "isTestProject": false,
+        "numberOfFiles": 60,
+        "numberOfCodeFiles": 55,
+        "linesTotal": 2397,
+        "linesOfCode": 2350,
+        "totalApiScanned": 20350,
+        "minLinesOfCodeToChange": 32,
+        "maxLinesOfCodeToChange": 32
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "cdb60a15-acd4-4942-a0b2-5cbccfc2fd0a",
+          "ruleId": "NuGet.0001",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets, 1.24.2-preview.1\n\nRecommendation:\n\nNo supported version found",
+              "protected": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets, 1.24.2-preview.1\n\nRecommendation:\n\nNo supported version found"
+            },
+            "kind": "File",
+            "path": "test application for development team\\test application for development team.csproj",
+            "snippet": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets, 1.24.2-preview.1\n\nRecommendation:\n\nNo supported version found",
+            "protectedSnippet": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets, 1.24.2-preview.1\n\nRecommendation:\n\nNo supported version found",
+            "label": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets 1.24.2-preview.1",
+            "properties": {
+              "PackageId": "Microsoft.VisualStudio.Azure.Containers.Tools.Targets",
+              "PackageVersion": "1.24.2-preview.1",
+              "PackageNewVersion": null,
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "aff4a4f1-02e5-4712-8381-81f502bfe72b",
+          "ruleId": "NuGet.0005",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "System.IdentityModel.Tokens.Jwt, 7.1.2\n\nRecommendation:\n\nMove to latest https://aka.ms/IdentityModel/LTS\nRemove System.IdentityModel.Tokens.Jwt, and replace with new package System.IdentityModel.Tokens.Jwt, 8.23.0",
+              "protected": "System.IdentityModel.Tokens.Jwt, 7.1.2\n\nRecommendation:\n\nMove to latest https://aka.ms/IdentityModel/LTS\nRemove System.IdentityModel.Tokens.Jwt, and replace with new package System.IdentityModel.Tokens.Jwt, 8.23.0"
+            },
+            "kind": "File",
+            "path": "test application for development team\\test application for development team.csproj",
+            "snippet": "System.IdentityModel.Tokens.Jwt, 7.1.2\n\nRecommendation:\n\nMove to latest https://aka.ms/IdentityModel/LTS\nRemove System.IdentityModel.Tokens.Jwt, and replace with new package System.IdentityModel.Tokens.Jwt, 8.23.0",
+            "protectedSnippet": "System.IdentityModel.Tokens.Jwt, 7.1.2\n\nRecommendation:\n\nMove to latest https://aka.ms/IdentityModel/LTS\nRemove System.IdentityModel.Tokens.Jwt, and replace with new package System.IdentityModel.Tokens.Jwt, 8.23.0",
+            "label": "System.IdentityModel.Tokens.Jwt 7.1.2",
+            "properties": {
+              "PackageId": "System.IdentityModel.Tokens.Jwt",
+              "PackageVersion": "7.1.2",
+              "PackageNewVersion": null,
+              "PackageReplacements": null
+            }
+          }
+        },
+        {
+          "incidentId": "43989388-a6da-4afa-ba0f-b57b9f39121d",
+          "ruleId": "Project.0002",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Current target framework: net8.0\nRecommended target framework: net10.0",
+              "protected": "Current target framework: net8.0\nRecommended target framework: net10.0"
+            },
+            "kind": "File",
+            "path": "test application for development team\\test application for development team.csproj",
+            "snippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "protectedSnippet": "Current target framework: net8.0\nRecommended target framework: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        },
+        {
+          "incidentId": "eb98870d-43fb-4f87-a66a-3c0beeebebb9",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var parts = values.Where(v =\u003E v.Value is not null).Select(v =\u003E $\u0022{v.Key}={Uri.EscapeDataString(Format(v.Value!))}\u0022).ToList();",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\Query.cs",
+            "snippet": "var parts = values.Where(v =\u003E v.Value is not null).Select(v =\u003E $\u0022{v.Key}={Uri.EscapeDataString(Format(v.Value!))}\u0022).ToList();",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "properties": {
+              "CharCount": "716"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 8,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "b3ae9a0d-838d-4540-9458-7d40932e704e",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "switch (c.Type)\r\n            {\r\n                case ClaimTypes.Name: claims.Add(new Claim(ClaimTypes.Name, c.Value)); break;\r\n                case ClaimTypes.Role: claims.Add(new Claim(ClaimTypes.Role, c.Value)); break;\r\n                case Permissions.ClaimType: claims.Add(new Claim(Permissions.ClaimType, c.Value)); break;\r\n                case AuthConstants.OwnerIdClaim: claims.Add(new Claim(AuthConstants.OwnerIdClaim, c.Value)); break;\r\n                case JwtRegisteredClaimNames.Sub: claims.Add(new Claim(ClaimTypes.NameIdentifier, c.Value)); break;\r\n            }",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\AuthServices.cs",
+            "snippet": "switch (c.Type)\r\n            {\r\n                case ClaimTypes.Name: claims.Add(new Claim(ClaimTypes.Name, c.Value)); break;\r\n                case ClaimTypes.Role: claims.Add(new Claim(ClaimTypes.Role, c.Value)); break;\r\n                case Permissions.ClaimType: claims.Add(new Claim(Permissions.ClaimType, c.Value)); break;\r\n                case AuthConstants.OwnerIdClaim: claims.Add(new Claim(AuthConstants.OwnerIdClaim, c.Value)); break;\r\n                case JwtRegisteredClaimNames.Sub: claims.Add(new Claim(ClaimTypes.NameIdentifier, c.Value)); break;\r\n            }",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames",
+            "properties": {
+              "CharCount": "3992"
+            },
+            "line": 43,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "1e249072-03d7-46ad-a04b-380559eab419",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "switch (c.Type)\r\n            {\r\n                case ClaimTypes.Name: claims.Add(new Claim(ClaimTypes.Name, c.Value)); break;\r\n                case ClaimTypes.Role: claims.Add(new Claim(ClaimTypes.Role, c.Value)); break;\r\n                case Permissions.ClaimType: claims.Add(new Claim(Permissions.ClaimType, c.Value)); break;\r\n                case AuthConstants.OwnerIdClaim: claims.Add(new Claim(AuthConstants.OwnerIdClaim, c.Value)); break;\r\n                case JwtRegisteredClaimNames.Sub: claims.Add(new Claim(ClaimTypes.NameIdentifier, c.Value)); break;\r\n            }",
+              "protected": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\AuthServices.cs",
+            "snippet": "switch (c.Type)\r\n            {\r\n                case ClaimTypes.Name: claims.Add(new Claim(ClaimTypes.Name, c.Value)); break;\r\n                case ClaimTypes.Role: claims.Add(new Claim(ClaimTypes.Role, c.Value)); break;\r\n                case Permissions.ClaimType: claims.Add(new Claim(Permissions.ClaimType, c.Value)); break;\r\n                case AuthConstants.OwnerIdClaim: claims.Add(new Claim(AuthConstants.OwnerIdClaim, c.Value)); break;\r\n                case JwtRegisteredClaimNames.Sub: claims.Add(new Claim(ClaimTypes.NameIdentifier, c.Value)); break;\r\n            }",
+            "protectedSnippet": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub",
+            "label": "F:System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub",
+            "properties": {
+              "CharCount": "3992"
+            },
+            "line": 43,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "0d6ee21d-e996-434a-947f-021f26977beb",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "foreach (var c in jwt.Claims)\r\n        {\r\n            switch (c.Type)\r\n            {\r\n                case ClaimTypes.Name: claims.Add(new Claim(ClaimTypes.Name, c.Value)); break;\r\n                case ClaimTypes.Role: claims.Add(new Claim(ClaimTypes.Role, c.Value)); break;\r\n                case Permissions.ClaimType: claims.Add(new Claim(Permissions.ClaimType, c.Value)); break;\r\n                case AuthConstants.OwnerIdClaim: claims.Add(new Claim(AuthConstants.OwnerIdClaim, c.Value)); break;\r\n                case JwtRegisteredClaimNames.Sub: claims.Add(new Claim(ClaimTypes.NameIdentifier, c.Value)); break;\r\n            }\r\n        }",
+              "protected": "P:System.IdentityModel.Tokens.Jwt.JwtSecurityToken.Claims"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\AuthServices.cs",
+            "snippet": "foreach (var c in jwt.Claims)\r\n        {\r\n            switch (c.Type)\r\n            {\r\n                case ClaimTypes.Name: claims.Add(new Claim(ClaimTypes.Name, c.Value)); break;\r\n                case ClaimTypes.Role: claims.Add(new Claim(ClaimTypes.Role, c.Value)); break;\r\n                case Permissions.ClaimType: claims.Add(new Claim(Permissions.ClaimType, c.Value)); break;\r\n                case AuthConstants.OwnerIdClaim: claims.Add(new Claim(AuthConstants.OwnerIdClaim, c.Value)); break;\r\n                case JwtRegisteredClaimNames.Sub: claims.Add(new Claim(ClaimTypes.NameIdentifier, c.Value)); break;\r\n            }\r\n        }",
+            "protectedSnippet": "P:System.IdentityModel.Tokens.Jwt.JwtSecurityToken.Claims",
+            "label": "P:System.IdentityModel.Tokens.Jwt.JwtSecurityToken.Claims",
+            "properties": {
+              "CharCount": "3992"
+            },
+            "line": 41,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "22448735-e287-49c4-acd9-94bee1112363",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var jwt = new JwtSecurityTokenHandler { MapInboundClaims = false }.ReadJwtToken(response.AccessToken);",
+              "protected": "P:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.MapInboundClaims"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\AuthServices.cs",
+            "snippet": "var jwt = new JwtSecurityTokenHandler { MapInboundClaims = false }.ReadJwtToken(response.AccessToken);",
+            "protectedSnippet": "P:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.MapInboundClaims",
+            "label": "P:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.MapInboundClaims",
+            "properties": {
+              "CharCount": "3992"
+            },
+            "line": 39,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "27963520-7873-4aed-b5e3-825eb19e7c2a",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var jwt = new JwtSecurityTokenHandler { MapInboundClaims = false }.ReadJwtToken(response.AccessToken);",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\AuthServices.cs",
+            "snippet": "var jwt = new JwtSecurityTokenHandler { MapInboundClaims = false }.ReadJwtToken(response.AccessToken);",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler",
+            "properties": {
+              "CharCount": "3992"
+            },
+            "line": 39,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "d920ea22-6718-4511-847f-a0d904804911",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var jwt = new JwtSecurityTokenHandler { MapInboundClaims = false }.ReadJwtToken(response.AccessToken);",
+              "protected": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.#ctor"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\AuthServices.cs",
+            "snippet": "var jwt = new JwtSecurityTokenHandler { MapInboundClaims = false }.ReadJwtToken(response.AccessToken);",
+            "protectedSnippet": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.#ctor",
+            "label": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.#ctor",
+            "properties": {
+              "CharCount": "3992"
+            },
+            "line": 39,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "1b712b09-651a-46ea-aa4a-a8039cd0a8e2",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var jwt = new JwtSecurityTokenHandler { MapInboundClaims = false }.ReadJwtToken(response.AccessToken);",
+              "protected": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityToken"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\AuthServices.cs",
+            "snippet": "var jwt = new JwtSecurityTokenHandler { MapInboundClaims = false }.ReadJwtToken(response.AccessToken);",
+            "protectedSnippet": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityToken",
+            "label": "T:System.IdentityModel.Tokens.Jwt.JwtSecurityToken",
+            "properties": {
+              "CharCount": "3992"
+            },
+            "line": 39,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "939cc0e4-c8f9-411f-88f0-9a2944f8cb2c",
+          "ruleId": "Api.0001",
+          "description": "API is unavailable in net8.0 ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var jwt = new JwtSecurityTokenHandler { MapInboundClaims = false }.ReadJwtToken(response.AccessToken);",
+              "protected": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.ReadJwtToken(System.String)"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\AuthServices.cs",
+            "snippet": "var jwt = new JwtSecurityTokenHandler { MapInboundClaims = false }.ReadJwtToken(response.AccessToken);",
+            "protectedSnippet": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.ReadJwtToken(System.String)",
+            "label": "M:System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.ReadJwtToken(System.String)",
+            "properties": {
+              "CharCount": "3992"
+            },
+            "line": 39,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "f09f054b-2747-48af-8dce-33674a8d1ce7",
+          "ruleId": "Api.0003",
+          "description": "Breaking change - Streaming HTTP responses enabled by default in browser HTTP clients ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "using var doc = JsonDocument.Parse(await r.Content.ReadAsStringAsync());",
+              "protected": "T:System.Net.Http.HttpContent"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\ApiClient.cs",
+            "snippet": "using var doc = JsonDocument.Parse(await r.Content.ReadAsStringAsync());",
+            "protectedSnippet": "T:System.Net.Http.HttpContent",
+            "label": "T:System.Net.Http.HttpContent",
+            "properties": {
+              "CharCount": "4678"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/default-http-streaming.md",
+                "isCustom": false
+              }
+            ],
+            "line": 86,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "899e0d24-7f14-4cac-9b1f-06e6a07d150c",
+          "ruleId": "Api.0003",
+          "description": "Nullable JsonDocument properties deserialize to JsonValueKind.Null ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "using var doc = JsonDocument.Parse(await r.Content.ReadAsStringAsync());",
+              "protected": "T:System.Text.Json.JsonDocument"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\ApiClient.cs",
+            "snippet": "using var doc = JsonDocument.Parse(await r.Content.ReadAsStringAsync());",
+            "protectedSnippet": "T:System.Text.Json.JsonDocument",
+            "label": "T:System.Text.Json.JsonDocument",
+            "properties": {
+              "CharCount": "4678"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/serialization/9.0/jsondocument-props.md",
+                "isCustom": false
+              }
+            ],
+            "line": 86,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "917cf48c-ba29-42c4-aace-d207aca89807",
+          "ruleId": "Api.0003",
+          "description": "Nullable JsonDocument properties deserialize to JsonValueKind.Null ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "using var doc = JsonDocument.Parse(await r.Content.ReadAsStringAsync());",
+              "protected": "T:System.Text.Json.JsonDocument"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\ApiClient.cs",
+            "snippet": "using var doc = JsonDocument.Parse(await r.Content.ReadAsStringAsync());",
+            "protectedSnippet": "T:System.Text.Json.JsonDocument",
+            "label": "T:System.Text.Json.JsonDocument",
+            "properties": {
+              "CharCount": "4678"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/serialization/9.0/jsondocument-props.md",
+                "isCustom": false
+              }
+            ],
+            "line": 86,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "d9de0241-bce8-421c-801b-d89385d05f3a",
+          "ruleId": "Api.0003",
+          "description": "Breaking change - Streaming HTTP responses enabled by default in browser HTTP clients ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "value = await r.Content.ReadFromJsonAsync\u003CT\u003E(Json);",
+              "protected": "T:System.Net.Http.HttpContent"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\ApiClient.cs",
+            "snippet": "value = await r.Content.ReadFromJsonAsync\u003CT\u003E(Json);",
+            "protectedSnippet": "T:System.Net.Http.HttpContent",
+            "label": "T:System.Net.Http.HttpContent",
+            "properties": {
+              "CharCount": "4678"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/default-http-streaming.md",
+                "isCustom": false
+              }
+            ],
+            "line": 70,
+            "column": 16
+          }
+        },
+        {
+          "incidentId": "a4b2bdf4-0157-4653-a27b-49c3d8952e77",
+          "ruleId": "Api.0003",
+          "description": "Breaking change - Streaming HTTP responses enabled by default in browser HTTP clients ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "if (r.StatusCode != HttpStatusCode.NoContent \u0026\u0026 r.Content.Headers.ContentLength != 0 \u0026\u0026 typeof(T) != typeof(object))\r\n                value = await r.Content.ReadFromJsonAsync\u003CT\u003E(Json);",
+              "protected": "T:System.Net.Http.HttpContent"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\ApiClient.cs",
+            "snippet": "if (r.StatusCode != HttpStatusCode.NoContent \u0026\u0026 r.Content.Headers.ContentLength != 0 \u0026\u0026 typeof(T) != typeof(object))\r\n                value = await r.Content.ReadFromJsonAsync\u003CT\u003E(Json);",
+            "protectedSnippet": "T:System.Net.Http.HttpContent",
+            "label": "T:System.Net.Http.HttpContent",
+            "properties": {
+              "CharCount": "4678"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/default-http-streaming.md",
+                "isCustom": false
+              }
+            ],
+            "line": 69,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "6578519c-9701-4527-ad0b-e6ddde3645cc",
+          "ruleId": "Api.0003",
+          "description": "Breaking change - Streaming HTTP responses enabled by default in browser HTTP clients ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "return (await r.Content.ReadAsByteArrayAsync(), name.Trim(\u0027\u0022\u0027));",
+              "protected": "T:System.Net.Http.HttpContent"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\ApiClient.cs",
+            "snippet": "return (await r.Content.ReadAsByteArrayAsync(), name.Trim(\u0027\u0022\u0027));",
+            "protectedSnippet": "T:System.Net.Http.HttpContent",
+            "label": "T:System.Net.Http.HttpContent",
+            "properties": {
+              "CharCount": "4678"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/default-http-streaming.md",
+                "isCustom": false
+              }
+            ],
+            "line": 55,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "060d573b-ab67-4c5a-8189-c49061f6953c",
+          "ruleId": "Api.0003",
+          "description": "Breaking change - Streaming HTTP responses enabled by default in browser HTTP clients ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var name = r.Content.Headers.ContentDisposition?.FileNameStar ?? r.Content.Headers.ContentDisposition?.FileName ?? \u0022file\u0022;",
+              "protected": "T:System.Net.Http.HttpContent"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\ApiClient.cs",
+            "snippet": "var name = r.Content.Headers.ContentDisposition?.FileNameStar ?? r.Content.Headers.ContentDisposition?.FileName ?? \u0022file\u0022;",
+            "protectedSnippet": "T:System.Net.Http.HttpContent",
+            "label": "T:System.Net.Http.HttpContent",
+            "properties": {
+              "CharCount": "4678"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/default-http-streaming.md",
+                "isCustom": false
+              }
+            ],
+            "line": 54,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "a1b314df-db58-4e53-ac9d-b1b655f9e2db",
+          "ruleId": "Api.0003",
+          "description": "Breaking change - Streaming HTTP responses enabled by default in browser HTTP clients ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var name = r.Content.Headers.ContentDisposition?.FileNameStar ?? r.Content.Headers.ContentDisposition?.FileName ?? \u0022file\u0022;",
+              "protected": "T:System.Net.Http.HttpContent"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\ApiClient.cs",
+            "snippet": "var name = r.Content.Headers.ContentDisposition?.FileNameStar ?? r.Content.Headers.ContentDisposition?.FileName ?? \u0022file\u0022;",
+            "protectedSnippet": "T:System.Net.Http.HttpContent",
+            "label": "T:System.Net.Http.HttpContent",
+            "properties": {
+              "CharCount": "4678"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/default-http-streaming.md",
+                "isCustom": false
+              }
+            ],
+            "line": 54,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "50313825-a59e-44a7-a9bd-40cd5a008e84",
+          "ruleId": "Api.0003",
+          "description": "Breaking change - Streaming HTTP responses enabled by default in browser HTTP clients ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "return (await r.Content.ReadFromJsonAsync\u003CT\u003E(Json))!;",
+              "protected": "T:System.Net.Http.HttpContent"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Services\\ApiClient.cs",
+            "snippet": "return (await r.Content.ReadFromJsonAsync\u003CT\u003E(Json))!;",
+            "protectedSnippet": "T:System.Net.Http.HttpContent",
+            "label": "T:System.Net.Http.HttpContent",
+            "properties": {
+              "CharCount": "4678"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/default-http-streaming.md",
+                "isCustom": false
+              }
+            ],
+            "line": 45,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "36bfb13e-7255-42ee-80e2-55015f75defd",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Existing = await Api.GetAsync\u003CUserDto\u003E($\u0022api/users/{Uri.EscapeDataString(Id)}\u0022);",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Pages\\Admin\\Users\\Users.cs",
+            "snippet": "Existing = await Api.GetAsync\u003CUserDto\u003E($\u0022api/users/{Uri.EscapeDataString(Id)}\u0022);",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "properties": {
+              "CharCount": "4222"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 91,
+            "column": 28
+          }
+        },
+        {
+          "incidentId": "896c6826-9057-457f-8bfe-894f410d02cf",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var r = await Api.PostAsync($\u0022api/users/{Uri.EscapeDataString(id)}/{action}\u0022, null);",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Pages\\Admin\\Users\\Users.cs",
+            "snippet": "var r = await Api.PostAsync($\u0022api/users/{Uri.EscapeDataString(id)}/{action}\u0022, null);",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "properties": {
+              "CharCount": "4222"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 83,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "0f80b03e-286a-4eaf-b33c-0e8e2eddd9bb",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var r = await Api.DeleteAsync($\u0022api/users/{Uri.EscapeDataString(id)}\u0022);",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Pages\\Admin\\Users\\Users.cs",
+            "snippet": "var r = await Api.DeleteAsync($\u0022api/users/{Uri.EscapeDataString(id)}\u0022);",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "properties": {
+              "CharCount": "4222"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 70,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "d6e88c26-c868-46ee-8807-bdef05c24c00",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var r = id is null\r\n                ? await Api.PostAsync(\u0022api/users\u0022, new UserCreateRequest(UserName, Email, Password!, OwnerId, Roles))\r\n                : await Api.PutAsync($\u0022api/users/{Uri.EscapeDataString(id)}\u0022, new UserUpdateRequest(Email, OwnerId, Roles, LockedOut));",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Pages\\Admin\\Users\\Users.cs",
+            "snippet": "var r = id is null\r\n                ? await Api.PostAsync(\u0022api/users\u0022, new UserCreateRequest(UserName, Email, Password!, OwnerId, Roles))\r\n                : await Api.PutAsync($\u0022api/users/{Uri.EscapeDataString(id)}\u0022, new UserUpdateRequest(Email, OwnerId, Roles, LockedOut));",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "properties": {
+              "CharCount": "4222"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 50,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "93306691-6a98-4b9f-8ecb-eb631ac5886a",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Existing = await Api.GetAsync\u003CUserDto\u003E($\u0022api/users/{Uri.EscapeDataString(id)}\u0022);",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Pages\\Admin\\Users\\Users.cs",
+            "snippet": "Existing = await Api.GetAsync\u003CUserDto\u003E($\u0022api/users/{Uri.EscapeDataString(id)}\u0022);",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "properties": {
+              "CharCount": "4222"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 38,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "0fa9867b-eddd-4500-9abe-7c16c17e3593",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var r = await Api.DeleteAsync($\u0022api/roles/{Uri.EscapeDataString(name)}\u0022);",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Pages\\Admin\\Roles.cshtml.cs",
+            "snippet": "var r = await Api.DeleteAsync($\u0022api/roles/{Uri.EscapeDataString(name)}\u0022);",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "properties": {
+              "CharCount": "2183"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 50,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "21904fdc-f3ff-4627-acdd-6b44277f119f",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var r = Original is null\r\n                ? await Api.PostAsync(\u0022api/roles\u0022, request)\r\n                : await Api.PutAsync($\u0022api/roles/{Uri.EscapeDataString(Original)}\u0022, request);",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Pages\\Admin\\Roles.cshtml.cs",
+            "snippet": "var r = Original is null\r\n                ? await Api.PostAsync(\u0022api/roles\u0022, request)\r\n                : await Api.PutAsync($\u0022api/roles/{Uri.EscapeDataString(Original)}\u0022, request);",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "properties": {
+              "CharCount": "2183"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 34,
+            "column": 12
+          }
+        },
+        {
+          "incidentId": "bf2d59fc-3088-4cc0-b838-ec657ec6f996",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: Exception diagnostics are suppressed when IExceptionHandler.TryHandleAsync returns true ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "app.UseExceptionHandler(\u0022/Error\u0022);",
+              "protected": "M:Microsoft.AspNetCore.Builder.ExceptionHandlerExtensions.UseExceptionHandler(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.String)"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Program.cs",
+            "snippet": "app.UseExceptionHandler(\u0022/Error\u0022);",
+            "protectedSnippet": "M:Microsoft.AspNetCore.Builder.ExceptionHandlerExtensions.UseExceptionHandler(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.String)",
+            "label": "M:Microsoft.AspNetCore.Builder.ExceptionHandlerExtensions.UseExceptionHandler(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.String)",
+            "properties": {
+              "CharCount": "3250"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/aspnet-core/10/exception-handler-diagnostics-suppressed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 69,
+            "column": 4
+          }
+        },
+        {
+          "incidentId": "feb6f96b-feb0-4482-8732-21ec95528767",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: Forwarded Headers Middleware ignores X-Forwarded-* headers from unknown proxies ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "app.UseForwardedHeaders();",
+              "protected": "M:Microsoft.AspNetCore.Builder.ForwardedHeadersExtensions.UseForwardedHeaders(Microsoft.AspNetCore.Builder.IApplicationBuilder)"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Program.cs",
+            "snippet": "app.UseForwardedHeaders();",
+            "protectedSnippet": "M:Microsoft.AspNetCore.Builder.ForwardedHeadersExtensions.UseForwardedHeaders(Microsoft.AspNetCore.Builder.IApplicationBuilder)",
+            "label": "M:Microsoft.AspNetCore.Builder.ForwardedHeadersExtensions.UseForwardedHeaders(Microsoft.AspNetCore.Builder.IApplicationBuilder)",
+            "properties": {
+              "CharCount": "3250"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/aspnet-core/8.0/forwarded-headers-unknown-proxies.md",
+                "isCustom": false
+              }
+            ],
+            "line": 66,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "d08bf655-8136-468e-82b6-c172ed2ad08d",
+          "ruleId": "Api.0002",
+          "description": "Breaking change: IPNetwork and ForwardedHeadersOptions.KnownNetworks are obsolete ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "o.KnownNetworks.Clear();",
+              "protected": "P:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownNetworks"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Program.cs",
+            "snippet": "o.KnownNetworks.Clear();",
+            "protectedSnippet": "P:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownNetworks",
+            "label": "P:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownNetworks",
+            "properties": {
+              "CharCount": "3250"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/aspnet-core/10/ipnetwork-knownnetworks-obsolete.md",
+                "isCustom": false
+              }
+            ],
+            "line": 60,
+            "column": 4
+          }
+        },
+        {
+          "incidentId": "aaf3acde-ffb2-4919-be9c-c7e5249886ad",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services.AddHttpClient\u003CApiClient\u003E(c =\u003E\r\n        c.BaseAddress = new Uri(builder.Configuration[\u0022Api:BaseUrl\u0022] ?? throw new InvalidOperationException(\u0022Api:BaseUrl is not configured.\u0022)))\r\n    .AddHttpMessageHandler\u003CAccessTokenHandler\u003E();",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Program.cs",
+            "snippet": "builder.Services.AddHttpClient\u003CApiClient\u003E(c =\u003E\r\n        c.BaseAddress = new Uri(builder.Configuration[\u0022Api:BaseUrl\u0022] ?? throw new InvalidOperationException(\u0022Api:BaseUrl is not configured.\u0022)))\r\n    .AddHttpMessageHandler\u003CAccessTokenHandler\u003E();",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "properties": {
+              "CharCount": "3250"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 53,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "b747cf84-0ee0-4bce-ae0b-6d4762fc580b",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services.AddHttpClient\u003CApiClient\u003E(c =\u003E\r\n        c.BaseAddress = new Uri(builder.Configuration[\u0022Api:BaseUrl\u0022] ?? throw new InvalidOperationException(\u0022Api:BaseUrl is not configured.\u0022)))\r\n    .AddHttpMessageHandler\u003CAccessTokenHandler\u003E();",
+              "protected": "M:System.Uri.#ctor(System.String)"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Program.cs",
+            "snippet": "builder.Services.AddHttpClient\u003CApiClient\u003E(c =\u003E\r\n        c.BaseAddress = new Uri(builder.Configuration[\u0022Api:BaseUrl\u0022] ?? throw new InvalidOperationException(\u0022Api:BaseUrl is not configured.\u0022)))\r\n    .AddHttpMessageHandler\u003CAccessTokenHandler\u003E();",
+            "protectedSnippet": "M:System.Uri.#ctor(System.String)",
+            "label": "M:System.Uri.#ctor(System.String)",
+            "properties": {
+              "CharCount": "3250"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 53,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "14fc9780-cc27-4fcb-99f5-ce93d21944ca",
+          "ruleId": "Api.0003",
+          "description": "Breaking change: URI length limits removed ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "builder.Services.AddHttpClient\u003CApiClient\u003E(c =\u003E\r\n        c.BaseAddress = new Uri(builder.Configuration[\u0022Api:BaseUrl\u0022] ?? throw new InvalidOperationException(\u0022Api:BaseUrl is not configured.\u0022)))\r\n    .AddHttpMessageHandler\u003CAccessTokenHandler\u003E();",
+              "protected": "T:System.Uri"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Program.cs",
+            "snippet": "builder.Services.AddHttpClient\u003CApiClient\u003E(c =\u003E\r\n        c.BaseAddress = new Uri(builder.Configuration[\u0022Api:BaseUrl\u0022] ?? throw new InvalidOperationException(\u0022Api:BaseUrl is not configured.\u0022)))\r\n    .AddHttpMessageHandler\u003CAccessTokenHandler\u003E();",
+            "protectedSnippet": "T:System.Uri",
+            "label": "T:System.Uri",
+            "properties": {
+              "CharCount": "3250"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/networking/10.0/uri-length-limits-removed.md",
+                "isCustom": false
+              }
+            ],
+            "line": 53,
+            "column": 0
+          }
+        },
+        {
+          "incidentId": "1c6b4d9a-1407-4247-9928-3adce589f081",
+          "ruleId": "Api.0001",
+          "description": "Breaking change: DynamicallyAccessedMembers annotation removed from trim-unsafe configuration APIs ",
+          "projectPath": "test application for development team\\test application for development team.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var cultures = builder.Configuration.GetSection(\u0022Localization:SupportedCultures\u0022).Get\u003Cstring[]\u003E() ?? [\u0022nl-NL\u0022, \u0022en-US\u0022];",
+              "protected": "M:Microsoft.Extensions.Configuration.ConfigurationBinder.Get\u0060\u00601(Microsoft.Extensions.Configuration.IConfiguration)"
+            },
+            "kind": "File",
+            "path": "test application for development team\\Program.cs",
+            "snippet": "var cultures = builder.Configuration.GetSection(\u0022Localization:SupportedCultures\u0022).Get\u003Cstring[]\u003E() ?? [\u0022nl-NL\u0022, \u0022en-US\u0022];",
+            "protectedSnippet": "M:Microsoft.Extensions.Configuration.ConfigurationBinder.Get\u0060\u00601(Microsoft.Extensions.Configuration.IConfiguration)",
+            "label": "M:Microsoft.Extensions.Configuration.ConfigurationBinder.Get\u0060\u00601(Microsoft.Extensions.Configuration.IConfiguration)",
+            "properties": {
+              "CharCount": "3250"
+            },
+            "links": [
+              {
+                "title": "API documentation",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/extensions/10.0/dynamically-accessed-members-configuration.md",
+                "isCustom": false
+              }
+            ],
+            "line": 9,
+            "column": 0
+          }
+        }
+      ],
+      "features": [
+        {
+          "featureId": "IdentityModel",
+          "incidents": [
+            "939cc0e4-c8f9-411f-88f0-9a2944f8cb2c",
+            "1b712b09-651a-46ea-aa4a-a8039cd0a8e2",
+            "d920ea22-6718-4511-847f-a0d904804911",
+            "27963520-7873-4aed-b5e3-825eb19e7c2a",
+            "22448735-e287-49c4-acd9-94bee1112363",
+            "0d6ee21d-e996-434a-947f-021f26977beb",
+            "1e249072-03d7-46ad-a04b-380559eab419",
+            "b3ae9a0d-838d-4540-9458-7d40932e704e"
+          ]
+        }
+      ]
+    }
+  ],
+  "rules": {
+    "Project.0002": {
+      "id": "Project.0002",
+      "isFeature": false,
+      "description": "Project\u0027s target framework(s) needs to be changed to the new target framework that you selected for this upgrade.\n\nDuring upgrade target framework will be adjusted to corresponding platform when applicable. In some cases project would result in multiple target frameworks after the upgrade if it was using features that now have their own platforms in modern .NET frameworks (windows, iOS, Android etc).",
+      "label": "Project\u0027s target framework(s) needs to be changed",
+      "severity": "Mandatory",
+      "effort": 1,
+      "links": [
+        {
+          "title": "Overview of porting from .NET Framework to .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265227",
+          "isCustom": false
+        },
+        {
+          "title": ".NET project SDKs",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265226",
+          "isCustom": false
+        }
+      ]
+    },
+    "NuGet.0002": {
+      "id": "NuGet.0002",
+      "isFeature": false,
+      "description": "NuGet package upgrade is recommended for selected target framework.\n\nStandard .NET packages are recommended to have versions matching version of .NET that project targets.\n\nSome other packages also are known to work better for selected target frameworks.",
+      "label": "NuGet package upgrade is recommended",
+      "severity": "Potential",
+      "effort": 1,
+      "links": [
+        {
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262530",
+          "isCustom": false
+        }
+      ]
+    },
+    "Api.0001": {
+      "id": "Api.0001",
+      "isFeature": false,
+      "description": "API is binary incompatible for selected .NET version: affects existing binaries, often requiring recompilation, because the API has changed in a way that prevents older binaries from loading or executing.",
+      "label": "Binary incompatible for selected .NET version",
+      "severity": "Mandatory",
+      "effort": 1,
+      "links": [
+        {
+          "title": "Breaking changes in .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262679",
+          "isCustom": false
+        }
+      ]
+    },
+    "Api.0002": {
+      "id": "Api.0002",
+      "isFeature": false,
+      "description": "API is source incompatible for selected .NET version: requires code changes to compile successfully when targeting a new version, such as removing obsolete APIs or changing method signatures.",
+      "label": "Source incompatible for selected .NET version",
+      "severity": "Potential",
+      "effort": 1,
+      "links": [
+        {
+          "title": "Breaking changes in .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262679",
+          "isCustom": false
+        }
+      ]
+    },
+    "Api.0003": {
+      "id": "Api.0003",
+      "isFeature": false,
+      "description": "API has a behavioral change in selected .NET version: code and binaries may behave differently at runtime without needing recompilation, but the new behavior might be undesirable and require updates.",
+      "label": "Behavioral change in selected .NET version",
+      "severity": "Potential",
+      "effort": 1
+    },
+    "IdentityModel": {
+      "id": "IdentityModel",
+      "isFeature": false,
+      "description": "Windows Identity Foundation (WIF), SAML, and claims-based authentication APIs that have been replaced by modern identity libraries. WIF was the original identity framework for .NET Framework. Migrate to Microsoft.IdentityModel.* packages (modern identity stack).",
+      "label": "IdentityModel \u0026 Claims-based Security",
+      "severity": "Mandatory",
+      "effort": 4,
+      "links": [
+        {
+          "title": "Microsoft.IdentityModel packages",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2341614",
+          "isCustom": false
+        }
+      ]
+    },
+    "NuGet.0005": {
+      "id": "NuGet.0005",
+      "isFeature": false,
+      "description": "NuGet package is deprecated.\n\nGo to its documentation and if there is a guidance for replacement of functionality provided by this package.",
+      "label": "NuGet package is deprecated",
+      "severity": "Optional",
+      "effort": 1,
+      "links": [
+        {
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262531",
+          "isCustom": false
+        }
+      ]
+    },
+    "NuGet.0001": {
+      "id": "NuGet.0001",
+      "isFeature": false,
+      "description": "NuGet package is incompatible with selected target framework.\n\nPackage needs to be upgraded to a version supporting selected project target framework. If there no new package versions supporting new target framework, different package needs to be used and all code needs to be upgraded to new API.",
+      "label": "NuGet package is incompatible",
+      "severity": "Mandatory",
+      "effort": 1,
+      "links": [
+        {
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262529",
+          "isCustom": false
+        }
+      ]
+    }
+  }
+}

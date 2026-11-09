@@ -1,0 +1,68 @@
+@page
+@model test_application_for_development_team.Pages.ProfileModel
+@{
+    ViewData["Title"] = L["My profile"];
+}
+<h1 class="h3 mb-3">@L["My profile"]</h1>
+<div asp-validation-summary="All" class="text-danger"></div>
+
+@if (Model.RecoveryCodes is not null)
+{
+    <div class="alert alert-warning">
+        <h2 class="h5">@L["Two-factor sign-in is turned on"]</h2>
+        <p>@L["Store these recovery codes in a safe place. Each code can be used once if you lose your authenticator app."]</p>
+        <ul class="font-monospace">
+            @foreach (var c in Model.RecoveryCodes)
+            {
+                <li>@c</li>
+            }
+        </ul>
+        <a asp-page="/Account/Login" class="btn btn-primary">@L["Sign in again"]</a>
+    </div>
+    return;
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <h2 class="h5">@L["Two-factor sign-in"]</h2>
+        @if (Model.Setup!.Enabled)
+        {
+            <p>@L["Two-factor sign-in is turned on."]</p>
+            <form method="post" asp-page-handler="Disable">
+                <button type="submit" class="btn btn-outline-danger">@L["Turn off"]</button>
+            </form>
+        }
+        else
+        {
+            <p>@L["Scan the QR code with an authenticator app (for example Microsoft Authenticator) and enter the code."]</p>
+            <img src="@Model.QrCodeDataUri" alt="QR code" width="200" height="200" />
+            <p class="small text-muted">@L["Key"]: <span class="font-monospace">@Model.Setup.SharedKey</span></p>
+            <form method="post" asp-page-handler="Enable" class="row g-2">
+                <div class="col-auto">
+                    <input asp-for="Code" class="form-control" autocomplete="one-time-code" inputmode="numeric" placeholder="123456" />
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">@L["Turn on"]</button>
+                </div>
+            </form>
+        }
+    </div>
+    <div class="col-md-6">
+        <h2 class="h5">@L["Change password"]</h2>
+        <form method="post" asp-page-handler="Password">
+            <div class="mb-2">
+                <label asp-for="CurrentPassword" class="form-label"></label>
+                <input asp-for="CurrentPassword" class="form-control" autocomplete="current-password" />
+            </div>
+            <div class="mb-2">
+                <label asp-for="NewPassword" class="form-label"></label>
+                <input asp-for="NewPassword" class="form-control" autocomplete="new-password" />
+            </div>
+            <button type="submit" class="btn btn-primary">@L["Save"]</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

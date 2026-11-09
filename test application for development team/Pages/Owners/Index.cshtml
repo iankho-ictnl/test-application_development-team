@@ -1,0 +1,37 @@
+@page
+@model test_application_for_development_team.Pages.Owners.IndexModel
+@{
+    ViewData["Title"] = L["Owners"];
+    var canEdit = User.Has(Permissions.OwnersAssets);
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">@L["Owners"]</h1>
+    @if (canEdit)
+    {
+        <a asp-page="Edit" class="btn btn-primary">@L["New owner"]</a>
+    }
+</div>
+<div asp-validation-summary="All" class="text-danger"></div>
+<table class="table table-sm table-striped">
+    <thead><tr><th>@L["Name"]</th><th>@L["Email"]</th><th>@L["Phone"]</th><th>@L["City"]</th><th></th></tr></thead>
+    <tbody>
+        @foreach (var o in Model.Owners)
+        {
+            <tr>
+                <td><a asp-page="Details" asp-route-id="@o.Id">@o.Name</a></td>
+                <td>@o.Email</td>
+                <td>@o.Phone</td>
+                <td>@o.City</td>
+                <td class="text-end">
+                    @if (canEdit)
+                    {
+                        <a asp-page="Edit" asp-route-id="@o.Id" class="btn btn-sm btn-outline-secondary">@L["Edit"]</a>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@o.Id" class="d-inline" onsubmit="return confirm('@L["Are you sure?"]');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">@L["Delete"]</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

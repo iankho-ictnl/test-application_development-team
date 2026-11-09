@@ -1,0 +1,30 @@
+@page "{id:int?}"
+@model test_application_for_development_team.Pages.Assets.EditModel
+@{
+    ViewData["Title"] = Model.Id is null ? L["New asset"] : L["Edit asset"];
+}
+<h1 class="h3 mb-3">@ViewData["Title"]</h1>
+<form method="post" class="col-md-6">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="mb-2">
+        <label asp-for="Input.OwnerId" class="form-label"></label>
+        <select asp-for="Input.OwnerId" asp-items="Model.Owners" class="form-select"><option value="0">--</option></select>
+    </div>
+    <div class="mb-2">
+        <label asp-for="Input.Type" class="form-label"></label>
+        <select asp-for="Input.Type" asp-items="Model.Types" class="form-select"></select>
+    </div>
+    @foreach (var field in new[] { "Name", "Address", "PostalCode", "City" })
+    {
+        <div class="mb-2">
+            <label for="Input_@field" class="form-label">@Html.DisplayName("Input." + field)</label>
+            @Html.TextBox("Input." + field, null, new { @class = "form-control" })
+        </div>
+    }
+    <button type="submit" class="btn btn-primary">@L["Save"]</button>
+    <a asp-page="Index" class="btn btn-link">@L["Cancel"]</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

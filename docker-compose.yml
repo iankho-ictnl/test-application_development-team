@@ -1,0 +1,105 @@
+name: propertyadmin
+
+services:
+  db:
+    image: postgres:18-trixie
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: propertyadmin
+      POSTGRES_USER: propertyadmin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql  # PostgreSQL 18 keeps its data in /var/lib/postgresql/18/docker (D-015)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U propertyadmin -d propertyadmin"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: PropertyAdmin.Api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Default: Host=db;Port=5432;Database=propertyadmin;Username=propertyadmin;Password=${POSTGRES_PASSWORD}
+      Jwt__Key: ${JWT_KEY:?Set JWT_KEY (at least 32 characters) in .env}
+      Seed__AdminUserName: ${SEED_ADMIN_USERNAME:-admin}
+      Seed__AdminEmail: ${SEED_ADMIN_EMAIL:?Set SEED_ADMIN_EMAIL in .env}
+      Seed__AdminPassword: ${SEED_ADMIN_PASSWORD:?Set SEED_ADMIN_PASSWORD in .env}
+      Company__Name: ${COMPANY_NAME:-}
+      Company__Address: ${COMPANY_ADDRESS:-}
+      Company__PostalCode: ${COMPANY_POSTALCODE:-}
+      Company__City: ${COMPANY_CITY:-}
+      Company__VatNumber: ${COMPANY_VATNUMBER:-}
+      Company__ChamberOfCommerce: ${COMPANY_COC:-}
+      Company__Iban: ${COMPANY_IBAN:-}
+      Company__Email: ${COMPANY_EMAIL:-}
+    # No published port: only the web container calls the API on the internal network.
+
+  web:
+    build:
+      context: .
+      dockerfile: test application for development team/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Api__BaseUrl: http://api:8080/
+      ForwardedHeaders__KnownProxies__0: 172.30.0.10  # the proxy below (D-023, S-15)
+    volumes:
+      - dpkeys:/home/app/.aspnet/DataProtection-Keys
+    # No published port: only the proxy reaches the frontend (D-023, REQ-025).
+
+  proxy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - web
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:?Set PUBLIC_HOST (the public host name of the admin frontend) in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      default:
+        ipv4_address: 172.30.0.10
+
+  backup:
+    image: postgres:18-trixie
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGDATABASE: propertyadmin
+      PGUSER: propertyadmin
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      BACKUP_HOUR: "2"
+    entrypoint: ["sh", "-c", "sed 's/\r$$//' /scripts/backup.sh | sh"]
+    volumes:
+      - ./deploy/backup/backup.sh:/scripts/backup.sh:ro
+      - pgbackup:/backups  # separate from pgdata (D-024)
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+
+volumes:
+  pgdata:
+  pgbackup:
+  caddy_data:
+  caddy_config:
+  dpkeys:

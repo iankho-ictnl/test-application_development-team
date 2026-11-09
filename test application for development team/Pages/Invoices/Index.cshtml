@@ -1,0 +1,22 @@
+@page
+@model test_application_for_development_team.Pages.Invoices.IndexModel
+@{
+    ViewData["Title"] = L["Invoices"];
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">@L["Invoices"]</h1>
+    @if (User.Has(Permissions.Invoices))
+    {
+        <a asp-page="Create" asp-route-ownerId="@Model.OwnerId" class="btn btn-primary">@L["New invoice"]</a>
+    }
+</div>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select asp-for="OwnerId" asp-items="Model.Owners" class="form-select"><option value="">@L["All owners"]</option></select>
+    </div>
+    <div class="col-auto">
+        <select asp-for="Status" asp-items="Model.Statuses" class="form-select"><option value="">@L["All statuses"]</option></select>
+    </div>
+    <div class="col-auto"><button type="submit" class="btn btn-outline-primary">@L["Filter"]</button></div>
+</form>
+<partial name="_InvoiceTable" model="Model.Items" />

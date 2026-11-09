@@ -1,0 +1,48 @@
+@page
+@model test_application_for_development_team.Pages.Assets.IndexModel
+@{
+    ViewData["Title"] = L["Assets"];
+    var canEdit = User.Has(Permissions.OwnersAssets);
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">@L["Assets"]</h1>
+    @if (canEdit)
+    {
+        <a asp-page="Edit" asp-route-ownerId="@Model.OwnerId" class="btn btn-primary">@L["New asset"]</a>
+    }
+</div>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select asp-for="OwnerId" asp-items="Model.Owners" class="form-select" onchange="this.form.submit()">
+            <option value="">@L["All owners"]</option>
+        </select>
+    </div>
+</form>
+<div asp-validation-summary="All" class="text-danger"></div>
+<table class="table table-sm table-striped">
+    <thead><tr><th>@L["Name"]</th><th>@L["Type"]</th><th>@L["Owner"]</th><th>@L["Address"]</th><th></th></tr></thead>
+    <tbody>
+        @foreach (var a in Model.Assets)
+        {
+            <tr>
+                <td><a asp-page="Details" asp-route-id="@a.Id">@a.Name</a></td>
+                <td>@L[a.Type.ToString()]</td>
+                <td>@a.OwnerName</td>
+                <td>@a.Address, @a.PostalCode @a.City</td>
+                <td class="text-end">
+                    @if (canEdit)
+                    {
+                        <a asp-page="Edit" asp-route-id="@a.Id" class="btn btn-sm btn-outline-secondary">@L["Edit"]</a>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@a.Id" class="d-inline" onsubmit="return confirm('@L["Are you sure?"]');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">@L["Delete"]</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

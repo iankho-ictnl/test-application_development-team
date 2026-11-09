@@ -1,0 +1,59 @@
+@page
+@model test_application_for_development_team.Pages.Admin.RolesModel
+@{
+    ViewData["Title"] = L["Roles and permissions"];
+}
+<h1 class="h3 mb-3">@L["Roles and permissions"]</h1>
+<div asp-validation-summary="All" class="text-danger"></div>
+<div class="table-responsive">
+<table class="table table-sm table-bordered text-center align-middle">
+    <thead>
+        <tr>
+            <th class="text-start">@L["Role"]</th>
+            @foreach (var p in Permissions.All) { <th class="small">@L["perm." + p]</th> }
+            <th>@L["Users"]</th><th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model.Items)
+        {
+            <tr>
+                <td class="text-start">@r.Name</td>
+                @foreach (var p in Permissions.All) { <td>@(r.Permissions.Contains(p) ? "✓" : "")</td> }
+                <td>@r.UserCount</td>
+                <td class="text-nowrap">
+                    <a asp-route-edit="@r.Name" class="btn btn-sm btn-outline-secondary">@L["Edit"]</a>
+                    @if (r.UserCount == 0)
+                    {
+                        <form method="post" asp-page-handler="Delete" asp-route-name="@r.Name" class="d-inline" onsubmit="return confirm('@L["Are you sure?"]');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">@L["Delete"]</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+</div>
+
+<h2 class="h5 mt-4">@(Model.Original is null ? L["New role"] : L["Edit role"])</h2>
+<form method="post" class="col-md-6">
+    <input type="hidden" asp-for="Original" />
+    <div class="mb-2">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    @foreach (var p in Permissions.All)
+    {
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="SelectedPermissions" value="@p" id="perm_@p" checked="@Model.SelectedPermissions.Contains(p)" />
+            <label class="form-check-label" for="perm_@p">@L["perm." + p]</label>
+        </div>
+    }
+    <button type="submit" class="btn btn-primary mt-2">@L["Save"]</button>
+    @if (Model.Original is not null) { <a asp-page="Roles" class="btn btn-link mt-2">@L["Cancel"]</a> }
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
