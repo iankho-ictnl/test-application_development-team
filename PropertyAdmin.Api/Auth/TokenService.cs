@@ -7,6 +7,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using PropertyAdmin.Contracts;
 using PropertyAdmin.Data;
+using PropertyAdmin.Logic.V1.Auth;
+using PropertyAdmin.Logic.V1.Auth.Models;
 
 namespace PropertyAdmin.Api.Auth;
 
@@ -32,7 +34,7 @@ public class TokenService(
     IOptions<JwtOptions> options,
     UserManager<ApplicationUser> userManager,
     RoleManager<IdentityRole> roleManager,
-    IMemoryCache cache)
+    IMemoryCache cache) : ITokenIssuer
 {
     private readonly JwtOptions _o = options.Value;
 
@@ -46,42 +48,51 @@ public class TokenService(
 
     public async Task<LoginResponse> CreateAccessTokenAsync(ApplicationUser user)
     {
-        var claims = new List<Claim>
-        {
-            new(JwtRegisteredClaimNames.Sub, user.Id),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(ClaimTypes.Name, user.UserName ?? ""),
-            new(AppClaims.SecurityStamp, user.SecurityStamp ?? ""),
-            new(AppClaims.Purpose, AppClaims.AccessPurpose),
-        };
-        if (user.OwnerId is int ownerId)
-            claims.Add(new Claim(AppClaims.OwnerId, ownerId.ToString()));
-
         var permissions = new HashSet<string>();
-        foreach (var roleName in await userManager.GetRolesAsync(user))
+        var roleNames = await userManager.GetRolesAsync(user);
+        foreach (var roleName in roleNames)
         {
-            claims.Add(new Claim(ClaimTypes.Role, roleName));
             var role = await roleManager.FindByNameAsync(roleName);
             if (role is null) continue;
             foreach (var c in await roleManager.GetClaimsAsync(role))
                 if (c.Type == Permissions.ClaimType) permissions.Add(c.Value);
         }
-        claims.AddRange(permissions.Select(p => new Claim(Permissions.ClaimType, p)));
-
-        var expires = DateTime.UtcNow.AddHours(_o.ExpiryHours);
-        return new LoginResponse(false, null, Write(claims, expires, _o.Audience), expires);
+        var token = CreateAccessToken(new TokenSubjectModel(user.Id, user.UserName ?? "", user.SecurityStamp ?? "", user.OwnerId, roleNames.ToList(), permissions));
+        return new LoginResponse(false, null, token.Token, token.ExpiresUtc);
     }
 
-    public LoginResponse CreateChallengeToken(ApplicationUser user)
+    public LoginResponse CreateChallengeToken(ApplicationUser user) =>
+        new(true, CreateChallengeToken(user.Id, user.SecurityStamp ?? ""), null, null);
+
+    public AccessTokenModel CreateAccessToken(TokenSubjectModel subject)
     {
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, user.Id),
+            new(JwtRegisteredClaimNames.Sub, subject.UserId),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(AppClaims.SecurityStamp, user.SecurityStamp ?? ""),
+            new(ClaimTypes.Name, subject.UserName),
+            new(AppClaims.SecurityStamp, subject.SecurityStamp),
+            new(AppClaims.Purpose, AppClaims.AccessPurpose),
+        };
+        if (subject.OwnerId is int ownerId)
+            claims.Add(new Claim(AppClaims.OwnerId, ownerId.ToString()));
+        claims.AddRange(subject.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
+        claims.AddRange(subject.Permissions.Select(p => new Claim(Permissions.ClaimType, p)));
+
+        var expires = DateTime.UtcNow.AddHours(_o.ExpiryHours);
+        return new AccessTokenModel(Write(claims, expires, _o.Audience), expires);
+    }
+
+    public string CreateChallengeToken(string userId, string securityStamp)
+    {
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.Sub, userId),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(AppClaims.SecurityStamp, securityStamp),
             new(AppClaims.Purpose, AppClaims.TwoFactorPurpose),
         };
-        return new LoginResponse(true, Write(claims, DateTime.UtcNow.AddMinutes(_o.ChallengeMinutes), _o.Audience + ".2fa"), null, null);
+        return Write(claims, DateTime.UtcNow.AddMinutes(_o.ChallengeMinutes), _o.Audience + ".2fa");
     }
 
     /// <summary>Validates a 2FA challenge token once; returns the user id or null.</summary>

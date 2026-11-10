@@ -67,6 +67,7 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
 builder.Services.AddAuthorization(Policies.Configure);
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<PropertyAdmin.Logic.V1.Auth.ITokenIssuer>(sp => sp.GetRequiredService<TokenService>());
 builder.Services.AddScoped<VatService>();
 builder.Services.AddScoped<InvoiceService>();
 builder.Services.AddScoped<ReportService>();

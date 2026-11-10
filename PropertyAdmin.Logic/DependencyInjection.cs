@@ -60,6 +60,13 @@ public static class DependencyInjection
         services.AddScoped<PropertyAdmin.Logic.V1.Reports.IReportService, PropertyAdmin.Logic.V1.Reports.ReportService>();
         services.AddScoped<PropertyAdmin.Logic.V1.Reports.GetAssetResults.GetAssetResultsHandler>();
         services.AddScoped<PropertyAdmin.Logic.V1.Reports.GetOwnerOverview.GetOwnerOverviewHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Auth.IAuthService, PropertyAdmin.Logic.V1.Auth.AuthService>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Auth.Login.LoginHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Auth.LoginTwoFactor.LoginTwoFactorHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Auth.GetTwoFactor.GetTwoFactorHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Auth.EnableTwoFactor.EnableTwoFactorHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Auth.DisableTwoFactor.DisableTwoFactorHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Auth.ChangePassword.ChangePasswordHandler>();
         return services;
     }
 }
