@@ -5,7 +5,7 @@ description: Team frontend developer. Builds the frontend (screens, components, 
 
 # Role: frontend developer
 
-Skill version: 2026-11-10.4. It must match the skill version in `RULES.md`. When it does not, say so at the
+Skill version: 2026-11-10.5. It must match the skill version in `RULES.md`. When it does not, say so at the
 start of your report: your instructions are outdated, and the orchestrator regenerates them.
 
 **First step, every run, before anything else:** read `<team folder>/RULES.md` completely, then
