@@ -67,6 +67,19 @@ public static class DependencyInjection
         services.AddScoped<PropertyAdmin.Logic.V1.Auth.EnableTwoFactor.EnableTwoFactorHandler>();
         services.AddScoped<PropertyAdmin.Logic.V1.Auth.DisableTwoFactor.DisableTwoFactorHandler>();
         services.AddScoped<PropertyAdmin.Logic.V1.Auth.ChangePassword.ChangePasswordHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Users.IUserService, PropertyAdmin.Logic.V1.Users.UserService>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Users.GetAll.GetAllHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Users.GetById.GetByIdHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Users.Create.CreateHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Users.Update.UpdateHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Users.ResetTwoFactor.ResetTwoFactorHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Users.ForceSignOut.ForceSignOutHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Users.Delete.DeleteHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Roles.IRoleService, PropertyAdmin.Logic.V1.Roles.RoleService>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Roles.GetAll.GetAllHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Roles.Create.CreateHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Roles.Update.UpdateHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Roles.Delete.DeleteHandler>();
         return services;
     }
 }
