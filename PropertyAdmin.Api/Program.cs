@@ -72,6 +72,7 @@ builder.Services.AddScoped<InvoiceService>();
 builder.Services.AddScoped<ReportService>();
 builder.Services.AddSingleton<InvoicePdfService>();
 builder.Services.Configure<CompanyOptions>(builder.Configuration.GetSection("Company"));
+builder.Services.Configure<PropertyAdmin.Logic.V1.Invoices.GetPdf.CompanyOptions>(builder.Configuration.GetSection("Company"));
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();

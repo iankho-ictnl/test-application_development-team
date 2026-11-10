@@ -63,4 +63,26 @@ public sealed class InvoicesApiTests(ApiFactory api)
         Assert.Equal(1, paid.GetProperty("status").GetInt32());
         await ExpectProblem(await admin.DeleteAsync($"/api/v1/invoices/{againId}"), HttpStatusCode.BadRequest, DomainTitle);
     }
+
+    [Fact]
+    public async Task Invoice_pdf_v1_returns_the_file_within_the_owner_scope()
+    {
+        var admin = await api.As("Admin");
+        var ownerId = await admin.CreateOwner(api.Unique("Pdf owner"));
+        await admin.CreateActivity(await admin.CreateAsset(ownerId, api.Unique("Pdf house")));
+        var created = await Expect(await admin.PostAsJsonAsync("/api/v1/invoices", new { ownerId, date = "2026-03-31", paymentTermDays = 14 }), HttpStatusCode.Created);
+        var id = created.GetProperty("id").GetInt32();
+
+        var pdf = await admin.GetAsync($"/api/v1/invoices/{id}/pdf");
+        Assert.Equal(HttpStatusCode.OK, pdf.StatusCode);
+        Assert.Equal("application/pdf", pdf.Content.Headers.ContentType?.MediaType);
+        Assert.Equal($"Factuur-{created.GetProperty("number").GetString()}.pdf", pdf.Content.Headers.ContentDisposition?.FileName?.Trim('"'));
+        Assert.StartsWith("%PDF", System.Text.Encoding.ASCII.GetString((await pdf.Content.ReadAsByteArrayAsync())[..4]));
+
+        await ExpectStatus(await admin.GetAsync("/api/v1/invoices/999999/pdf"), HttpStatusCode.NotFound);
+        Assert.Equal(HttpStatusCode.OK, (await (await api.As("Owner", ownerId)).GetAsync($"/api/v1/invoices/{id}/pdf")).StatusCode);
+        var otherOwner = await api.As("Owner", await admin.CreateOwner(api.Unique("Other pdf owner")));
+        await ExpectStatus(await otherOwner.GetAsync($"/api/v1/invoices/{id}/pdf"), HttpStatusCode.NotFound);
+        await ExpectStatus(await api.Anonymous().GetAsync($"/api/v1/invoices/{id}/pdf"), HttpStatusCode.Unauthorized);
+    }
 }

@@ -7,6 +7,7 @@ public interface IInvoiceService
 {
     Task<IReadOnlyList<InvoiceModel>> GetAllAsync(int? ownerScopeId, int? ownerId, InvoiceStatus? status, CancellationToken cancellationToken);
     Task<InvoiceModel?> GetByIdAsync(int id, int? ownerScopeId, CancellationToken cancellationToken);
+    Task<InvoiceOwnerModel> GetOwnerAsync(int ownerId, CancellationToken cancellationToken);
     Task<UninvoicedModel> GetUninvoicedAsync(int ownerId, CancellationToken cancellationToken);
     Task<InvoiceModel> CreateAsync(InvoiceCreateModel model, CancellationToken cancellationToken);
     Task<bool> MarkPaidAsync(int id, DateOnly paidDate, CancellationToken cancellationToken);

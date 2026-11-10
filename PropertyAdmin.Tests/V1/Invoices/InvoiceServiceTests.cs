@@ -172,6 +172,28 @@ public sealed class InvoiceServiceTests
         Assert.Empty(database.Context.Invoices);
     }
 
+    [Fact]
+    public async Task GetPdf_renders_the_scoped_invoice_and_passes_a_cancellation_through()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var invoice = await SeedInvoiceAsync(database.Context);
+        var service = new InvoiceService(database.Context);
+        var renderer = new PropertyAdmin.Logic.V1.Invoices.GetPdf.InvoicePdfRenderer(
+            Microsoft.Extensions.Options.Options.Create(new PropertyAdmin.Logic.V1.Invoices.GetPdf.CompanyOptions { Name = "Company" }));
+        var handler = new PropertyAdmin.Logic.V1.Invoices.GetPdf.GetPdfHandler(service, renderer);
+
+        var result = await handler.HandleAsync(new PropertyAdmin.Logic.V1.Invoices.GetPdf.Query(invoice.Id, invoice.OwnerId), CancellationToken.None);
+        Assert.True(result.Found);
+        Assert.Equal($"Factuur-{invoice.Number}.pdf", result.FileName);
+        Assert.StartsWith("%PDF", System.Text.Encoding.ASCII.GetString(result.Content![..4]));
+        Assert.False((await handler.HandleAsync(new PropertyAdmin.Logic.V1.Invoices.GetPdf.Query(invoice.Id, invoice.OwnerId + 100), CancellationToken.None)).Found);
+
+        using var cancellation = new CancellationTokenSource();
+        await cancellation.CancelAsync();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => handler.HandleAsync(
+            new PropertyAdmin.Logic.V1.Invoices.GetPdf.Query(invoice.Id, null), cancellation.Token));
+    }
+
     private static async Task<Asset> SeedAssetAsync(AppDbContext context, string ownerName)
     {
         var asset = new Asset { Owner = new Owner { Name = ownerName }, Name = $"{ownerName} house", Address = "Road 1", PostalCode = "1000 AA", City = "City" };

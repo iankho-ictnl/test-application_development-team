@@ -30,6 +30,12 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
                 invoice.Lines.OrderBy(line => line.Id).Select(line => new InvoiceLineModel(line.Description, line.AmountExclVat, line.VatPercentage)).ToList()))
             .FirstOrDefaultAsync(cancellationToken);
 
+    public async Task<InvoiceOwnerModel> GetOwnerAsync(int ownerId, CancellationToken cancellationToken) =>
+        await db.Owners.AsNoTracking()
+            .Where(owner => owner.Id == ownerId)
+            .Select(owner => new InvoiceOwnerModel(owner.Name, owner.Address, owner.PostalCode, owner.City))
+            .SingleAsync(cancellationToken);
+
     public async Task<UninvoicedModel> GetUninvoicedAsync(int ownerId, CancellationToken cancellationToken)
     {
         var activities = await db.Activities.AsNoTracking()

@@ -5,6 +5,7 @@ using PropertyAdmin.Api.V1.Invoices.Create;
 using PropertyAdmin.Api.V1.Invoices.Delete;
 using PropertyAdmin.Api.V1.Invoices.GetAll;
 using PropertyAdmin.Api.V1.Invoices.GetById;
+using PropertyAdmin.Api.V1.Invoices.GetPdf;
 using PropertyAdmin.Api.V1.Invoices.GetUninvoiced;
 using PropertyAdmin.Api.V1.Invoices.MarkPaid;
 using PropertyAdmin.Contracts;
@@ -12,6 +13,7 @@ using PropertyAdmin.Logic.V1.Invoices.Create;
 using PropertyAdmin.Logic.V1.Invoices.Delete;
 using PropertyAdmin.Logic.V1.Invoices.GetAll;
 using PropertyAdmin.Logic.V1.Invoices.GetById;
+using PropertyAdmin.Logic.V1.Invoices.GetPdf;
 using PropertyAdmin.Logic.V1.Invoices.GetUninvoiced;
 using PropertyAdmin.Logic.V1.Invoices.MarkPaid;
 
@@ -41,6 +43,17 @@ public sealed class InvoicesController : ControllerBase
     {
         var result = await handler.HandleAsync(new GetById.Request(id).ToQuery(User.ReadScopeOwnerId()), cancellationToken);
         return result.Invoice is null ? NotFound() : Ok(result.ToResponse());
+    }
+
+    [HttpGet("{id:int}/pdf")]
+    [Authorize(Policy = Policies.Read)]
+    public async Task<IActionResult> GetPdf(
+        int id,
+        [FromServices] GetPdfHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var result = await handler.HandleAsync(new GetPdf.Request(id).ToQuery(User.ReadScopeOwnerId()), cancellationToken);
+        return result.Found ? File(result.Content!, "application/pdf", result.FileName) : NotFound();
     }
 
     [HttpGet("uninvoiced/{ownerId:int}")]
