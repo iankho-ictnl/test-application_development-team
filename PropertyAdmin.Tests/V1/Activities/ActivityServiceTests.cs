@@ -3,6 +3,8 @@ using PropertyAdmin.Logic;
 using PropertyAdmin.Logic.V1.Activities;
 using PropertyAdmin.Logic.V1.Activities.Models;
 using PropertyAdmin.Logic.V1.VatRates;
+using ActivitiesApi = PropertyAdmin.Api.V1.Activities;
+using ActivitiesLogic = PropertyAdmin.Logic.V1.Activities;
 
 namespace PropertyAdmin.Tests.V1.Activities;
 
@@ -131,6 +133,86 @@ public sealed class ActivityServiceTests
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => service.GetAllAsync(null, null, null, null, cancellation.Token));
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => service.CreateAsync(Fixed(asset.Id, new DateOnly(2026, 3, 1)), cancellation.Token));
+    }
+
+    [Fact]
+    public async Task Handlers_create_read_update_and_delete_within_the_owner_scope()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var asset = await SeedAsync(database.Context, "Owner");
+        var otherAsset = await SeedAsync(database.Context, "Other", seedRate: false);
+        var service = CreateService(database.Context);
+        var created = (await new ActivitiesLogic.Create.CreateHandler(service).HandleAsync(
+            new(Fixed(asset.Id, new DateOnly(2026, 3, 1))), CancellationToken.None)).Activity;
+        Assert.Equal((10m, 21m), (created.AmountExclVat, created.VatPercentage));
+
+        var getAll = new ActivitiesLogic.GetAll.GetAllHandler(service);
+        Assert.Equal([created], (await getAll.HandleAsync(new(asset.OwnerId, asset.Id, new DateOnly(2026, 3, 1), new DateOnly(2026, 3, 1)), CancellationToken.None)).Activities);
+        Assert.Empty((await getAll.HandleAsync(new(otherAsset.OwnerId, null, null, null), CancellationToken.None)).Activities);
+        Assert.Empty((await getAll.HandleAsync(new(null, null, null, new DateOnly(2026, 2, 28)), CancellationToken.None)).Activities);
+
+        var getById = new ActivitiesLogic.GetById.GetByIdHandler(service);
+        Assert.Equal(created, (await getById.HandleAsync(new(created.Id, asset.OwnerId), CancellationToken.None)).Activity);
+        Assert.Null((await getById.HandleAsync(new(created.Id, otherAsset.OwnerId), CancellationToken.None)).Activity);
+
+        var update = new ActivitiesLogic.Update.UpdateHandler(service);
+        var hourly = new ActivitySaveModel(asset.Id, new DateOnly(2026, 3, 2), ActivityKind.Administration, "Uren", PricingType.Hourly, 2m, 50m, null, RateName);
+        var updated = (await update.HandleAsync(new(created.Id, hourly), CancellationToken.None)).Activity!;
+        Assert.Equal((PricingType.Hourly, 100m, (decimal?)null), (updated.PricingType, updated.AmountExclVat, updated.FixedPrice));
+        Assert.Null((await update.HandleAsync(new(created.Id + 100, hourly), CancellationToken.None)).Activity);
+
+        var delete = new ActivitiesLogic.Delete.DeleteHandler(service);
+        Assert.True((await delete.HandleAsync(new(created.Id), CancellationToken.None)).Deleted);
+        Assert.False((await delete.HandleAsync(new(created.Id), CancellationToken.None)).Deleted);
+    }
+
+    [Fact]
+    public async Task Handlers_pass_a_cancellation_through()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var asset = await SeedAsync(database.Context, "Owner");
+        var service = CreateService(database.Context);
+        var save = Fixed(asset.Id, new DateOnly(2026, 3, 1));
+        using var cancellation = new CancellationTokenSource();
+        await cancellation.CancelAsync();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => new ActivitiesLogic.GetAll.GetAllHandler(service).HandleAsync(new(null, null, null, null), cancellation.Token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => new ActivitiesLogic.GetById.GetByIdHandler(service).HandleAsync(new(1, null), cancellation.Token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => new ActivitiesLogic.Create.CreateHandler(service).HandleAsync(new(save), cancellation.Token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => new ActivitiesLogic.Update.UpdateHandler(service).HandleAsync(new(1, save), cancellation.Token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => new ActivitiesLogic.Delete.DeleteHandler(service).HandleAsync(new(1), cancellation.Token));
+    }
+
+    [Fact]
+    public void Mappings_copy_every_field_and_convert_the_enums()
+    {
+        var activity = new ActivityModel(7, 3, "House", new DateOnly(2026, 3, 1), ActivityKind.Maintenance, "Inspectie", PricingType.Fixed,
+            null, null, 100m, 100m, RateName, 21m, 5);
+        var save = new ActivitySaveModel(3, new DateOnly(2026, 3, 1), ActivityKind.Maintenance, "Inspectie", PricingType.Fixed, null, null, 100m, RateName);
+        var expected = new
+        {
+            Id = 7, AssetId = 3, AssetName = "House", Date = new DateOnly(2026, 3, 1), Kind = PropertyAdmin.Api.V1.ActivityKind.Maintenance,
+            Description = "Inspectie", PricingType = PropertyAdmin.Api.V1.PricingType.Fixed, Hours = (decimal?)null, HourlyRate = (decimal?)null,
+            FixedPrice = (decimal?)100m, AmountExclVat = 100m, VatRateName = RateName, VatPercentage = 21m, VatAmount = 21m, AmountInclVat = 121m,
+            InvoiceId = (int?)5,
+        };
+
+        Assert.Equal(new ActivitiesLogic.GetAll.Query(5, 3, new DateOnly(2026, 1, 1), new DateOnly(2026, 12, 31)), ActivitiesApi.GetAll.Mapping.ToQuery(
+            new ActivitiesApi.GetAll.Request(3, new DateOnly(2026, 1, 1), new DateOnly(2026, 12, 31)), 5));
+        Assert.Equivalent(expected, Assert.Single(ActivitiesApi.GetAll.Mapping.ToResponse(new ActivitiesLogic.GetAll.Result([activity]))), strict: true);
+        Assert.Equal(new ActivitiesLogic.GetById.Query(7, 5), ActivitiesApi.GetById.Mapping.ToQuery(new ActivitiesApi.GetById.Request(7), 5));
+        Assert.Equivalent(expected, ActivitiesApi.GetById.Mapping.ToResponse(new ActivitiesLogic.GetById.Result(activity)), strict: true);
+
+        Assert.Equal(new ActivitiesLogic.Create.Command(save), ActivitiesApi.Create.Mapping.ToCommand(new ActivitiesApi.Create.Request(
+            3, new DateOnly(2026, 3, 1), PropertyAdmin.Api.V1.ActivityKind.Maintenance, "Inspectie", PropertyAdmin.Api.V1.PricingType.Fixed, null, null, 100m, RateName)));
+        Assert.Equivalent(expected, ActivitiesApi.Create.Mapping.ToResponse(new ActivitiesLogic.Create.Result(activity)), strict: true);
+
+        Assert.Equal(new ActivitiesLogic.Update.Command(7, save), ActivitiesApi.Update.Mapping.ToCommand(new ActivitiesApi.Update.Request(
+            3, new DateOnly(2026, 3, 1), PropertyAdmin.Api.V1.ActivityKind.Maintenance, "Inspectie", PropertyAdmin.Api.V1.PricingType.Fixed, null, null, 100m, RateName), 7));
+        Assert.Equivalent(expected, ActivitiesApi.Update.Mapping.ToResponse(new ActivitiesLogic.Update.Result(activity)), strict: true);
+
+        Assert.Equal(new ActivitiesLogic.Delete.Command(7), ActivitiesApi.Delete.Mapping.ToCommand(new ActivitiesApi.Delete.Request(7)));
+        Assert.True(ActivitiesApi.Delete.Mapping.ToResponse(new ActivitiesLogic.Delete.Result(true)).Deleted);
     }
 
     private static ActivitySaveModel Fixed(int assetId, DateOnly date) =>
