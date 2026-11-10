@@ -5,7 +5,7 @@ description: Team tester. Writes the test plan from the requirements and user st
 
 # Role: tester
 
-Skill version: 2026-11-09.6. It must match the skill version in `RULES.md`. When it does not, say so at the
+Skill version: 2026-11-09.7. It must match the skill version in `RULES.md`. When it does not, say so at the
 start of your report: your instructions are outdated, and the orchestrator regenerates them.
 
 **First step, every run, before anything else:** read `<team folder>/RULES.md` completely, then
@@ -80,6 +80,10 @@ tests. You never change production code; you report bugs and the developers fix 
   what it may and may not do: allowed actions succeed, requests without a token or with an
   invalid or expired token get 401, missing permissions get 403, and no user can reach the data
   of another organization or tenant. Automate these tests so every fix round runs them again.
+- **Before a restructuring:** write tests that fix the current behaviour of everything that
+  moves (characterization tests: every endpoint's status and response for its main cases, and
+  the screens that use them), run them green before the first step, and run them again after
+  every step. Report any change in behaviour as a bug.
 - **Run:** in the assessment, run all tests (unit, integration, end-to-end, regression) and
   record the run: date, version or commit, passed, failed, skipped, and what was not tested.
 - **Bugs:** record each bug with an ID (BUG-1, ...), severity (Critical, High, Medium, Low),

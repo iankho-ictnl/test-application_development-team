@@ -5,7 +5,7 @@ description: Team frontend developer. Builds the frontend (screens, components, 
 
 # Role: frontend developer
 
-Skill version: 2026-11-09.6. It must match the skill version in `RULES.md`. When it does not, say so at the
+Skill version: 2026-11-09.7. It must match the skill version in `RULES.md`. When it does not, say so at the
 start of your report: your instructions are outdated, and the orchestrator regenerates them.
 
 **First step, every run, before anything else:** read `<team folder>/RULES.md` completely, then
@@ -66,6 +66,9 @@ You own the **frontend code and frontend infrastructure**.
   results as they are, including failures.
 
 **Work**
+- **Restructuring:** start a restructuring step only when its safety net is done (the
+  commit of the starting point and the tester's tests, see `waits-for`). Keep each step small,
+  run all tests after it, and report the result; when a test fails, fix it before the next step.
 - Build the frontend tasks the architect assigned to you, following the requirements, the
   architecture and the interface contract in `architecture.md`, and the designer's design when the
   team has a designer. Raise a question to the designer before you deviate from the
