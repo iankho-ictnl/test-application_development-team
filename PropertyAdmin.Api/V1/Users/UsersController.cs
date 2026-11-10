@@ -21,6 +21,7 @@ namespace PropertyAdmin.Api.V1.Users;
 
 [ApiController]
 [Route("api/v1/users")]
+[Route("api/users")] // Legacy alias (Q-045): remove after T-037 and T-038.
 [Authorize(Policy = Permissions.Users)]
 public sealed class UsersController : ControllerBase
 {
@@ -50,7 +51,7 @@ public sealed class UsersController : ControllerBase
         CancellationToken cancellationToken)
     {
         var response = (await handler.HandleAsync(request.ToCommand(), cancellationToken)).ToResponse();
-        return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
+        return this.CreatedUnderRequestPath(response.Id, response);
     }
 
     [HttpPut("{id}")]

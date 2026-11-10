@@ -21,6 +21,7 @@ namespace PropertyAdmin.Api.V1.Invoices;
 
 [ApiController]
 [Route("api/v1/invoices")]
+[Route("api/invoices")] // Legacy alias (Q-045): remove after T-037 and T-038.
 public sealed class InvoicesController : ControllerBase
 {
     [HttpGet]
@@ -76,7 +77,7 @@ public sealed class InvoicesController : ControllerBase
     {
         var result = await handler.HandleAsync(request.ToCommand(), cancellationToken);
         var response = result.ToResponse();
-        return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
+        return this.CreatedUnderRequestPath(response.Id, response);
     }
 
     [HttpPost("{id:int}/pay")]

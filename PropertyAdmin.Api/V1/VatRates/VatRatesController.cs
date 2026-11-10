@@ -21,6 +21,7 @@ namespace PropertyAdmin.Api.V1.VatRates;
 
 [ApiController]
 [Route("api/v1/vatrates")]
+[Route("api/vatrates")] // Legacy alias (Q-045): remove after T-037 and T-038.
 public sealed class VatRatesController : ControllerBase
 {
     [HttpGet]
@@ -51,7 +52,7 @@ public sealed class VatRatesController : ControllerBase
     {
         var result = await handler.HandleAsync(request.ToCommand(), cancellationToken);
         var response = result.ToResponse();
-        return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
+        return this.CreatedUnderRequestPath(response.Id, response);
     }
 
     [HttpPut("{id:int}")]

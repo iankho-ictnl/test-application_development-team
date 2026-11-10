@@ -14,6 +14,7 @@ namespace PropertyAdmin.Api.V1.Roles;
 
 [ApiController]
 [Route("api/v1/roles")]
+[Route("api/roles")] // Legacy alias (Q-045): remove after T-037 and T-038.
 [Authorize(Policy = Permissions.Users)]
 public sealed class RolesController : ControllerBase
 {

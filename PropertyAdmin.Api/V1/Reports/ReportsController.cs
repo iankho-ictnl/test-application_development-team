@@ -11,6 +11,7 @@ namespace PropertyAdmin.Api.V1.Reports;
 
 [ApiController]
 [Route("api/v1/reports")]
+[Route("api/reports")] // Legacy alias (Q-045): remove after T-037 and T-038.
 [Authorize(Policy = Permissions.Reports)]
 public sealed class ReportsController : ControllerBase
 {

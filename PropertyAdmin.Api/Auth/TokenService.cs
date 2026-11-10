@@ -1,12 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using PropertyAdmin.Contracts;
-using PropertyAdmin.Data;
 using PropertyAdmin.Logic.V1.Auth;
 using PropertyAdmin.Logic.V1.Auth.Models;
 
@@ -30,11 +28,7 @@ public static class AppClaims
     public const string TwoFactorPurpose = "2fa";
 }
 
-public class TokenService(
-    IOptions<JwtOptions> options,
-    UserManager<ApplicationUser> userManager,
-    RoleManager<IdentityRole> roleManager,
-    IMemoryCache cache) : ITokenIssuer
+public class TokenService(IOptions<JwtOptions> options, IMemoryCache cache) : ITokenIssuer
 {
     private readonly JwtOptions _o = options.Value;
 
@@ -45,24 +39,6 @@ public class TokenService(
             throw new InvalidOperationException("Jwt:Key must be at least 256 bits (32 bytes).");
         return new SymmetricSecurityKey(bytes);
     }
-
-    public async Task<LoginResponse> CreateAccessTokenAsync(ApplicationUser user)
-    {
-        var permissions = new HashSet<string>();
-        var roleNames = await userManager.GetRolesAsync(user);
-        foreach (var roleName in roleNames)
-        {
-            var role = await roleManager.FindByNameAsync(roleName);
-            if (role is null) continue;
-            foreach (var c in await roleManager.GetClaimsAsync(role))
-                if (c.Type == Permissions.ClaimType) permissions.Add(c.Value);
-        }
-        var token = CreateAccessToken(new TokenSubjectModel(user.Id, user.UserName ?? "", user.SecurityStamp ?? "", user.OwnerId, roleNames.ToList(), permissions));
-        return new LoginResponse(false, null, token.Token, token.ExpiresUtc);
-    }
-
-    public LoginResponse CreateChallengeToken(ApplicationUser user) =>
-        new(true, CreateChallengeToken(user.Id, user.SecurityStamp ?? ""), null, null);
 
     public AccessTokenModel CreateAccessToken(TokenSubjectModel subject)
     {

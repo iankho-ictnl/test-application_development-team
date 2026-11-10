@@ -20,6 +20,7 @@ namespace PropertyAdmin.Api.V1.Auth;
 /// <summary>Sign-in (anonymous) and the caller's own account (signed-in user only, the fallback policy).</summary>
 [ApiController]
 [Route("api/v1/auth")]
+[Route("api/auth")] // Legacy alias (Q-045): remove after T-037 and T-038.
 public sealed class AuthController : ControllerBase
 {
     [AllowAnonymous]

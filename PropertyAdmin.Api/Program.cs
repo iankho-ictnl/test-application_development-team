@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PropertyAdmin.Api.Auth;
-using PropertyAdmin.Api.Services;
 using PropertyAdmin.Data;
 using PropertyAdmin.Logic;
 
@@ -68,11 +67,6 @@ builder.Services.AddAuthorization(Policies.Configure);
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<PropertyAdmin.Logic.V1.Auth.ITokenIssuer>(sp => sp.GetRequiredService<TokenService>());
-builder.Services.AddScoped<VatService>();
-builder.Services.AddScoped<InvoiceService>();
-builder.Services.AddScoped<ReportService>();
-builder.Services.AddSingleton<InvoicePdfService>();
-builder.Services.Configure<CompanyOptions>(builder.Configuration.GetSection("Company"));
 builder.Services.Configure<PropertyAdmin.Logic.V1.Invoices.GetPdf.CompanyOptions>(builder.Configuration.GetSection("Company"));
 
 builder.Services.AddControllers();

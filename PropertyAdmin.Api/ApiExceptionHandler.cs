@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using PropertyAdmin.Api.Services;
 using PropertyAdmin.Logic;
 
 namespace PropertyAdmin.Api;
@@ -20,7 +19,6 @@ public sealed class ApiExceptionHandler(IProblemDetailsService problemDetails, I
 
         var (status, title, detail) = exception switch
         {
-            DomainException e => (StatusCodes.Status400BadRequest, "Ongeldige aanvraag", e.Message),
             BusinessRuleException e => (StatusCodes.Status400BadRequest, "Ongeldige aanvraag", e.Message),
             KeyNotFoundException => (StatusCodes.Status404NotFound, "Niet gevonden", null),
             _ => (StatusCodes.Status500InternalServerError, "Er is een onverwachte fout opgetreden", null),

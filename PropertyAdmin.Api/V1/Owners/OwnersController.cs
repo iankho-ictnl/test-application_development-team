@@ -21,6 +21,7 @@ namespace PropertyAdmin.Api.V1.Owners;
 
 [ApiController]
 [Route("api/v1/owners")]
+[Route("api/owners")] // Legacy alias (Q-045): remove after T-037 and T-038.
 public sealed class OwnersController : ControllerBase
 {
     [HttpGet]
@@ -54,7 +55,7 @@ public sealed class OwnersController : ControllerBase
     {
         var result = await handler.HandleAsync(request.ToCommand(), cancellationToken);
         var response = result.ToResponse();
-        return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
+        return this.CreatedUnderRequestPath(response.Id, response);
     }
 
     [HttpPut("{id:int}")]
