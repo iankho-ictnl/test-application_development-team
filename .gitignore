@@ -1,4 +1,5 @@
 .team/
+.worktrees/
 .env
 bin/
 obj/
