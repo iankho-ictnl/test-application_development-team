@@ -55,6 +55,9 @@ public static class DependencyInjection
         services.AddScoped<PropertyAdmin.Logic.V1.Invoices.Create.CreateHandler>();
         services.AddScoped<PropertyAdmin.Logic.V1.Invoices.MarkPaid.MarkPaidHandler>();
         services.AddScoped<PropertyAdmin.Logic.V1.Invoices.Delete.DeleteHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Reports.IReportService, PropertyAdmin.Logic.V1.Reports.ReportService>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Reports.GetAssetResults.GetAssetResultsHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Reports.GetOwnerOverview.GetOwnerOverviewHandler>();
         return services;
     }
 }
