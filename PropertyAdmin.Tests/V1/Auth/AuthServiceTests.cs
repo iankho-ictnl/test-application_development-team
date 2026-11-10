@@ -84,6 +84,22 @@ public sealed class AuthServiceTests
     }
 
     [Fact]
+    public async Task Two_factor_setup_hides_the_key_and_uri_once_two_factor_is_on()
+    {
+        await using var host = await IdentityTestHost.CreateAsync();
+        var user = await host.CreateUserAsync("enabled");
+        await host.Users.ResetAuthenticatorKeyAsync(user);
+        await host.Users.SetTwoFactorEnabledAsync(user, true);
+        var get = new PropertyAdmin.Logic.V1.Auth.GetTwoFactor.GetTwoFactorHandler(Service(host));
+
+        var setup = (await get.HandleAsync(new(user.Id), CancellationToken.None)).Setup!;
+
+        Assert.Equal(new TwoFactorSetupModel(null, null, true), setup);
+        Assert.Equal(new PropertyAdmin.Api.V1.Auth.GetTwoFactor.Response(null, null, true),
+            PropertyAdmin.Api.V1.Auth.GetTwoFactor.Mapping.ToResponse(new PropertyAdmin.Logic.V1.Auth.GetTwoFactor.Result(setup)));
+    }
+
+    [Fact]
     public async Task Disable_two_factor_turns_it_off_and_resets_the_key()
     {
         await using var host = await IdentityTestHost.CreateAsync();

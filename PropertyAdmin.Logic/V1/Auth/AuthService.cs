@@ -52,6 +52,8 @@ public sealed class AuthService(
         cancellationToken.ThrowIfCancellationRequested();
         var user = await users.FindByIdAsync(userId);
         if (user is null) return null;
+        // S-18: once two-factor sign-in is on, the shared key is never handed out again.
+        if (await users.GetTwoFactorEnabledAsync(user)) return new TwoFactorSetupModel(null, null, true);
         var key = await users.GetAuthenticatorKeyAsync(user);
         if (string.IsNullOrEmpty(key))
         {
@@ -60,7 +62,7 @@ public sealed class AuthService(
         }
         var issuer = UrlEncoder.Default.Encode(Issuer);
         var uri = $"otpauth://totp/{issuer}:{UrlEncoder.Default.Encode(user.UserName!)}?secret={key}&issuer={issuer}&digits=6";
-        return new TwoFactorSetupModel(key!, uri, user.TwoFactorEnabled);
+        return new TwoFactorSetupModel(key!, uri, false);
     }
 
     public async Task<IReadOnlyList<string>?> EnableTwoFactorAsync(string userId, string code, CancellationToken cancellationToken)
