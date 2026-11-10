@@ -30,6 +30,12 @@ public static class DependencyInjection
         services.AddScoped<PropertyAdmin.Logic.V1.Assets.Create.CreateHandler>();
         services.AddScoped<PropertyAdmin.Logic.V1.Assets.Update.UpdateHandler>();
         services.AddScoped<PropertyAdmin.Logic.V1.Assets.Delete.DeleteHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.VatRates.IVatRateService, PropertyAdmin.Logic.V1.VatRates.VatRateService>();
+        services.AddScoped<PropertyAdmin.Logic.V1.VatRates.GetAll.GetAllHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.VatRates.GetById.GetByIdHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.VatRates.Create.CreateHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.VatRates.Update.UpdateHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.VatRates.Delete.DeleteHandler>();
         return services;
     }
 }
