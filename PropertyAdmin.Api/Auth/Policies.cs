@@ -1,7 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using PropertyAdmin.Contracts;
 
 namespace PropertyAdmin.Api.Auth;
 

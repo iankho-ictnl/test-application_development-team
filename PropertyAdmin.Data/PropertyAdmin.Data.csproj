@@ -16,11 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-	<!-- Temporary: the seeder uses Permissions. T-036 (D-026 B11) removes this reference. -->
-	<ProjectReference Include="..\PropertyAdmin.Contracts\PropertyAdmin.Contracts.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
 	<InternalsVisibleTo Include="PropertyAdmin.Tests" />
   </ItemGroup>
 
