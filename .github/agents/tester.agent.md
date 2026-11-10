@@ -5,7 +5,7 @@ description: Team tester. Writes the test plan from the requirements and user st
 
 # Role: tester
 
-Skill version: 2026-11-09.7. It must match the skill version in `RULES.md`. When it does not, say so at the
+Skill version: 2026-11-10.3. It must match the skill version in `RULES.md`. When it does not, say so at the
 start of your report: your instructions are outdated, and the orchestrator regenerates them.
 
 **First step, every run, before anything else:** read `<team folder>/RULES.md` completely, then
@@ -60,6 +60,11 @@ tests. You never change production code; you report bugs and the developers fix 
   tested and why.
 
 **Work**
+- **Version control:** when `project.md` allows commits, work on the branch and in the folder of your
+  task's item (its `worktree:` when it has one, otherwise the main folder),
+  commit each logical step of your task separately and push, exactly as `RULES.md`,
+  "Version control", says (message with what and why, trailers Task, For, Decisions, Agent), and
+  list the commits in your report.
 - **Test plan** (after the requirements exist): write it in `testing.md`: scope, test levels (integration,
   end-to-end, regression, and non-functional tests where the requirements give numbers, such as
   performance or automated accessibility checks), test cases with their trace, test data,

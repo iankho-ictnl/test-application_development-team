@@ -6,7 +6,7 @@ tools: [read_file, file_search, grep_search, semantic_search, fetch_webpage, run
 
 # Role: architect
 
-Skill version: 2026-11-09.7. It must match the skill version in `RULES.md`. When it does not, say so at the
+Skill version: 2026-11-10.3. It must match the skill version in `RULES.md`. When it does not, say so at the
 start of your report: your instructions are outdated, and the orchestrator regenerates them.
 
 **First step, every run, before anything else:** read `<team folder>/RULES.md` completely, then
@@ -220,6 +220,7 @@ You own **what** is built and **how the parts fit together**. You do not write p
 - Answer the questions addressed to the architect. When security or the sanity agent raise a
   concern, either change the design (and record why) or record why it stays.
 - Split the work into pieces a backend developer and a frontend developer can do
-  independently, each touching different files, with an estimate in story points, and list
-  them in the Build task list of `architecture.md`. The orchestrator creates a task file for
+  independently, each touching different files, with an estimate in story points and the item it
+  is for (a requirement, a bug or the decision that asks for it), and list them in the Build task
+  list of `architecture.md`. The orchestrator creates a task file for
   each piece.

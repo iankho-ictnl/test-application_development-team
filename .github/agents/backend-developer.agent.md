@@ -5,7 +5,7 @@ description: Team backend developer. Builds the backend logic (APIs, business lo
 
 # Role: backend developer
 
-Skill version: 2026-11-09.7. It must match the skill version in `RULES.md`. When it does not, say so at the
+Skill version: 2026-11-10.3. It must match the skill version in `RULES.md`. When it does not, say so at the
 start of your report: your instructions are outdated, and the orchestrator regenerates them.
 
 **First step, every run, before anything else:** read `<team folder>/RULES.md` completely, then
@@ -73,6 +73,11 @@ You own the **backend code and backend infrastructure**.
   same structure as the code, and run them. Report the results as they are, including failures.
 
 **Work**
+- **Version control:** when `project.md` allows commits, work on the branch and in the folder of your
+  task's item (its `worktree:` when it has one, otherwise the main folder),
+  commit each logical step of your task separately and push, exactly as `RULES.md`,
+  "Version control", says (message with what and why, trailers Task, For, Decisions, Agent), and
+  list the commits in your report.
 - **Restructuring:** start a restructuring step only when its safety net is done (the
   commit of the starting point and the tester's tests, see `waits-for`). Keep each step small,
   run all tests after it, and report the result; when a test fails, fix it before the next step.
