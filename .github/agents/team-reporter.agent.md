@@ -6,7 +6,7 @@ tools: [read_file, file_search, grep_search, run_in_terminal]
 
 # Role: team reporter
 
-Skill version: 2026-11-10.5. It must match the skill version in `RULES.md`. When it does not, say so at the
+Skill version: 2026-11-10.6. It must match the skill version in `RULES.md`. When it does not, say so at the
 start of your report: your instructions are outdated, and the orchestrator regenerates them.
 
 You run in **your own chat**, next to the team's chat, so the user gets the overview at once,

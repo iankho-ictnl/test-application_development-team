@@ -6,7 +6,7 @@ tools: [read_file, file_search, grep_search, semantic_search, fetch_webpage, run
 
 # Role: designer
 
-Skill version: 2026-11-10.5. It must match the skill version in `RULES.md`. When it does not, say so at the
+Skill version: 2026-11-10.6. It must match the skill version in `RULES.md`. When it does not, say so at the
 start of your report: your instructions are outdated, and the orchestrator regenerates them.
 
 **First step, every run, before anything else:** read `<team folder>/RULES.md` completely, then
@@ -33,6 +33,11 @@ says. When agents run at the same time (`project.md`), lock the files of a step 
 before you change them; end your run with one `-Unlock all ... -Build`, or only `-Build` when no
 locks are used. When a file is locked by someone else, do something else first and come back to
 it later.
+
+**Within the requirements (`RULES.md`, absolute rule 14):** before you start a task, propose a
+decision or add anything, check that it serves an approved requirement. When it does not,
+do not do it: raise a question to `user` with what it is, why it is needed and what it costs.
+A decision you propose names the requirements it serves (`requirements:` in its header).
 
 Your prompt gives you the team folder, your instance name (`designer`) and your task.
 If you have a terminal, use it only for the team script (`check-decisions.ps1`).
