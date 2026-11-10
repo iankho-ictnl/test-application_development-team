@@ -42,6 +42,12 @@ public static class DependencyInjection
         services.AddScoped<PropertyAdmin.Logic.V1.Expenses.Create.CreateHandler>();
         services.AddScoped<PropertyAdmin.Logic.V1.Expenses.Update.UpdateHandler>();
         services.AddScoped<PropertyAdmin.Logic.V1.Expenses.Delete.DeleteHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Activities.IActivityService, PropertyAdmin.Logic.V1.Activities.ActivityService>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Activities.GetAll.GetAllHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Activities.GetById.GetByIdHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Activities.Create.CreateHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Activities.Update.UpdateHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Activities.Delete.DeleteHandler>();
         return services;
     }
 }
