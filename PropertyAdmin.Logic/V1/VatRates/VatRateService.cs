@@ -48,6 +48,16 @@ public sealed class VatRateService(AppDbContext db) : IVatRateService
         return true;
     }
 
+    public async Task<decimal> GetPercentageAsync(string name, DateOnly date, CancellationToken cancellationToken)
+    {
+        var percentage = await db.VatRates.AsNoTracking()
+            .Where(rate => rate.Name == name && rate.ValidFrom <= date && (rate.ValidTo == null || rate.ValidTo >= date))
+            .Select(rate => (decimal?)rate.Percentage)
+            .FirstOrDefaultAsync(cancellationToken);
+        return percentage
+            ?? throw new BusinessRuleException($"Er is geen btw-tarief '{name}' geldig op {date:dd-MM-yyyy}.");
+    }
+
     private async Task ValidateAsync(VatRateSaveModel model, int? excludeId, CancellationToken cancellationToken)
     {
         if (model.ValidTo is DateOnly validTo && validTo < model.ValidFrom)

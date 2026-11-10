@@ -9,4 +9,5 @@ public interface IVatRateService
     Task<VatRateModel> CreateAsync(VatRateSaveModel model, CancellationToken cancellationToken);
     Task<VatRateModel?> UpdateAsync(int id, VatRateSaveModel model, CancellationToken cancellationToken);
     Task<bool> DeleteAsync(int id, CancellationToken cancellationToken);
+    Task<decimal> GetPercentageAsync(string name, DateOnly date, CancellationToken cancellationToken);
 }
