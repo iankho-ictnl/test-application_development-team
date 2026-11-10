@@ -1,4 +1,3 @@
-using PropertyAdmin.Contracts;
 using PropertyAdmin.Data;
 using PropertyAdmin.Logic;
 using PropertyAdmin.Logic.V1.Invoices;
@@ -39,7 +38,7 @@ public sealed class InvoiceServiceTests
 
         Assert.Equal("2026-0001", response.Number);
         Assert.Equal(new DateOnly(2026, 4, 14), response.DueDate);
-        Assert.Equal(InvoiceStatus.Open, response.Status);
+        Assert.Equal(PropertyAdmin.Api.V1.InvoiceStatus.Open, response.Status);
         Assert.Equal("Owner", response.OwnerName);
         Assert.Equal(["01-03-2026 Owner house: Expense", "02-03-2026 Owner house: Activity"], response.Lines.Select(line => line.Description).Order());
         Assert.Equal(300m, response.TotalExclVat);

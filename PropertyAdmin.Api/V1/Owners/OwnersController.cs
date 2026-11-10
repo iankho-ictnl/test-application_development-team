@@ -6,7 +6,6 @@ using PropertyAdmin.Api.V1.Owners.Delete;
 using PropertyAdmin.Api.V1.Owners.GetById;
 using PropertyAdmin.Api.V1.Owners.GetAll;
 using PropertyAdmin.Api.V1.Owners.Update;
-using PropertyAdmin.Contracts;
 using PropertyAdmin.Logic.V1.Owners.Create;
 using PropertyAdmin.Logic.V1.Owners.Delete;
 using PropertyAdmin.Logic.V1.Owners.GetById;

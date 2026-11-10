@@ -8,7 +8,7 @@ public static class Mapping
 
     public static Response ToResponse(this Result result) => new(
         result.Uninvoiced.Activities.Select(activity => new ActivityResponse(activity.Id, activity.AssetId, activity.AssetName, activity.Date,
-            activity.Kind, activity.Description, activity.PricingType, activity.Hours, activity.HourlyRate, activity.FixedPrice,
+            (ActivityKind)activity.Kind, activity.Description, (PricingType)activity.PricingType, activity.Hours, activity.HourlyRate, activity.FixedPrice,
             activity.AmountExclVat, activity.VatRateName, activity.VatPercentage, activity.VatAmount, activity.AmountInclVat, activity.InvoiceId)).ToList(),
         result.Uninvoiced.Expenses.Select(expense => new ExpenseResponse(expense.Id, expense.AssetId, expense.AssetName, expense.Date,
             expense.Description, expense.Category, expense.AmountExclVat, expense.VatRateName, expense.VatPercentage, expense.VatAmount,

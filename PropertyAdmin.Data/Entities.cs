@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using PropertyAdmin.Contracts;
 
 namespace PropertyAdmin.Data;
 

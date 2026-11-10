@@ -11,5 +11,5 @@ public static class Mapping
         result.Assets.Select(asset => asset.ToResponse()).ToList();
 
     private static Response ToResponse(this AssetModel asset) =>
-        new(asset.Id, asset.OwnerId, asset.OwnerName, asset.Type, asset.Name, asset.Address, asset.PostalCode, asset.City);
+        new(asset.Id, asset.OwnerId, asset.OwnerName, (AssetType)asset.Type, asset.Name, asset.Address, asset.PostalCode, asset.City);
 }

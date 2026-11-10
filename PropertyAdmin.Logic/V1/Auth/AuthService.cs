@@ -1,6 +1,5 @@
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Identity;
-using PropertyAdmin.Contracts;
 using PropertyAdmin.Data;
 using PropertyAdmin.Logic.V1.Auth.Models;
 

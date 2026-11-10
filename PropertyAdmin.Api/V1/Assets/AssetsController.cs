@@ -5,7 +5,6 @@ using PropertyAdmin.Api.V1.Assets.GetAll;
 using PropertyAdmin.Api.V1.Assets.GetById;
 using PropertyAdmin.Api.V1.Assets.Create;
 using PropertyAdmin.Api.V1.Assets.Update;
-using PropertyAdmin.Contracts;
 using PropertyAdmin.Logic.V1.Assets.GetAll;
 using PropertyAdmin.Logic.V1.Assets.GetById;
 using PropertyAdmin.Logic.V1.Assets.Create;

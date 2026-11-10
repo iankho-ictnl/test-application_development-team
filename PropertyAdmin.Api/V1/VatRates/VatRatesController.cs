@@ -5,7 +5,6 @@ using PropertyAdmin.Api.V1.VatRates.GetAll;
 using PropertyAdmin.Api.V1.VatRates.GetById;
 using PropertyAdmin.Api.V1.VatRates.Create;
 using PropertyAdmin.Api.V1.VatRates.Update;
-using PropertyAdmin.Contracts;
 using PropertyAdmin.Logic.V1.VatRates.GetAll;
 using PropertyAdmin.Logic.V1.VatRates.GetById;
 using PropertyAdmin.Logic.V1.VatRates.Create;

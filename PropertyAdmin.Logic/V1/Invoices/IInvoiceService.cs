@@ -1,4 +1,4 @@
-using PropertyAdmin.Contracts;
+using PropertyAdmin.Data;
 using PropertyAdmin.Logic.V1.Invoices.Models;
 
 namespace PropertyAdmin.Logic.V1.Invoices;

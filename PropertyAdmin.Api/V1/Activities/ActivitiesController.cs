@@ -6,7 +6,6 @@ using PropertyAdmin.Api.V1.Activities.Delete;
 using PropertyAdmin.Api.V1.Activities.GetAll;
 using PropertyAdmin.Api.V1.Activities.GetById;
 using PropertyAdmin.Api.V1.Activities.Update;
-using PropertyAdmin.Contracts;
 using PropertyAdmin.Logic.V1.Activities.Create;
 using PropertyAdmin.Logic.V1.Activities.Delete;
 using PropertyAdmin.Logic.V1.Activities.GetAll;

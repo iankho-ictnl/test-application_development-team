@@ -1,4 +1,3 @@
-using PropertyAdmin.Contracts;
 
 namespace PropertyAdmin.Api.V1.Assets.GetAll;
 

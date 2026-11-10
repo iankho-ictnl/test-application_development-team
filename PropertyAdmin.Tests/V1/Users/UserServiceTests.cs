@@ -1,4 +1,4 @@
-using PropertyAdmin.Contracts;
+using PropertyAdmin.Data;
 using PropertyAdmin.Logic;
 using PropertyAdmin.Logic.V1.Users;
 using PropertyAdmin.Logic.V1.Users.Models;

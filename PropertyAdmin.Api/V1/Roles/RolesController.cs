@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PropertyAdmin.Api.V1.Roles.Create;
 using PropertyAdmin.Api.V1.Roles.Update;
-using PropertyAdmin.Contracts;
+using PropertyAdmin.Api.Auth;
 using PropertyAdmin.Logic.V1.Roles.Create;
 using PropertyAdmin.Logic.V1.Roles.Delete;
 using PropertyAdmin.Logic.V1.Roles.GetAll;

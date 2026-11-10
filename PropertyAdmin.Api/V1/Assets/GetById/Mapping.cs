@@ -10,5 +10,5 @@ public static class Mapping
     public static Response ToResponse(this Result result) => result.Asset!.ToResponse();
 
     private static Response ToResponse(this AssetModel asset) =>
-        new(asset.Id, asset.OwnerId, asset.OwnerName, asset.Type, asset.Name, asset.Address, asset.PostalCode, asset.City);
+        new(asset.Id, asset.OwnerId, asset.OwnerName, (AssetType)asset.Type, asset.Name, asset.Address, asset.PostalCode, asset.City);
 }

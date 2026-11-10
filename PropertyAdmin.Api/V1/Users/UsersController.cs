@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PropertyAdmin.Api.V1.Users.Create;
 using PropertyAdmin.Api.V1.Users.GetById;
 using PropertyAdmin.Api.V1.Users.Update;
-using PropertyAdmin.Contracts;
+using PropertyAdmin.Api.Auth;
 using PropertyAdmin.Logic.V1.Users.Create;
 using PropertyAdmin.Logic.V1.Users.Delete;
 using PropertyAdmin.Logic.V1.Users.ForceSignOut;

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using PropertyAdmin.Api.Auth;
 using PropertyAdmin.Api.V1.Reports.GetAssetResults;
 using PropertyAdmin.Api.V1.Reports.GetOwnerOverview;
-using PropertyAdmin.Contracts;
 using PropertyAdmin.Logic.V1.Reports.GetAssetResults;
 using PropertyAdmin.Logic.V1.Reports.GetOwnerOverview;
 

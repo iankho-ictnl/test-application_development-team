@@ -8,7 +8,6 @@ using PropertyAdmin.Api.V1.Invoices.GetById;
 using PropertyAdmin.Api.V1.Invoices.GetPdf;
 using PropertyAdmin.Api.V1.Invoices.GetUninvoiced;
 using PropertyAdmin.Api.V1.Invoices.MarkPaid;
-using PropertyAdmin.Contracts;
 using PropertyAdmin.Logic.V1.Invoices.Create;
 using PropertyAdmin.Logic.V1.Invoices.Delete;
 using PropertyAdmin.Logic.V1.Invoices.GetAll;

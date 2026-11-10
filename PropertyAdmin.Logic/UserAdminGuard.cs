@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using PropertyAdmin.Contracts;
 using PropertyAdmin.Data;
 
 namespace PropertyAdmin.Logic;

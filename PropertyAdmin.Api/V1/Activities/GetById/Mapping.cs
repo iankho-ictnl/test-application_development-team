@@ -9,7 +9,7 @@ public static class Mapping
     public static Response ToResponse(this Result result)
     {
         var activity = result.Activity!;
-        return new Response(activity.Id, activity.AssetId, activity.AssetName, activity.Date, activity.Kind, activity.Description, activity.PricingType,
+        return new Response(activity.Id, activity.AssetId, activity.AssetName, activity.Date, (ActivityKind)activity.Kind, activity.Description, (PricingType)activity.PricingType,
             activity.Hours, activity.HourlyRate, activity.FixedPrice, activity.AmountExclVat, activity.VatRateName, activity.VatPercentage,
             activity.VatAmount, activity.AmountInclVat, activity.InvoiceId);
     }

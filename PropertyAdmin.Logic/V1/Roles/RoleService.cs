@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using PropertyAdmin.Contracts;
 using PropertyAdmin.Data;
 using PropertyAdmin.Logic.V1.Roles.Models;
 

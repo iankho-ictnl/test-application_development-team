@@ -6,7 +6,6 @@ using PropertyAdmin.Api.V1.Expenses.Delete;
 using PropertyAdmin.Api.V1.Expenses.GetAll;
 using PropertyAdmin.Api.V1.Expenses.GetById;
 using PropertyAdmin.Api.V1.Expenses.Update;
-using PropertyAdmin.Contracts;
 using PropertyAdmin.Logic.V1.Expenses.Create;
 using PropertyAdmin.Logic.V1.Expenses.Delete;
 using PropertyAdmin.Logic.V1.Expenses.GetAll;

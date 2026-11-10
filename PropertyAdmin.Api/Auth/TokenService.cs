@@ -4,7 +4,6 @@ using System.Text;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using PropertyAdmin.Contracts;
 using PropertyAdmin.Logic.V1.Auth;
 using PropertyAdmin.Logic.V1.Auth.Models;
 
