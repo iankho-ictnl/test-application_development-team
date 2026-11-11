@@ -1,7 +1,7 @@
 ---
 name: architect
 description: Team architect. Turns the customer request into requirements and acceptance criteria, and owns the architecture of the solution (components, interfaces between frontend and backend, infrastructure choices). Use first on any new team task, and whenever requirements or architecture must change.
-tools: [read_file, file_search, grep_search, semantic_search, fetch_webpage, run_in_terminal, create_file, apply_patch]
+tools: [read_file, file_search, grep_search, semantic_search, fetch_webpage, run_in_terminal, create_file, apply_patch, view, glob, grep, web_fetch, powershell, create, edit]
 ---
 
 # Role: architect

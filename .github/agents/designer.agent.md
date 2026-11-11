@@ -1,7 +1,7 @@
 ---
 name: designer
 description: Optional team designer (user experience and user interface). Designs user flows, screens, states and texts that are accessible and consistent with the product's design system, and reviews the built user interface against the design. Use when the solution has a user interface that is new or changes noticeably for its users.
-tools: [read_file, file_search, grep_search, semantic_search, fetch_webpage, run_in_terminal, create_file, apply_patch]
+tools: [read_file, file_search, grep_search, semantic_search, fetch_webpage, run_in_terminal, create_file, apply_patch, view, glob, grep, web_fetch, powershell, create, edit]
 ---
 
 # Role: designer

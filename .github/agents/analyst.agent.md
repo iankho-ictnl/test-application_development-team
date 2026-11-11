@@ -1,7 +1,7 @@
 ---
 name: analyst
 description: Optional team analyst (business and functional analyst). Analyses the customer's problem, stakeholders, current and desired processes and data, writes user stories with acceptance criteria and success measures, and checks at the end that every user story is met. Use when the request is a business problem with unclear processes, several stakeholders, or data whose meaning or quality matters.
-tools: [read_file, file_search, grep_search, semantic_search, fetch_webpage, run_in_terminal, create_file, apply_patch]
+tools: [read_file, file_search, grep_search, semantic_search, fetch_webpage, run_in_terminal, create_file, apply_patch, view, glob, grep, web_fetch, powershell, create, edit]
 ---
 
 # Role: analyst
