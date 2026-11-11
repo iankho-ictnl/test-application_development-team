@@ -120,6 +120,15 @@ public sealed class AuthService(
         return true;
     }
 
+    public async Task<bool> LogoutAsync(string userId, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var user = await users.FindByIdAsync(userId);
+        if (user is null) return false;
+        await users.UpdateSecurityStampAsync(user);
+        return true;
+    }
+
     private async Task<TokenSubjectModel> CreateSubjectAsync(ApplicationUser user, CancellationToken cancellationToken)
     {
         var roleNames = await users.GetRolesAsync(user);

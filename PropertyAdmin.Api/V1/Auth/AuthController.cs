@@ -13,7 +13,9 @@ using PropertyAdmin.Logic.V1.Auth.EnableTwoFactor;
 using PropertyAdmin.Logic.V1.Auth.GetTwoFactor;
 using PropertyAdmin.Logic.V1.Auth.Login;
 using PropertyAdmin.Logic.V1.Auth.LoginTwoFactor;
+using PropertyAdmin.Logic.V1.Auth.Logout;
 using GetTwoFactorMapping = PropertyAdmin.Api.V1.Auth.GetTwoFactor.Mapping;
+using LogoutMapping = PropertyAdmin.Api.V1.Auth.Logout.Mapping;
 
 namespace PropertyAdmin.Api.V1.Auth;
 
@@ -81,6 +83,15 @@ public sealed class AuthController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await handler.HandleAsync(request.ToCommand(CurrentUserId), cancellationToken);
+        return result.Found ? NoContent() : Unauthorized();
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(
+        [FromServices] LogoutHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var result = await handler.HandleAsync(LogoutMapping.ToCommand(CurrentUserId), cancellationToken);
         return result.Found ? NoContent() : Unauthorized();
     }
 

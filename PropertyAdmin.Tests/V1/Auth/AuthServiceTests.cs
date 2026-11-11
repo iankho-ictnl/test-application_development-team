@@ -220,6 +220,19 @@ public sealed class AuthServiceTests
     }
 
     [Fact]
+    public async Task Logout_renews_the_security_stamp_and_reports_an_unknown_user()
+    {
+        await using var host = await IdentityTestHost.CreateAsync();
+        var user = await host.CreateUserAsync("logout");
+        var stamp = await host.Users.GetSecurityStampAsync(user);
+        var handler = new PropertyAdmin.Logic.V1.Auth.Logout.LogoutHandler(Service(host));
+
+        Assert.True((await handler.HandleAsync(PropertyAdmin.Api.V1.Auth.Logout.Mapping.ToCommand(user.Id), CancellationToken.None)).Found);
+        Assert.NotEqual(stamp, await host.Users.GetSecurityStampAsync(user));
+        Assert.False((await handler.HandleAsync(new("unknown"), CancellationToken.None)).Found);
+    }
+
+    [Fact]
     public async Task Cancelled_request_passes_the_cancellation_through()
     {
         await using var host = await IdentityTestHost.CreateAsync();
@@ -232,6 +245,9 @@ public sealed class AuthServiceTests
             .HandleAsync(new("cancel", IdentityTestHost.Password), cancellation.Token));
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => service.ChangePasswordAsync(user.Id, IdentityTestHost.Password, "Another-Password-456!", cancellation.Token));
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => service.DisableTwoFactorAsync(user.Id, "wrong-password", null, cancellation.Token));
+        var stamp = await host.Users.GetSecurityStampAsync(user);
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => service.LogoutAsync(user.Id, cancellation.Token));
+        Assert.Equal(stamp, await host.Users.GetSecurityStampAsync(user));
         Assert.Equal(0, await host.Users.GetAccessFailedCountAsync(user));
         Assert.Null(host.Tokens.LastSubject);
         Assert.True(await host.Users.CheckPasswordAsync(user, IdentityTestHost.Password));

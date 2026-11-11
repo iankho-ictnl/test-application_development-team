@@ -82,6 +82,34 @@ public sealed class AuthApiTests(ApiFactory api)
             new { userName = api.Unique("longpw"), email = "longpw@example.test", password = password129, ownerId = (int?)null, roles = new[] { "Viewer" } }));
     }
 
+    [Theory]
+    [InlineData("/api/v1/auth")]
+    [InlineData("/api/auth")]
+    public async Task Logout_refuses_every_token_of_the_user_afterwards(string route)
+    {
+        var userName = api.Unique("logout");
+        await api.CreateUserAsync(userName, "Viewer");
+        var first = await SignInAsync(userName);
+        var second = await SignInAsync(userName);
+        await ExpectStatus(await second.GetAsync("/api/v1/owners"), HttpStatusCode.OK);
+
+        await ExpectStatus(await first.PostAsync($"{route}/logout", null), HttpStatusCode.NoContent);
+
+        foreach (var client in new[] { first, second })
+        {
+            await ExpectStatus(await client.GetAsync("/api/v1/auth/2fa"), HttpStatusCode.Unauthorized);
+            await ExpectStatus(await client.GetAsync("/api/v1/owners"), HttpStatusCode.Unauthorized);
+            await ExpectStatus(await client.PostAsync($"{route}/logout", null), HttpStatusCode.Unauthorized);
+        }
+        await ExpectStatus(await api.Anonymous().PostAsync($"{route}/logout", null), HttpStatusCode.Unauthorized);
+    }
+
+    private async Task<HttpClient> SignInAsync(string userName)
+    {
+        var login = await Expect(await api.Anonymous().PostAsJsonAsync("/api/v1/auth/login", new { userName, password = ApiFactory.Password }), HttpStatusCode.OK);
+        return api.WithToken(login.GetProperty("accessToken").GetString()!);
+    }
+
     /// <summary>A user with two-factor sign-in on, signed in through login and login-2fa with a recovery code.</summary>
     private async Task<HttpClient> SignInWithTwoFactorAsync(string userName)
     {
