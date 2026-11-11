@@ -38,6 +38,41 @@ public sealed class RoleServiceTests
     }
 
     [Fact]
+    public async Task Create_and_update_refuse_ReadOwn_together_with_any_other_permission()
+    {
+        await using var host = await IdentityTestHost.CreateAsync();
+        await host.CreateRoleAsync("Viewer", Permissions.ReadOwn);
+        var service = Service(host);
+
+        Assert.Equal(RoleService.ReadOwnNotAlone, (await Assert.ThrowsAsync<BusinessRuleException>(() => service.CreateAsync(new("Mixed", [Permissions.ReadOwn, Permissions.Reports]), CancellationToken.None))).Message);
+        Assert.Equal(RoleService.ReadOwnNotAlone, (await Assert.ThrowsAsync<BusinessRuleException>(() => service.CreateAsync(new("Mixed", [Permissions.ReadAll, Permissions.ReadOwn]), CancellationToken.None))).Message);
+        Assert.Equal(RoleService.ReadOwnNotAlone, (await Assert.ThrowsAsync<BusinessRuleException>(() => service.UpdateAsync("Viewer", new("Viewer", [Permissions.ReadOwn, Permissions.Invoices]), CancellationToken.None))).Message);
+        Assert.Equal(RoleService.UnknownPermissions, (await Assert.ThrowsAsync<BusinessRuleException>(() => service.CreateAsync(new("Mixed", ["readown"]), CancellationToken.None))).Message);
+
+        host.Db.ChangeTracker.Clear();
+        var role = Assert.Single(await service.GetAllAsync(CancellationToken.None));
+        Assert.Equal("Viewer", role.Name);
+        Assert.Equal([Permissions.ReadOwn], role.Permissions);
+    }
+
+    [Fact]
+    public async Task Create_and_update_accept_ReadOwn_alone()
+    {
+        await using var host = await IdentityTestHost.CreateAsync();
+        await host.CreateRoleAsync("Admin", Permissions.Users);
+        await host.CreateUserAsync("admin", null, "Admin");
+        await host.CreateRoleAsync("Clerk", Permissions.Reports);
+        var service = Service(host);
+
+        await service.CreateAsync(new("Viewer", [Permissions.ReadOwn, Permissions.ReadOwn]), CancellationToken.None);
+        Assert.True(await service.UpdateAsync("Clerk", new("Clerk", [Permissions.ReadOwn]), CancellationToken.None));
+
+        var roles = await service.GetAllAsync(CancellationToken.None);
+        Assert.Equal(["Admin", "Clerk", "Viewer"], roles.Select(role => role.Name));
+        Assert.All(roles.Where(role => role.Name != "Admin"), role => Assert.Equal([Permissions.ReadOwn], role.Permissions));
+    }
+
+    [Fact]
     public async Task Update_renames_and_replaces_the_permissions_and_reports_an_unknown_role()
     {
         await using var host = await IdentityTestHost.CreateAsync();
