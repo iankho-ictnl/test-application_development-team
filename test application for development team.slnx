@@ -2,6 +2,7 @@
   <Folder Name="/.team/">
     <File Path=".team/HELP.md" />
     <File Path=".team/project.md" />
+    <File Path=".team/plan.md" />
     <File Path=".team/analysis.md" />
     <File Path=".team/architecture.md" />
     <File Path=".team/design.md" />
