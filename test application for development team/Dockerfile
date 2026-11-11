@@ -2,6 +2,8 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-resolute AS base
+# Docker copies this ownership into the new empty dpkeys volume, so the app user can write its keys.
+RUN mkdir -p /home/app/.aspnet/DataProtection-Keys && chown -R $APP_UID /home/app/.aspnet
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
