@@ -55,6 +55,33 @@ public sealed class AuthApiTests(ApiFactory api)
         await ExpectStatus(await client.PostAsJsonAsync("/api/v1/auth/2fa/disable", new { password = ApiFactory.Password }), HttpStatusCode.NoContent);
     }
 
+    [Fact]
+    public async Task Too_long_credentials_are_refused_with_a_validation_400_on_both_routes()
+    {
+        var userName101 = new string('u', 101);
+        var password129 = new string('p', 129);
+        var code65 = new string('1', 65);
+        var token4097 = new string('t', 4097);
+        var anonymous = api.Anonymous();
+        var signedIn = await api.As("Viewer");
+        var admin = await api.As("Admin");
+
+        foreach (var route in new[] { "/api/v1/auth", "/api/auth" })
+        {
+            await ExpectValidationProblem(await anonymous.PostAsJsonAsync($"{route}/login", new { userName = userName101, password = ApiFactory.Password }));
+            await ExpectValidationProblem(await anonymous.PostAsJsonAsync($"{route}/login", new { userName = ApiFactory.AdminUserName, password = password129 }));
+            await ExpectValidationProblem(await anonymous.PostAsJsonAsync($"{route}/login-2fa", new { challengeToken = token4097, code = "123456" }));
+            await ExpectValidationProblem(await anonymous.PostAsJsonAsync($"{route}/login-2fa", new { challengeToken = "challenge", code = code65 }));
+            await ExpectValidationProblem(await signedIn.PostAsJsonAsync($"{route}/2fa/enable", new { code = code65 }));
+            await ExpectValidationProblem(await signedIn.PostAsJsonAsync($"{route}/2fa/disable", new { password = password129 }));
+            await ExpectValidationProblem(await signedIn.PostAsJsonAsync($"{route}/2fa/disable", new { code = code65 }));
+            await ExpectValidationProblem(await signedIn.PostAsJsonAsync($"{route}/password", new { currentPassword = password129, newPassword = "Another-Password-456!" }));
+            await ExpectValidationProblem(await signedIn.PostAsJsonAsync($"{route}/password", new { currentPassword = ApiFactory.Password, newPassword = password129 }));
+        }
+        await ExpectValidationProblem(await admin.PostAsJsonAsync("/api/v1/users",
+            new { userName = api.Unique("longpw"), email = "longpw@example.test", password = password129, ownerId = (int?)null, roles = new[] { "Viewer" } }));
+    }
+
     /// <summary>A user with two-factor sign-in on, signed in through login and login-2fa with a recovery code.</summary>
     private async Task<HttpClient> SignInWithTwoFactorAsync(string userName)
     {
