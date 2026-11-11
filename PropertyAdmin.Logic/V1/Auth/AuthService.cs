@@ -11,6 +11,8 @@ public sealed class AuthService(
     ITokenIssuer tokens) : IAuthService
 {
     private const string Issuer = "PropertyAdmin";
+    public const string ReauthenticationRequired = "Geef je huidige wachtwoord of een code uit je authenticator-app.";
+    public const string ReauthenticationFailed = "Het wachtwoord of de code is onjuist.";
 
     // Identity's UserManager takes no cancellation token, so each step checks it before it starts.
     public async Task<LoginModel?> LoginAsync(string userName, string password, CancellationToken cancellationToken)
@@ -77,11 +79,26 @@ public sealed class AuthService(
         return codes!.ToList();
     }
 
-    public async Task<bool> DisableTwoFactorAsync(string userId, CancellationToken cancellationToken)
+    public async Task<bool> DisableTwoFactorAsync(string userId, string? password, string? code, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var user = await users.FindByIdAsync(userId);
-        if (user is null) return false;
+        if (user is null || await users.IsLockedOutAsync(user)) return false;
+        var hasPassword = !string.IsNullOrEmpty(password);
+        var hasCode = !string.IsNullOrWhiteSpace(code);
+        if (!hasPassword && !hasCode) throw new BusinessRuleException(ReauthenticationRequired);
+
+        cancellationToken.ThrowIfCancellationRequested();
+        // S-19: every credential given must be right, and one message for both does not tell which failed.
+        var ok = (!hasPassword || await users.CheckPasswordAsync(user, password!))
+                 && (!hasCode || await users.VerifyTwoFactorTokenAsync(user, users.Options.Tokens.AuthenticatorTokenProvider, NormalizeCode(code!)));
+        if (!ok)
+        {
+            await users.AccessFailedAsync(user);
+            throw new BusinessRuleException(ReauthenticationFailed);
+        }
+        await users.ResetAccessFailedCountAsync(user);
+        if (!await users.GetTwoFactorEnabledAsync(user)) return true;
         await users.SetTwoFactorEnabledAsync(user, false);
         await users.ResetAuthenticatorKeyAsync(user);
         return true;

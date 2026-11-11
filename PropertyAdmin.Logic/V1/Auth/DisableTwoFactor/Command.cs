@@ -1,3 +1,4 @@
 namespace PropertyAdmin.Logic.V1.Auth.DisableTwoFactor;
 
-public sealed record Command(string UserId);
+/// <summary>Password or Code (authenticator only) re-authenticates the caller; at least one is required.</summary>
+public sealed record Command(string UserId, string? Password, string? Code);

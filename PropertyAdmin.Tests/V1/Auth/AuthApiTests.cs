@@ -40,6 +40,21 @@ public sealed class AuthApiTests(ApiFactory api)
         Assert.Equal(JsonValueKind.Null, setup.GetProperty("authenticatorUri").ValueKind);
     }
 
+    [Fact]
+    public async Task Disable_two_factor_needs_the_password_or_a_code_and_gives_one_400_for_both_wrong()
+    {
+        var client = await SignInWithTwoFactorAsync(api.Unique("disablev1"));
+
+        // No JSON body at all (the profile page until T-046) is refused before the handler.
+        await ExpectStatus(await client.PostAsync("/api/v1/auth/2fa/disable", null), HttpStatusCode.UnsupportedMediaType);
+        await ExpectProblem(await client.PostAsJsonAsync("/api/v1/auth/2fa/disable", new { }), HttpStatusCode.BadRequest, DomainTitle);
+        var wrongPassword = await ExpectProblem(await client.PostAsJsonAsync("/api/v1/auth/2fa/disable", new { password = "wrong-password" }), HttpStatusCode.BadRequest, DomainTitle);
+        var wrongCode = await ExpectProblem(await client.PostAsJsonAsync("/api/auth/2fa/disable", new { code = "000000" }), HttpStatusCode.BadRequest, DomainTitle);
+        Assert.Equal(wrongPassword.GetProperty("detail").GetString(), wrongCode.GetProperty("detail").GetString());
+
+        await ExpectStatus(await client.PostAsJsonAsync("/api/v1/auth/2fa/disable", new { password = ApiFactory.Password }), HttpStatusCode.NoContent);
+    }
+
     /// <summary>A user with two-factor sign-in on, signed in through login and login-2fa with a recovery code.</summary>
     private async Task<HttpClient> SignInWithTwoFactorAsync(string userName)
     {

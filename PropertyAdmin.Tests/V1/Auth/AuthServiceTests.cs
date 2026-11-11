@@ -100,19 +100,92 @@ public sealed class AuthServiceTests
     }
 
     [Fact]
-    public async Task Disable_two_factor_turns_it_off_and_resets_the_key()
+    public async Task Disable_two_factor_with_the_password_turns_it_off_and_resets_the_key()
     {
         await using var host = await IdentityTestHost.CreateAsync();
-        var user = await host.CreateUserAsync("disable");
-        await host.Users.SetTwoFactorEnabledAsync(user, true);
-        await host.Users.ResetAuthenticatorKeyAsync(user);
+        var user = await TwoFactorUserAsync(host, "disable");
         var oldKey = await host.Users.GetAuthenticatorKeyAsync(user);
         var handler = new PropertyAdmin.Logic.V1.Auth.DisableTwoFactor.DisableTwoFactorHandler(Service(host));
 
-        Assert.True((await handler.HandleAsync(new(user.Id), CancellationToken.None)).Found);
+        Assert.True((await handler.HandleAsync(new(user.Id, IdentityTestHost.Password, null), CancellationToken.None)).Found);
         Assert.False(await host.Users.GetTwoFactorEnabledAsync(user));
         Assert.NotEqual(oldKey, await host.Users.GetAuthenticatorKeyAsync(user));
-        Assert.False((await handler.HandleAsync(new("unknown"), CancellationToken.None)).Found);
+        Assert.False((await handler.HandleAsync(new("unknown", IdentityTestHost.Password, null), CancellationToken.None)).Found);
+    }
+
+    [Fact]
+    public async Task Disable_two_factor_with_an_authenticator_code_turns_it_off()
+    {
+        await using var host = await IdentityTestHost.CreateAsync();
+        var user = await TwoFactorUserAsync(host, "disablecode");
+        var code = PropertyAdmin.Tests.Characterization.AuthTests.CreateAuthenticatorCode((await host.Users.GetAuthenticatorKeyAsync(user))!);
+
+        Assert.True(await Service(host).DisableTwoFactorAsync(user.Id, null, code, CancellationToken.None));
+        Assert.False(await host.Users.GetTwoFactorEnabledAsync(user));
+    }
+
+    [Fact]
+    public async Task Disable_two_factor_refuses_no_credential_a_wrong_one_and_a_recovery_code_with_one_message()
+    {
+        await using var host = await IdentityTestHost.CreateAsync();
+        var user = await TwoFactorUserAsync(host, "disablewrong");
+        var recoveryCode = (await host.Users.GenerateNewTwoFactorRecoveryCodesAsync(user, 1))!.Single();
+        var service = Service(host);
+
+        var none = await Assert.ThrowsAsync<BusinessRuleException>(() => service.DisableTwoFactorAsync(user.Id, null, " ", CancellationToken.None));
+        Assert.Equal(AuthService.ReauthenticationRequired, none.Message);
+        Assert.Equal(0, await host.Users.GetAccessFailedCountAsync(user));
+
+        foreach (var (password, code) in new (string?, string?)[] { ("wrong-password", null), (null, "000000"), (null, recoveryCode), (IdentityTestHost.Password, "000000") })
+        {
+            var error = await Assert.ThrowsAsync<BusinessRuleException>(() => service.DisableTwoFactorAsync(user.Id, password, code, CancellationToken.None));
+            Assert.Equal(AuthService.ReauthenticationFailed, error.Message);
+        }
+
+        Assert.Equal(4, await host.Users.GetAccessFailedCountAsync(user));
+        Assert.True(await host.Users.GetTwoFactorEnabledAsync(user));
+        Assert.Equal(1, await host.Users.CountRecoveryCodesAsync(user));
+    }
+
+    [Fact]
+    public async Task Disable_two_factor_locks_out_at_the_fifth_failure_and_then_refuses_before_any_check()
+    {
+        await using var host = await IdentityTestHost.CreateAsync();
+        var user = await TwoFactorUserAsync(host, "disablelock");
+        var service = Service(host);
+
+        for (var attempt = 0; attempt < 5; attempt++)
+            await Assert.ThrowsAsync<BusinessRuleException>(() => service.DisableTwoFactorAsync(user.Id, "wrong-password", null, CancellationToken.None));
+
+        Assert.True(await host.Users.IsLockedOutAsync(user));
+        Assert.False(await service.DisableTwoFactorAsync(user.Id, IdentityTestHost.Password, null, CancellationToken.None));
+        Assert.True(await host.Users.GetTwoFactorEnabledAsync(user));
+    }
+
+    [Fact]
+    public async Task Disable_two_factor_while_it_is_off_changes_nothing()
+    {
+        await using var host = await IdentityTestHost.CreateAsync();
+        var user = await host.CreateUserAsync("alreadyoff");
+        var stamp = await host.Users.GetSecurityStampAsync(user);
+
+        Assert.True(await Service(host).DisableTwoFactorAsync(user.Id, IdentityTestHost.Password, null, CancellationToken.None));
+
+        Assert.Null(await host.Users.GetAuthenticatorKeyAsync(user));
+        Assert.Equal(stamp, await host.Users.GetSecurityStampAsync(user));
+    }
+
+    [Fact]
+    public void Disable_two_factor_mapping_copies_every_field() =>
+        Assert.Equal(new PropertyAdmin.Logic.V1.Auth.DisableTwoFactor.Command("id", "secret", "123456"),
+            PropertyAdmin.Api.V1.Auth.DisableTwoFactor.Mapping.ToCommand(new PropertyAdmin.Api.V1.Auth.DisableTwoFactor.Request("secret", "123456"), "id"));
+
+    private static async Task<PropertyAdmin.Data.ApplicationUser> TwoFactorUserAsync(IdentityTestHost host, string userName)
+    {
+        var user = await host.CreateUserAsync(userName);
+        await host.Users.ResetAuthenticatorKeyAsync(user);
+        await host.Users.SetTwoFactorEnabledAsync(user, true);
+        return user;
     }
 
     [Fact]
@@ -140,6 +213,8 @@ public sealed class AuthServiceTests
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => new PropertyAdmin.Logic.V1.Auth.Login.LoginHandler(service)
             .HandleAsync(new("cancel", IdentityTestHost.Password), cancellation.Token));
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => service.ChangePasswordAsync(user.Id, IdentityTestHost.Password, "Another-Password-456!", cancellation.Token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => service.DisableTwoFactorAsync(user.Id, "wrong-password", null, cancellation.Token));
+        Assert.Equal(0, await host.Users.GetAccessFailedCountAsync(user));
         Assert.Null(host.Tokens.LastSubject);
         Assert.True(await host.Users.CheckPasswordAsync(user, IdentityTestHost.Password));
     }

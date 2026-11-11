@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PropertyAdmin.Api.Auth;
 using PropertyAdmin.Api.V1.Auth.ChangePassword;
+using PropertyAdmin.Api.V1.Auth.DisableTwoFactor;
 using PropertyAdmin.Api.V1.Auth.EnableTwoFactor;
 using PropertyAdmin.Api.V1.Auth.GetTwoFactor;
 using PropertyAdmin.Api.V1.Auth.Login;
@@ -12,7 +13,6 @@ using PropertyAdmin.Logic.V1.Auth.EnableTwoFactor;
 using PropertyAdmin.Logic.V1.Auth.GetTwoFactor;
 using PropertyAdmin.Logic.V1.Auth.Login;
 using PropertyAdmin.Logic.V1.Auth.LoginTwoFactor;
-using DisableTwoFactorMapping = PropertyAdmin.Api.V1.Auth.DisableTwoFactor.Mapping;
 using GetTwoFactorMapping = PropertyAdmin.Api.V1.Auth.GetTwoFactor.Mapping;
 
 namespace PropertyAdmin.Api.V1.Auth;
@@ -66,10 +66,11 @@ public sealed class AuthController : ControllerBase
 
     [HttpPost("2fa/disable")]
     public async Task<IActionResult> DisableTwoFactor(
+        DisableTwoFactor.Request request,
         [FromServices] DisableTwoFactorHandler handler,
         CancellationToken cancellationToken)
     {
-        var result = await handler.HandleAsync(DisableTwoFactorMapping.ToCommand(CurrentUserId), cancellationToken);
+        var result = await handler.HandleAsync(request.ToCommand(CurrentUserId), cancellationToken);
         return result.Found ? NoContent() : Unauthorized();
     }
 
