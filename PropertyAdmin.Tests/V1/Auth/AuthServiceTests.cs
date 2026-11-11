@@ -42,6 +42,24 @@ public sealed class AuthServiceTests
     }
 
     [Fact]
+    public async Task Login_with_an_unknown_or_locked_out_user_name_still_runs_a_password_hash_check()
+    {
+        await using var host = await IdentityTestHost.CreateAsync();
+        var user = await host.CreateUserAsync("locked");
+        await host.Users.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddMinutes(15));
+        var hasher = new CountingPasswordHasher(host.Users.PasswordHasher);
+        host.Users.PasswordHasher = hasher;
+        var service = Service(host);
+
+        Assert.Null(await service.LoginAsync("nobody", IdentityTestHost.Password, CancellationToken.None));
+        Assert.Equal(1, hasher.Verifications);
+        Assert.Null(await service.LoginAsync("locked", IdentityTestHost.Password, CancellationToken.None));
+        Assert.Equal(2, hasher.Verifications);
+        Assert.Equal(0, await host.Users.GetAccessFailedCountAsync(user));
+        Assert.Null(host.Tokens.LastSubject);
+    }
+
+    [Fact]
     public async Task Login_with_two_factor_returns_a_challenge_that_a_recovery_code_completes()
     {
         await using var host = await IdentityTestHost.CreateAsync();
@@ -232,4 +250,18 @@ public sealed class AuthServiceTests
     }
 
     private static AuthService Service(IdentityTestHost host) => new(host.Users, host.Roles, host.Tokens);
+
+    private sealed class CountingPasswordHasher(Microsoft.AspNetCore.Identity.IPasswordHasher<PropertyAdmin.Data.ApplicationUser> inner)
+        : Microsoft.AspNetCore.Identity.IPasswordHasher<PropertyAdmin.Data.ApplicationUser>
+    {
+        public int Verifications { get; private set; }
+
+        public string HashPassword(PropertyAdmin.Data.ApplicationUser user, string password) => inner.HashPassword(user, password);
+
+        public Microsoft.AspNetCore.Identity.PasswordVerificationResult VerifyHashedPassword(PropertyAdmin.Data.ApplicationUser user, string hashedPassword, string providedPassword)
+        {
+            Verifications++;
+            return inner.VerifyHashedPassword(user, hashedPassword, providedPassword);
+        }
+    }
 }

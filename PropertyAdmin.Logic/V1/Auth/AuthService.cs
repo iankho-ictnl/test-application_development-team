@@ -13,13 +13,18 @@ public sealed class AuthService(
     private const string Issuer = "PropertyAdmin";
     public const string ReauthenticationRequired = "Geef je huidige wachtwoord of een code uit je authenticator-app.";
     public const string ReauthenticationFailed = "Het wachtwoord of de code is onjuist.";
+    private static string? dummyHash;
 
     // Identity's UserManager takes no cancellation token, so each step checks it before it starts.
     public async Task<LoginModel?> LoginAsync(string userName, string password, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var user = await users.FindByNameAsync(userName);
-        if (user is null || await users.IsLockedOutAsync(user)) return null;
+        if (user is null || await users.IsLockedOutAsync(user))
+        {
+            VerifyDummyHash(password);
+            return null;
+        }
         if (!await users.CheckPasswordAsync(user, password))
         {
             await users.AccessFailedAsync(user);
@@ -128,6 +133,14 @@ public sealed class AuthService(
                 if (claim.Type == Permissions.ClaimType) permissions.Add(claim.Value);
         }
         return new TokenSubjectModel(user.Id, user.UserName ?? "", user.SecurityStamp ?? "", user.OwnerId, roleNames.ToList(), permissions);
+    }
+
+    // S-23: an unknown or locked-out user name costs the same hash check as a wrong password.
+    private void VerifyDummyHash(string password)
+    {
+        var dummyUser = new ApplicationUser();
+        dummyHash ??= users.PasswordHasher.HashPassword(dummyUser, Guid.NewGuid().ToString());
+        users.PasswordHasher.VerifyHashedPassword(dummyUser, dummyHash, password);
     }
 
     private static string NormalizeCode(string code) => code.Replace(" ", "").Replace("-", "");
