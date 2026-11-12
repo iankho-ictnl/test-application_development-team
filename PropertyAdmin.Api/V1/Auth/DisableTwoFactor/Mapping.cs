@@ -4,5 +4,5 @@ namespace PropertyAdmin.Api.V1.Auth.DisableTwoFactor;
 
 public static class Mapping
 {
-    public static Command ToCommand(string userId) => new(userId);
+    public static Command ToCommand(this Request request, string userId) => new(userId, request.Password, request.Code);
 }

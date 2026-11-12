@@ -52,6 +52,9 @@ public sealed class UsersApiTests(ApiFactory api)
         Assert.Equal(0, role.GetProperty("userCount").GetInt32());
 
         await ExpectStatus(await admin.PutAsJsonAsync($"/api/v1/roles/{name}", new { name, permissions = new[] { "ReadAll" } }), HttpStatusCode.NoContent);
+        await ExpectProblem(await admin.PostAsJsonAsync("/api/v1/roles", new { name = api.Unique("V1Rol"), permissions = new[] { "ReadOwn", "Reports" } }), HttpStatusCode.BadRequest);
+        await ExpectProblem(await admin.PutAsJsonAsync($"/api/v1/roles/{name}", new { name, permissions = new[] { "ReadAll", "ReadOwn" } }), HttpStatusCode.BadRequest);
+        await ExpectProblem(await admin.PostAsJsonAsync("/api/roles", new { name = api.Unique("Rol"), permissions = new[] { "ReadOwn", "Invoices" } }), HttpStatusCode.BadRequest);
         await ExpectStatus(await admin.DeleteAsync($"/api/v1/roles/{name}"), HttpStatusCode.NoContent);
         await ExpectStatus(await admin.DeleteAsync($"/api/v1/roles/{name}"), HttpStatusCode.NotFound);
     }

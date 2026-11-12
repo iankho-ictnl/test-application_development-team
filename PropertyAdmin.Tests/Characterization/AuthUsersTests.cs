@@ -58,7 +58,8 @@ public class AuthTests(ApiFactory api)
         Assert.Equal(setup.GetProperty("sharedKey").GetString(), (await Expect(await client.GetAsync("/api/auth/2fa"), HttpStatusCode.OK)).GetProperty("sharedKey").GetString());
 
         await ExpectProblem(await client.PostAsJsonAsync("/api/auth/2fa/enable", new { code = "000000" }), HttpStatusCode.BadRequest, DomainTitle);
-        await ExpectStatus(await client.PostAsync("/api/auth/2fa/disable", null), HttpStatusCode.NoContent);
+        // T-044 S-19 (D-036): disable needs the current password or an authenticator code.
+        await ExpectStatus(await client.PostAsJsonAsync("/api/auth/2fa/disable", new { password = ApiFactory.Password }), HttpStatusCode.NoContent);
     }
 
     [Fact]
@@ -89,7 +90,7 @@ public class AuthTests(ApiFactory api)
         Assert.False(string.IsNullOrEmpty(signedIn.GetProperty("accessToken").GetString()));
     }
 
-    private static string CreateAuthenticatorCode(string sharedKey)
+    internal static string CreateAuthenticatorCode(string sharedKey)
     {
         const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
         var key = new List<byte>();

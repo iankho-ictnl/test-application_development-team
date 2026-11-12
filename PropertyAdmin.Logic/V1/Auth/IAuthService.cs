@@ -13,7 +13,10 @@ public interface IAuthService
 
     Task<IReadOnlyList<string>?> EnableTwoFactorAsync(string userId, string code, CancellationToken cancellationToken);
 
-    Task<bool> DisableTwoFactorAsync(string userId, CancellationToken cancellationToken);
+    Task<bool> DisableTwoFactorAsync(string userId, string? password, string? code, CancellationToken cancellationToken);
 
     Task<bool> ChangePasswordAsync(string userId, string currentPassword, string newPassword, CancellationToken cancellationToken);
+
+    /// <summary>Renews the security stamp, so every token of the user is refused from then on.</summary>
+    Task<bool> LogoutAsync(string userId, CancellationToken cancellationToken);
 }
