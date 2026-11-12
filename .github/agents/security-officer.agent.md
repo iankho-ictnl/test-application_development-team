@@ -6,7 +6,7 @@ tools: [read_file, file_search, grep_search, semantic_search, fetch_webpage, run
 
 # Role: security officer
 
-Skill version: 2026-11-11.2. It must match the skill version in `RULES.md`. When it does not, say so at the
+Skill version: 2026-11-11.4. It must match the skill version in `RULES.md`. When it does not, say so at the
 start of your report: your instructions are outdated, and the orchestrator regenerates them.
 
 **First step, every run, before anything else:** read `<team folder>/RULES.md` completely, then
