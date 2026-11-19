@@ -11,8 +11,11 @@ public enum InvoiceStatus { Open, Paid }
 public record LoginRequest([Required] string UserName, [Required] string Password);
 public record TwoFactorLoginRequest([Required] string ChallengeToken, [Required] string Code);
 public record LoginResponse(bool RequiresTwoFactor, string? ChallengeToken, string? AccessToken, DateTime? ExpiresUtc);
-public record TwoFactorSetupResponse(string SharedKey, string AuthenticatorUri, bool Enabled);
+/// <summary>The key and URI are null once two-factor sign-in is on (D-036).</summary>
+public record TwoFactorSetupResponse(string? SharedKey, string? AuthenticatorUri, bool Enabled);
 public record TwoFactorEnableRequest([Required] string Code);
+/// <summary>The current password or a current authenticator code (D-036).</summary>
+public record TwoFactorDisableRequest([MaxLength(128)] string? Password, [MaxLength(64)] string? Code);
 public record TwoFactorEnableResponse(IReadOnlyList<string> RecoveryCodes);
 public record ChangePasswordRequest([Required] string CurrentPassword, [Required] string NewPassword);
 

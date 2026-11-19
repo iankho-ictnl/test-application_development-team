@@ -143,4 +143,8 @@
   <data name="You do not have permission for this action." xml:space="preserve"><value>You do not have permission for this action.</value></data>
   <data name="You do not have permission for this page." xml:space="preserve"><value>You do not have permission for this page.</value></data>
   <data name="Your password has been changed. Sign in again." xml:space="preserve"><value>Your password has been changed. Sign in again.</value></data>
+  <data name="Enter your current password or a code from your authenticator app." xml:space="preserve"><value>Enter your current password or a code from your authenticator app.</value></data>
+  <data name="Or a code from your authenticator app" xml:space="preserve"><value>Or a code from your authenticator app</value></data>
+  <data name="The password or code is incorrect." xml:space="preserve"><value>The password or code is incorrect.</value></data>
+  <data name="Too long" xml:space="preserve"><value>Too long</value></data>
 </root>
