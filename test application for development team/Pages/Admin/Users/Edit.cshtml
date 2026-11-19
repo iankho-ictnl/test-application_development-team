@@ -55,7 +55,7 @@
             <form method="post" asp-page-handler="ResetTwoFactor" asp-route-id="@id"><button class="btn btn-outline-warning">@L["Reset two-factor sign-in"]</button></form>
         }
         <form method="post" asp-page-handler="SignOut" asp-route-id="@id"><button class="btn btn-outline-secondary">@L["Sign out everywhere"]</button></form>
-        <form method="post" asp-page-handler="Delete" asp-route-id="@id" onsubmit="return confirm('@L["Are you sure?"]');"><button class="btn btn-outline-danger">@L["Delete"]</button></form>
+        <form method="post" asp-page-handler="Delete" asp-route-id="@id" data-confirm="@L["Are you sure?"]"><button class="btn btn-outline-danger">@L["Delete"]</button></form>
     </div>
 }
 
