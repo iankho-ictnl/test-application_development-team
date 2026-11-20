@@ -25,7 +25,7 @@ public sealed class ScreenFormTests(FrontendFactory web)
             ["Input.Country"] = "Nederland", ["Input.KvkNumber"] = "12345678", ["Input.VatNumber"] = "NL123456789B01",
         };
 
-        Browser.ExpectRedirect(await browser.Submit("/Owners/Edit", fields), "/Owners");
+        Assert.Contains(name, await browser.Page(Browser.ExpectRedirect(await browser.Submit("/Owners/Edit", fields), "/Owners").PathAndQuery));
         var owner = Named(await Http.Expect(await admin.GetAsync("/api/owners"), HttpStatusCode.OK), "name", name);
         Assert.Equal("form@example.test", owner.GetProperty("email").GetString());
         Assert.Equal("Formstad", owner.GetProperty("city").GetString());
@@ -82,7 +82,7 @@ public sealed class ScreenFormTests(FrontendFactory web)
             ["Input.Country"] = "Nederland",
         };
 
-        Browser.ExpectRedirect(await browser.Submit("/Assets/Edit", fields), "/Assets");
+        Assert.Contains(name, await browser.Page(Browser.ExpectRedirect(await browser.Submit("/Assets/Edit", fields), "/Assets").PathAndQuery));
         var asset = Named(await Http.Expect(await admin.GetAsync($"/api/assets?ownerId={ownerId}"), HttpStatusCode.OK), "name", name);
         Assert.Equal("Pandweg", asset.GetProperty("street").GetString());
         Assert.Equal("4a", asset.GetProperty("houseNumber").GetString());
@@ -116,7 +116,7 @@ public sealed class ScreenFormTests(FrontendFactory web)
             ["Input.AmountExclVat"] = "50", ["Input.VatRateName"] = "Hoog", ["Input.Reinvoiceable"] = "true",
         });
 
-        Browser.ExpectRedirect(response, $"/Assets/Details/{assetId}");
+        Assert.Contains(description, await browser.Page(Browser.ExpectRedirect(response, $"/Assets/Details/{assetId}").PathAndQuery));
         var expense = Named(await Http.Expect(await admin.GetAsync($"/api/expenses?assetId={assetId}"), HttpStatusCode.OK), "description", description);
         Assert.Equal(60.50m, expense.GetProperty("amountInclVat").GetDecimal());
         Assert.True(expense.GetProperty("reinvoiceable").GetBoolean());
@@ -138,7 +138,7 @@ public sealed class ScreenFormTests(FrontendFactory web)
             ["Input.PricingType"] = "Hourly", ["Input.Hours"] = "2", ["Input.HourlyRate"] = "50", ["Input.VatRateName"] = "Hoog",
         });
 
-        Browser.ExpectRedirect(response, $"/Assets/Details/{assetId}");
+        Assert.Contains(description, await browser.Page(Browser.ExpectRedirect(response, $"/Assets/Details/{assetId}").PathAndQuery));
         var activity = Named(await Http.Expect(await admin.GetAsync($"/api/activities?assetId={assetId}"), HttpStatusCode.OK), "description", description);
         Assert.Equal("2026-04-01", activity.GetProperty("date").GetString());
         Assert.Equal(100.00m, activity.GetProperty("amountExclVat").GetDecimal());
@@ -154,7 +154,7 @@ public sealed class ScreenFormTests(FrontendFactory web)
 
         var response = await browser.Submit("/VatRates", new() { ["Input.Name"] = name, ["Input.Percentage"] = "5", ["Input.ValidFrom"] = "2026-01-01" });
 
-        Browser.ExpectRedirect(response, "/VatRates");
+        Assert.Contains(name, await browser.Page(Browser.ExpectRedirect(response, "/VatRates").PathAndQuery));
         var rate = Named(await Http.Expect(await (await web.Api.As("Admin")).GetAsync("/api/vatrates"), HttpStatusCode.OK), "name", name);
         Assert.Equal(5m, rate.GetProperty("percentage").GetDecimal());
         Assert.Equal("2026-01-01", rate.GetProperty("validFrom").GetString());
@@ -171,9 +171,9 @@ public sealed class ScreenFormTests(FrontendFactory web)
 
         var response = await browser.Submit($"/Invoices/Create?OwnerId={ownerId}", new() { ["OwnerId"] = $"{ownerId}", ["Date"] = "2026-04-30", ["PaymentTermDays"] = "14" }, "/Invoices/Create");
 
-        var location = response.Headers.Location?.OriginalString ?? "";
-        var id = int.Parse(location[(location.LastIndexOf('/') + 1)..]);
-        Browser.ExpectRedirect(response, $"/Invoices/Details/{id}");
+        var location = Browser.ExpectRedirectPrefix(response, "/Invoices/Details/");
+        var id = int.Parse(location.AbsolutePath[(location.AbsolutePath.LastIndexOf('/') + 1)..], System.Globalization.CultureInfo.InvariantCulture);
+        Assert.Contains("14-05-2026", await browser.Page(location.PathAndQuery));
         var invoice = await Http.Expect(await admin.GetAsync($"/api/invoices/{id}"), HttpStatusCode.OK);
         Assert.Equal(ownerId, invoice.GetProperty("ownerId").GetInt32());
         Assert.Equal(200.00m, invoice.GetProperty("totalExclVat").GetDecimal());
@@ -192,7 +192,7 @@ public sealed class ScreenFormTests(FrontendFactory web)
         var name = web.Api.Unique("Schermrol");
         var browser = await web.SignInAs("Admin");
 
-        Browser.ExpectRedirect(await browser.Submit("/Admin/Roles", new() { ["Name"] = name, ["SelectedPermissions"] = "Reports" }), "/Admin/Roles");
+        Assert.Contains(name, await browser.Page(Browser.ExpectRedirect(await browser.Submit("/Admin/Roles", new() { ["Name"] = name, ["SelectedPermissions"] = "Reports" }), "/Admin/Roles").PathAndQuery));
 
         var role = Named(await Http.Expect(await (await web.Api.As("Admin")).GetAsync("/api/roles"), HttpStatusCode.OK), "name", name);
         Assert.Equal(["Reports"], role.GetProperty("permissions").EnumerateArray().Select(p => p.GetString()));
@@ -210,7 +210,7 @@ public sealed class ScreenFormTests(FrontendFactory web)
             ["UserName"] = userName, ["Email"] = $"{userName}@example.test", ["Password"] = ApiFactory.Password, ["Roles"] = "Viewer",
         });
 
-        Browser.ExpectRedirect(response, "/Admin/Users");
+        Assert.Contains(userName, await browser.Page(Browser.ExpectRedirect(response, "/Admin/Users").PathAndQuery));
         var user = await web.SignIn(userName);
         await user.Page("/Reports");
         Browser.ExpectRedirect(await user.GetAsync("/VatRates"), "/Account/AccessDenied");

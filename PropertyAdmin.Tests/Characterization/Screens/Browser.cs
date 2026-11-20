@@ -79,6 +79,16 @@ public static partial class Browser
         return location;
     }
 
+    /// <summary>Expect a 302 whose path starts with the prefix (for a new id in the location); returns the absolute location.</summary>
+    public static Uri ExpectRedirectPrefix(HttpResponseMessage response, string pathPrefix)
+    {
+        Assert.True(response.StatusCode == HttpStatusCode.Redirect, $"Expected 302 to {pathPrefix}..., got {(int)response.StatusCode} {response.Headers.Location} {Errors(response)}");
+        var location = response.Headers.Location!;
+        if (!location.IsAbsoluteUri) location = new Uri(Origin, location);
+        Assert.True(location.AbsolutePath.StartsWith(pathPrefix, StringComparison.OrdinalIgnoreCase), $"Expected 302 to {pathPrefix}..., got 302 to {location}");
+        return location;
+    }
+
     /// <summary>The validation messages of a page that was shown again, for the failure message.</summary>
     private static string Errors(HttpResponseMessage response)
     {

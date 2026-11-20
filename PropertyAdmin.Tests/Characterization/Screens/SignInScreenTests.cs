@@ -145,8 +145,10 @@ public sealed class SignInScreenTests(FrontendFactory web)
         var page = await browser.Page("/Profile");
         Assert.Contains("data:image/png;base64,", page);
 
-        // Current behaviour: the first set-up creates the authenticator key and changes the
-        // security stamp, so the next API call is 401 and the frontend signs the user out.
+        // Current behaviour of BUG-13 (testing.md), not the expected behaviour: the first set-up
+        // creates the authenticator key and changes the security stamp, so the next API call is
+        // 401 and the frontend signs the user out. When BUG-13 is fixed, this line changes to
+        // await browser.Page("/Owners").
         Browser.ExpectRedirect(await browser.GetAsync("/Owners"), "/Account/Login");
         browser = await web.SignIn(userName);
         await browser.Page("/Profile");

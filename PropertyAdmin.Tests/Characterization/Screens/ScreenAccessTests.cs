@@ -26,7 +26,7 @@ public sealed class ScreenAccessTests(FrontendFactory web)
         ["Owner"] = [],
     };
 
-    // null: every signed-in user. Profile is last: its first visit ends the API session.
+    // null: every signed-in user. Profile is last because of BUG-13 (testing.md): its first visit ends the API session.
     private static readonly (string Url, string? Permission)[] Screens =
     [
         ("/", null),
