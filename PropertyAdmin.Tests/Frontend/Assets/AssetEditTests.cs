@@ -1,6 +1,7 @@
 extern alias Frontend;
 
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -185,7 +186,7 @@ public sealed class AssetEditTests
     private sealed class EchoLocalizer : IStringLocalizer<SharedResource>
     {
         public LocalizedString this[string name] => new(name, name);
-        public LocalizedString this[string name, params object[] arguments] => new(name, string.Format(name, arguments));
+        public LocalizedString this[string name, params object[] arguments] => new(name, string.Format(CultureInfo.InvariantCulture, name, arguments));
         public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures) => [];
     }
 
