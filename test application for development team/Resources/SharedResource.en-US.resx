@@ -56,6 +56,7 @@
   <data name="Income" xml:space="preserve"><value>Income</value></data>
   <data name="Invalid email address" xml:space="preserve"><value>Invalid email address</value></data>
   <data name="Invalid user name or password, or the account is locked." xml:space="preserve"><value>Invalid user name or password, or the account is locked.</value></data>
+  <data name="Too many sign-in attempts. Wait a minute and try again." xml:space="preserve"><value>Too many sign-in attempts. Wait a minute and try again.</value></data>
   <data name="Invoice" xml:space="preserve"><value>Invoice</value></data>
   <data name="Invoice date" xml:space="preserve"><value>Invoice date</value></data>
   <data name="Invoiced" xml:space="preserve"><value>Invoiced</value></data>

@@ -49,6 +49,9 @@ builder.Services.AddAntiforgery(o =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<SignInService>();
+builder.Services.AddSingleton(new SignInRateLimiter(
+    builder.Configuration.GetValue("SignInRateLimit:PermitLimit", 10),
+    TimeSpan.FromSeconds(builder.Configuration.GetValue("SignInRateLimit:WindowSeconds", 60))));
 builder.Services.AddScoped<ApiExceptionPageFilter>();
 builder.Services.AddTransient<AccessTokenHandler>();
 builder.Services.AddHttpClient<ApiClient>(c =>
