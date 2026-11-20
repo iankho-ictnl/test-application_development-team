@@ -16,6 +16,9 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
     /// <summary>Business-rule key (D-050); the Dutch text is in BusinessRuleMessages.nl.resx.</summary>
     public const string InvalidPaymentTerm = "The payment term is 14 days.";
 
+    /// <summary>Business-rule key (D-050, D-056); the Dutch text is in BusinessRuleMessages.nl.resx.</summary>
+    public const string OnlyMostRecentDeletable = "Only the most recent unpaid invoice can be deleted.";
+
     public async Task<IReadOnlyList<InvoiceModel>> GetAllAsync(int? ownerScopeId, int? ownerId, InvoiceStatus? status, CancellationToken cancellationToken) =>
         await db.Invoices.AsNoTracking()
             .Where(invoice => (ownerScopeId == null || invoice.OwnerId == ownerScopeId)
@@ -104,11 +107,13 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
 
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
     {
+        // The check and the delete in one transaction (D-056 point 2).
+        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
         var invoice = await db.Invoices.Include(item => item.Lines).FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
         if (invoice is null) return false;
         if (invoice.Status == InvoiceStatus.Paid) throw new BusinessRuleException("Een betaalde factuur kan niet worden verwijderd.");
+        if (!await IsMostRecentAsync(invoice, cancellationToken)) throw new BusinessRuleException(OnlyMostRecentDeletable);
 
-        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
         foreach (var activity in await db.Activities.Where(activity => activity.InvoiceId == id).ToListAsync(cancellationToken))
             activity.InvoiceId = null;
         foreach (var expense in await db.Expenses.Where(expense => expense.InvoiceId == id).ToListAsync(cancellationToken))
@@ -163,14 +168,27 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
         SourceId = sourceId,
     };
 
-    private async Task<string> NextNumberAsync(int year, CancellationToken cancellationToken)
+    private async Task<string> NextNumberAsync(int year, CancellationToken cancellationToken) =>
+        $"{year}-{await HighestSequenceAsync(year, cancellationToken) + 1:0000}";
+
+    /// <summary>The most recent invoice is the highest number of the latest year: the last one issued (D-056).</summary>
+    private async Task<bool> IsMostRecentAsync(Invoice invoice, CancellationToken cancellationToken)
+    {
+        var year = invoice.Date.Year;
+        if (await db.Invoices.AnyAsync(other => other.Date.Year > year, cancellationToken)) return false;
+        return Sequence(invoice.Number, $"{year}-") >= await HighestSequenceAsync(year, cancellationToken);
+    }
+
+    private async Task<int> HighestSequenceAsync(int year, CancellationToken cancellationToken)
     {
         var prefix = $"{year}-";
         var numbers = await db.Invoices.AsNoTracking()
             .Where(invoice => invoice.Number.StartsWith(prefix))
             .Select(invoice => invoice.Number)
             .ToListAsync(cancellationToken);
-        var max = numbers.Select(number => int.TryParse(number[prefix.Length..], out var value) ? value : 0).DefaultIfEmpty(0).Max();
-        return $"{prefix}{max + 1:0000}";
+        return numbers.Select(number => Sequence(number, prefix)).DefaultIfEmpty(0).Max();
     }
+
+    private static int Sequence(string number, string prefix) =>
+        number.StartsWith(prefix, StringComparison.Ordinal) && int.TryParse(number[prefix.Length..], System.Globalization.CultureInfo.InvariantCulture, out var value) ? value : 0;
 }

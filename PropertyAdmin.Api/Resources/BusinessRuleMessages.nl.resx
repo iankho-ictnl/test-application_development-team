@@ -24,4 +24,7 @@
   <data name="The payment term is 14 days." xml:space="preserve">
     <value>De betalingstermijn is 14 dagen.</value>
   </data>
+  <data name="Only the most recent unpaid invoice can be deleted." xml:space="preserve">
+    <value>Alleen de meest recente onbetaalde factuur kan worden verwijderd.</value>
+  </data>
 </root>
