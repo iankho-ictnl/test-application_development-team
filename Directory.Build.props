@@ -10,4 +10,17 @@
     <NuGetAuditMode>all</NuGetAuditMode>
     <NuGetAuditLevel>low</NuGetAuditLevel>
   </PropertyGroup>
+  <!--
+    SDK analyzers, code style and nullable (D-051 part 2, REQ-032).
+    Recommended rules and all security rules run on every project; the code
+    style rules of .editorconfig run in the build. Findings are warnings:
+    no TreatWarningsAsErrors and no blanket suppressions (the clean-up is a
+    separate task, capped at 2 story points, Q-111).
+  -->
+  <PropertyGroup>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <AnalysisModeSecurity>All</AnalysisModeSecurity>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 </Project>
