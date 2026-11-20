@@ -70,7 +70,7 @@ public sealed class ScreenFormTests(FrontendFactory web)
     [Trait("Requirement", "REQ-003")]
     public async Task Asset_create_and_edit_save_through_the_API()
     {
-        // BUG-7 fixed: the type travels as a number. The D-041 address fields (street, house number, country) are added after T-066.
+        // BUG-7 fixed: the type travels as a number. D-041: five address fields (street, house number, postal code, city, country; foreign allowed).
         var admin = await web.Api.As("Admin");
         var ownerId = await admin.CreateOwner(web.Api.Unique("Formeigenaar"));
         var name = web.Api.Unique("Formpand");
@@ -78,18 +78,27 @@ public sealed class ScreenFormTests(FrontendFactory web)
         var fields = new Dictionary<string, string>
         {
             ["Input.OwnerId"] = $"{ownerId}", ["Input.Type"] = "Home", ["Input.Name"] = name,
-            ["Input.Address"] = "Pandweg 4", ["Input.PostalCode"] = "1234 GH", ["Input.City"] = "Pandstad",
+            ["Input.Street"] = "Pandweg", ["Input.HouseNumber"] = "4a", ["Input.PostalCode"] = "1234 GH", ["Input.City"] = "Pandstad",
+            ["Input.Country"] = "Nederland",
         };
 
         Browser.ExpectRedirect(await browser.Submit("/Assets/Edit", fields), "/Assets");
         var asset = Named(await Http.Expect(await admin.GetAsync($"/api/assets?ownerId={ownerId}"), HttpStatusCode.OK), "name", name);
-        Assert.Equal("Pandstad", asset.GetProperty("city").GetString());
+        Assert.Equal("Pandweg", asset.GetProperty("street").GetString());
+        Assert.Equal("4a", asset.GetProperty("houseNumber").GetString());
         Assert.Equal("1234 GH", asset.GetProperty("postalCode").GetString());
+        Assert.Equal("Pandstad", asset.GetProperty("city").GetString());
+        Assert.Equal("Nederland", asset.GetProperty("country").GetString());
         var id = asset.GetProperty("id").GetInt32();
 
-        fields["Input.City"] = "Andere stad";
+        fields["Input.City"] = "Antwerpen";
+        fields["Input.PostalCode"] = "2000";
+        fields["Input.Country"] = "België";
         Browser.ExpectRedirect(await browser.Submit($"/Assets/Edit/{id}", fields), "/Assets");
-        Assert.Equal("Andere stad", (await Http.Expect(await admin.GetAsync($"/api/assets/{id}"), HttpStatusCode.OK)).GetProperty("city").GetString());
+        var saved = await Http.Expect(await admin.GetAsync($"/api/assets/{id}"), HttpStatusCode.OK);
+        Assert.Equal("Antwerpen", saved.GetProperty("city").GetString());
+        Assert.Equal("2000", saved.GetProperty("postalCode").GetString());
+        Assert.Equal("België", saved.GetProperty("country").GetString());
     }
 
     [Fact]
