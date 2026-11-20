@@ -73,6 +73,9 @@ public class ApiClient(HttpClient http)
         return (await r.Content.ReadFromJsonAsync<T>(Json))!;
     }
 
+    /// <summary>A GET whose failure the page shows itself: a 400 keeps its field errors, a 403 its status (D-033 report period).</summary>
+    public async Task<ApiResult<T>> TryGetAsync<T>(string url) => await Read<T>(await http.GetAsync(url));
+
     public async Task<(byte[] Bytes, string FileName)> GetFileAsync(string url)
     {
         var r = await http.GetAsync(url);

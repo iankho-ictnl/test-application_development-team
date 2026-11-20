@@ -154,11 +154,16 @@ public class ReportsTests(ApiFactory api)
     }
 
     [Fact]
-    public async Task Missing_period_currently_returns_200_with_zero_totals()
+    public async Task Missing_period_returns_400_at_from_and_to()
     {
-        // Current behaviour (Q-044): without from/to both default to 0001-01-01, so every total is 0.
-        var json = await Expect(await (await api.As("Viewer")).GetAsync("/api/reports/asset-results"), HttpStatusCode.OK);
-        Assert.All(json.EnumerateArray(), r => Assert.Equal(0m, r.GetProperty("income").GetDecimal()));
+        // D-033 (T-161, T-164): the period is required; the old 200 with zero totals (Q-044) is gone on purpose.
+        var viewer = await api.As("Viewer");
+        foreach (var route in new[] { "/api/reports/asset-results", "/api/reports/owner-overview" })
+        {
+            var errors = (await ExpectProblem(await viewer.GetAsync(route), HttpStatusCode.BadRequest)).GetProperty("errors");
+            Assert.Equal("Dit veld is verplicht.", errors.GetProperty("from")[0].GetString());
+            Assert.Equal("Dit veld is verplicht.", errors.GetProperty("to")[0].GetString());
+        }
     }
 
     [Fact]
