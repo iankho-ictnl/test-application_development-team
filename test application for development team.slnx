@@ -17,6 +17,7 @@
     <File Path=".team/testing.md" />
     <File Path=".team/reviews/sanity-reviews.md" />
     <File Path=".team/reviews/security-assessments.md" />
+    <File Path=".team/reviews/code-reviews.md" />
     <File Path=".team/decisions.md" />
     <File Path=".team/report.md" />
     <File Path=".team/standup.md" />
