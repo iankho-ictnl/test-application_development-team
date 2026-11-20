@@ -51,6 +51,24 @@ public sealed class UsersApiTests(ApiFactory api)
     }
 
     [Fact]
+    [Trait("Requirement", "REQ-013")]
+    public async Task Admin_reset_2fa_alone_ends_the_users_sessions()
+    {
+        // S-37: no forced sign-out in between, so only reset-2fa can have renewed the security stamp.
+        var userName = api.Unique("v1reset2fa");
+        await api.CreateUserAsync(userName, "Viewer");
+        var user = api.WithToken(await api.LoginAsync(userName, ApiFactory.Password));
+        await ExpectStatus(await user.GetAsync("/api/v1/owners"), HttpStatusCode.OK);
+        var admin = await api.As("Admin");
+        var users = await Expect(await admin.GetAsync("/api/v1/users"), HttpStatusCode.OK);
+        var id = users.EnumerateArray().Single(u => u.GetProperty("userName").GetString() == userName).GetProperty("id").GetString();
+
+        await ExpectStatus(await admin.PostAsync($"/api/v1/users/{id}/reset-2fa", null), HttpStatusCode.NoContent);
+
+        await ExpectStatus(await user.GetAsync("/api/v1/owners"), HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
     public async Task Roles_v1_create_list_update_and_delete()
     {
         var admin = await api.As("Admin");
