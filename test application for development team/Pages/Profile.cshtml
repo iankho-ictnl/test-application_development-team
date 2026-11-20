@@ -4,7 +4,7 @@
     ViewData["Title"] = L["My profile"];
 }
 <h1 class="h3 mb-3">@L["My profile"]</h1>
-<div asp-validation-summary="All" class="text-danger"></div>
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 @if (Model.RecoveryCodes is not null)
 {
@@ -29,6 +29,17 @@
         {
             <p>@L["Two-factor sign-in is turned on."]</p>
             <form method="post" asp-page-handler="Disable">
+                <p class="small text-muted">@L["Enter your current password or a code from your authenticator app."]</p>
+                <div class="mb-2">
+                    <label asp-for="DisablePassword" class="form-label"></label>
+                    <input asp-for="DisablePassword" class="form-control" autocomplete="current-password" />
+                    <span asp-validation-for="DisablePassword" class="text-danger"></span>
+                </div>
+                <div class="mb-2">
+                    <label asp-for="DisableCode" class="form-label"></label>
+                    <input asp-for="DisableCode" class="form-control" autocomplete="one-time-code" inputmode="numeric" />
+                    <span asp-validation-for="DisableCode" class="text-danger"></span>
+                </div>
                 <button type="submit" class="btn btn-outline-danger">@L["Turn off"]</button>
             </form>
         }
