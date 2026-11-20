@@ -36,7 +36,20 @@ public sealed class ReportService(AppDbContext db) : IReportService
             .OrderBy(owner => owner.Name)
             .Select(owner => new { owner.Id, owner.Name, AssetCount = owner.Assets.Count })
             .ToListAsync(cancellationToken);
-        var assetResults = await GetAssetResultsAsync(from, to, ownerScopeId, cancellationToken);
+        // Q-112 b, Q-113: an invoiced line counts under the invoice's owner, an uninvoiced line under the
+        // asset's current owner. The owner scope filters on that same per-line owner (T-143).
+        var income = await db.Activities.AsNoTracking()
+            .Where(activity => activity.Date >= from && activity.Date <= to)
+            .Select(activity => new { OwnerId = activity.InvoiceId != null ? activity.Invoice!.OwnerId : activity.Asset.OwnerId, activity.AmountExclVat })
+            .Where(line => ownerScopeId == null || line.OwnerId == ownerScopeId)
+            .ToListAsync(cancellationToken);
+        var expenses = await db.Expenses.AsNoTracking()
+            .Where(expense => expense.Date >= from && expense.Date <= to)
+            .Select(expense => new { OwnerId = expense.InvoiceId != null ? expense.Invoice!.OwnerId : expense.Asset.OwnerId, expense.AmountExclVat })
+            .Where(line => ownerScopeId == null || line.OwnerId == ownerScopeId)
+            .ToListAsync(cancellationToken);
+        var incomePerOwner = income.GroupBy(line => line.OwnerId).ToDictionary(group => group.Key, group => group.Sum(line => line.AmountExclVat));
+        var expensesPerOwner = expenses.GroupBy(line => line.OwnerId).ToDictionary(group => group.Key, group => group.Sum(line => line.AmountExclVat));
         var openInvoices = await db.Invoices.AsNoTracking()
             .Where(invoice => invoice.Status == InvoiceStatus.Open && (ownerScopeId == null || invoice.OwnerId == ownerScopeId))
             .Select(invoice => new { invoice.OwnerId, Lines = invoice.Lines.Select(line => new { line.AmountExclVat, line.VatPercentage }).ToList() })
@@ -44,10 +57,9 @@ public sealed class ReportService(AppDbContext db) : IReportService
 
         return owners.Select(owner =>
         {
-            var results = assetResults.Where(result => result.OwnerId == owner.Id).ToList();
             var open = openInvoices.Where(invoice => invoice.OwnerId == owner.Id).ToList();
-            return new OwnerOverviewModel(owner.Id, owner.Name, owner.AssetCount, results.Sum(result => result.Income),
-                results.Sum(result => result.Expenses), open.Count,
+            return new OwnerOverviewModel(owner.Id, owner.Name, owner.AssetCount, incomePerOwner.GetValueOrDefault(owner.Id),
+                expensesPerOwner.GetValueOrDefault(owner.Id), open.Count,
                 open.Sum(invoice => InvoiceTotals.TotalInclVat(invoice.Lines.Select(line => (line.AmountExclVat, line.VatPercentage)))));
         }).ToList();
     }

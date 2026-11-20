@@ -102,6 +102,50 @@ public sealed class ReportServiceTests
         return (asset, otherAsset);
     }
 
+    [Fact]
+    public async Task GetOwnerOverview_after_a_move_counts_invoiced_lines_under_the_invoice_owner_and_uninvoiced_under_the_current_owner()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var (oldOwnerId, newOwnerId) = await SeedMovedAssetAsync(database.Context);
+        var service = new ReportService(database.Context);
+
+        var overview = await service.GetOwnerOverviewAsync(From, To, null, CancellationToken.None);
+        var scopedToOld = await service.GetOwnerOverviewAsync(From, To, oldOwnerId, CancellationToken.None);
+        var scopedToNew = await service.GetOwnerOverviewAsync(From, To, newOwnerId, CancellationToken.None);
+
+        var oldOwner = overview.Single(owner => owner.OwnerId == oldOwnerId);
+        var newOwner = overview.Single(owner => owner.OwnerId == newOwnerId);
+        Assert.Equal((300m, 30m), (oldOwner.Income, oldOwner.Expenses));
+        Assert.Equal((70m, 7m), (newOwner.Income, newOwner.Expenses));
+        Assert.Equal([(oldOwnerId, 300m, 30m)], scopedToOld.Select(owner => (owner.OwnerId, owner.Income, owner.Expenses)));
+        Assert.Equal([(newOwnerId, 70m, 7m)], scopedToNew.Select(owner => (owner.OwnerId, owner.Income, owner.Expenses)));
+    }
+
+    private static async Task<(int OldOwnerId, int NewOwnerId)> SeedMovedAssetAsync(AppDbContext context)
+    {
+        var oldOwner = new Owner { Name = "Old" };
+        var newOwner = new Owner { Name = "New" };
+        var asset = new Asset { Owner = oldOwner, Name = "Moved house", Street = "Road 3", PostalCode = "1000 AA", City = "City" };
+        context.Assets.Add(asset);
+        context.Owners.Add(newOwner);
+        await context.SaveChangesAsync();
+
+        var invoice = new Invoice { Number = "2025-0010", OwnerId = oldOwner.Id, Date = new DateOnly(2025, 5, 1), DueDate = new DateOnly(2025, 5, 15), Status = InvoiceStatus.Open };
+        invoice.Lines.Add(Line(330m));
+        context.Invoices.Add(invoice);
+        await context.SaveChangesAsync();
+
+        var invoicedActivity = Activity(asset, new DateOnly(2025, 4, 1), 300m);
+        invoicedActivity.InvoiceId = invoice.Id;
+        var invoicedExpense = Expense(asset, new DateOnly(2025, 4, 2), 30m);
+        invoicedExpense.InvoiceId = invoice.Id;
+        context.Activities.AddRange(invoicedActivity, Activity(asset, new DateOnly(2025, 8, 1), 70m));
+        context.Expenses.AddRange(invoicedExpense, Expense(asset, new DateOnly(2025, 8, 2), 7m));
+        asset.OwnerId = newOwner.Id;
+        await context.SaveChangesAsync();
+        return (oldOwner.Id, newOwner.Id);
+    }
+
     private static Activity Activity(Asset asset, DateOnly date, decimal amount) =>
         new() { AssetId = asset.Id, Date = date, Description = "Activity", PricingType = PricingType.Fixed, FixedPrice = amount, AmountExclVat = amount, VatRateName = "Hoog", VatPercentage = 21m };
 
