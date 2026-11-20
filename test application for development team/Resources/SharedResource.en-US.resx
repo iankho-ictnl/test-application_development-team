@@ -148,4 +148,11 @@
   <data name="Or a code from your authenticator app" xml:space="preserve"><value>Or a code from your authenticator app</value></data>
   <data name="The password or code is incorrect." xml:space="preserve"><value>The password or code is incorrect.</value></data>
   <data name="Too long" xml:space="preserve"><value>Too long</value></data>
+  <data name="Street" xml:space="preserve"><value>Street</value></data>
+  <data name="House number" xml:space="preserve"><value>House number</value></data>
+  <data name="Country" xml:space="preserve"><value>Country</value></data>
+  <data name="KvK number" xml:space="preserve"><value>KvK number</value></data>
+  <data name="KvK number (optional)" xml:space="preserve"><value>KvK number (optional)</value></data>
+  <data name="VAT number" xml:space="preserve"><value>VAT number</value></data>
+  <data name="VAT number (optional)" xml:space="preserve"><value>VAT number (optional)</value></data>
 </root>

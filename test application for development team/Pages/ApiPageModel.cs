@@ -15,6 +15,21 @@ public abstract class ApiPageModel(ApiClient api, IStringLocalizer<SharedResourc
     protected void AddApiError(ApiResult r) =>
         ModelState.AddModelError("", r.Status == System.Net.HttpStatusCode.Forbidden ? L["You do not have permission for this action."] : r.Error ?? L["Something went wrong."]);
 
+    /// <summary>Puts the API's 400 errors at the matching field of <typeparamref name="TInput"/> (bound as <paramref name="prefix"/>); the rest goes to the summary.</summary>
+    protected void AddApiError<TInput>(ApiResult r, string prefix = "Input")
+    {
+        var placed = false;
+        foreach (var (key, messages) in r.FieldErrors)
+        {
+            var name = key.StartsWith("$.") ? key[2..] : key;
+            var property = typeof(TInput).GetProperty(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+            if (property is null) continue;
+            foreach (var m in messages) ModelState.AddModelError($"{prefix}.{property.Name}", m);
+            placed = true;
+        }
+        if (!placed) AddApiError(r);
+    }
+
     protected void Done(string message) => TempData["Message"] = L[message].Value;
 
     protected async Task<List<SelectListItem>> OwnerOptionsAsync() =>
@@ -33,14 +48,24 @@ public abstract class ApiPageModel(ApiClient api, IStringLocalizer<SharedResourc
 public class OwnerInput
 {
     [Required(ErrorMessage = "Required"), MaxLength(200), Display(Name = "Name")] public string Name { get; set; } = "";
-    [EmailAddress(ErrorMessage = "Invalid email address"), MaxLength(200), Display(Name = "Email")] public string? Email { get; set; }
-    [MaxLength(50), Display(Name = "Phone")] public string? Phone { get; set; }
-    [MaxLength(200), Display(Name = "Address")] public string? Address { get; set; }
-    [MaxLength(20), Display(Name = "Postal code")] public string? PostalCode { get; set; }
-    [MaxLength(100), Display(Name = "City")] public string? City { get; set; }
+    [Required(ErrorMessage = "Required"), EmailAddress(ErrorMessage = "Invalid email address"), MaxLength(200), Display(Name = "Email")] public string Email { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(50), Display(Name = "Phone")] public string Phone { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(200), Display(Name = "Street")] public string Street { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(20), Display(Name = "House number")] public string HouseNumber { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(20), Display(Name = "Postal code")] public string PostalCode { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(100), Display(Name = "City")] public string City { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(100), Display(Name = "Country")] public string Country { get; set; } = "";
+    // Optional; the format (8 digits, EU VAT number) is checked by the API only (D-041).
+    [Display(Name = "KvK number (optional)")] public string? KvkNumber { get; set; }
+    [Display(Name = "VAT number (optional)")] public string? VatNumber { get; set; }
 
-    public OwnerSaveRequest ToRequest() => new(Name, Email, Phone, Address, PostalCode, City);
-    public static OwnerInput From(OwnerDto o) => new() { Name = o.Name, Email = o.Email, Phone = o.Phone, Address = o.Address, PostalCode = o.PostalCode, City = o.City };
+    public OwnerSaveRequest ToRequest() => new(Name, Email, Phone, Street, HouseNumber, PostalCode, City, Country,
+        string.IsNullOrWhiteSpace(KvkNumber) ? null : KvkNumber, string.IsNullOrWhiteSpace(VatNumber) ? null : VatNumber);
+    public static OwnerInput From(OwnerDto o) => new()
+    {
+        Name = o.Name, Email = o.Email ?? "", Phone = o.Phone ?? "", Street = o.Street, HouseNumber = o.HouseNumber,
+        PostalCode = o.PostalCode, City = o.City, Country = o.Country, KvkNumber = o.KvkNumber, VatNumber = o.VatNumber,
+    };
 }
 
 public class AssetInput
