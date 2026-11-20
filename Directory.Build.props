@@ -1,0 +1,13 @@
+<Project>
+  <!--
+    Code checks with the .NET SDK only (D-051, REQ-028).
+    Package audit: every restore checks the direct and transitive packages
+    against the known vulnerabilities (NuGetAudit, the SDK's own audit).
+    A finding is a build warning (NU1901-NU1904) and is never suppressed.
+  -->
+  <PropertyGroup>
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <NuGetAuditLevel>low</NuGetAuditLevel>
+  </PropertyGroup>
+</Project>
