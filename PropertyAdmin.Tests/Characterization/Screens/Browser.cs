@@ -1,7 +1,4 @@
-using System.Buffers.Binary;
-using System.Globalization;
 using System.Net;
-using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace PropertyAdmin.Tests.Characterization.Screens;
@@ -97,31 +94,36 @@ public static partial class Browser
 
     public static string Text(string html) => WebUtility.HtmlDecode(html).Replace('\u00A0', ' ').Replace('\u202F', ' ');
 
-    /// <summary>The current authenticator code (RFC 6238: SHA-1, 30 seconds, 6 digits) for an ASP.NET Identity shared key.</summary>
-    public static string AuthenticatorCode(string sharedKey)
+    /// <summary>The validation messages at one field (its asp-validation-for span), for an invalid post.</summary>
+    public static string FieldError(string html, string field)
     {
-        const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-        var key = new List<byte>();
-        var buffer = 0;
-        var bits = 0;
-        foreach (var character in sharedKey.Replace(" ", "", StringComparison.Ordinal).ToUpperInvariant())
-        {
-            buffer = (buffer << 5) | alphabet.IndexOf(character);
-            bits += 5;
-            if (bits >= 8)
-            {
-                bits -= 8;
-                key.Add((byte)(buffer >> bits));
-                buffer &= (1 << bits) - 1;
-            }
-        }
-        var counter = new byte[8];
-        BinaryPrimitives.WriteInt64BigEndian(counter, DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 30);
-        using var hmac = new HMACSHA1(key.ToArray());
-        var hash = hmac.ComputeHash(counter);
-        var offset = hash[^1] & 0x0f;
-        var value = BinaryPrimitives.ReadInt32BigEndian(hash.AsSpan(offset, 4)) & int.MaxValue;
-        return (value % 1_000_000).ToString("D6", CultureInfo.InvariantCulture);
+        var match = Regex.Match(html, $"<span[^>]*class=\"[^\"]*field-validation-error[^\"]*\"[^>]*data-valmsg-for=\"{Regex.Escape(field)}\"[^>]*>(.*?)</span>", RegexOptions.Singleline);
+        if (!match.Success)
+            match = Regex.Match(html, $"<span[^>]*data-valmsg-for=\"{Regex.Escape(field)}\"[^>]*class=\"[^\"]*field-validation-error[^\"]*\"[^>]*>(.*?)</span>", RegexOptions.Singleline);
+        Assert.True(match.Success, $"No field-validation-error at {field}");
+        var text = Text(Regex.Replace(match.Groups[1].Value, "<[^>]+>", " ")).Trim();
+        Assert.False(string.IsNullOrEmpty(text), $"Empty field error at {field}");
+        return text;
+    }
+
+    /// <summary>Post an invalid form: expect the form shown again (200) with an error at the field.</summary>
+    public static async Task<string> ExpectFieldError(HttpResponseMessage response, string field)
+    {
+        var html = await response.Content.ReadAsStringAsync();
+        Assert.True(response.StatusCode == HttpStatusCode.OK, $"Expected 200 with a field error at {field}, got {(int)response.StatusCode} {response.Headers.Location}");
+        return FieldError(html, field);
+    }
+
+    /// <summary>Post an invalid form on a screen without per-field messages: expect 200 with the error in the validation summary.</summary>
+    public static async Task<string> ExpectSummaryError(HttpResponseMessage response)
+    {
+        var html = await response.Content.ReadAsStringAsync();
+        Assert.True(response.StatusCode == HttpStatusCode.OK, $"Expected 200 with a validation summary, got {(int)response.StatusCode} {response.Headers.Location}");
+        var match = Regex.Match(html, "class=\"[^\"]*validation-summary-errors[^\"]*\"[^>]*>(.*?)</div>", RegexOptions.Singleline);
+        Assert.True(match.Success, "No validation-summary-errors in the page");
+        var text = Text(Regex.Replace(match.Groups[1].Value, "<[^>]+>", " ")).Trim();
+        Assert.False(string.IsNullOrEmpty(text), "Empty validation summary");
+        return text;
     }
 
     [GeneratedRegex("<input\\b[^>]*>")]

@@ -89,12 +89,12 @@ public sealed class SignInScreenTests(FrontendFactory web)
         var sharedKey = (await Http.Expect(await api.GetAsync("/api/auth/2fa"), HttpStatusCode.OK)).GetProperty("sharedKey").GetString()!;
         // The first set-up changes the security stamp (see AuthUsersTests), so sign in to the API again.
         api = web.Api.WithToken(await web.Api.LoginAsync(userName, ApiFactory.Password));
-        await Http.Expect(await api.PostAsJsonAsync("/api/auth/2fa/enable", new { code = Browser.AuthenticatorCode(sharedKey) }), HttpStatusCode.OK);
+        await Http.Expect(await api.PostAsJsonAsync("/api/auth/2fa/enable", new { code = AuthTests.CreateAuthenticatorCode(sharedKey) }), HttpStatusCode.OK);
         var browser = web.NewBrowser();
 
         var response = await browser.Submit("/Account/Login", new() { ["UserName"] = userName, ["Password"] = ApiFactory.Password });
         Browser.ExpectRedirect(response, "/Account/LoginTwoFactor");
-        response = await browser.Submit("/Account/LoginTwoFactor", new() { ["Code"] = Browser.AuthenticatorCode(sharedKey) });
+        response = await browser.Submit("/Account/LoginTwoFactor", new() { ["Code"] = AuthTests.CreateAuthenticatorCode(sharedKey) });
 
         Browser.ExpectRedirect(response, "/");
         await browser.Page("/Owners");
@@ -108,7 +108,7 @@ public sealed class SignInScreenTests(FrontendFactory web)
         var api = web.Api.WithToken(await web.Api.LoginAsync(userName, ApiFactory.Password));
         var sharedKey = (await Http.Expect(await api.GetAsync("/api/auth/2fa"), HttpStatusCode.OK)).GetProperty("sharedKey").GetString()!;
         api = web.Api.WithToken(await web.Api.LoginAsync(userName, ApiFactory.Password));
-        await Http.Expect(await api.PostAsJsonAsync("/api/auth/2fa/enable", new { code = Browser.AuthenticatorCode(sharedKey) }), HttpStatusCode.OK);
+        await Http.Expect(await api.PostAsJsonAsync("/api/auth/2fa/enable", new { code = AuthTests.CreateAuthenticatorCode(sharedKey) }), HttpStatusCode.OK);
         var browser = web.NewBrowser();
         Browser.ExpectRedirect(await browser.Submit("/Account/Login", new() { ["UserName"] = userName, ["Password"] = ApiFactory.Password }), "/Account/LoginTwoFactor");
 
