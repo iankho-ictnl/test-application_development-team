@@ -13,7 +13,7 @@ public sealed class ReportServiceTests
     {
         await using var database = await MasterDataTestDatabase.CreateAsync();
         var (asset, otherAsset) = await SeedAsync(database.Context);
-        var service = new ReportService(database.Context);
+        var service = NewService(database);
 
         var results = await service.GetAssetResultsAsync(From, To, null, CancellationToken.None);
         var response = PropertyAdmin.Api.V1.Reports.GetAssetResults.Mapping.ToResponse(new PropertyAdmin.Logic.V1.Reports.GetAssetResults.Result(results));
@@ -29,16 +29,17 @@ public sealed class ReportServiceTests
     }
 
     [Fact]
-    public async Task GetOwnerOverview_counts_assets_and_open_invoices_with_the_invoice_rounding()
+    public async Task GetOwnerOverview_lists_only_owners_with_open_invoices_and_counts_them_with_the_invoice_rounding()
     {
         await using var database = await MasterDataTestDatabase.CreateAsync();
-        var (asset, otherAsset) = await SeedAsync(database.Context);
-        var service = new ReportService(database.Context);
+        var (asset, _) = await SeedAsync(database.Context);
+        var service = NewService(database, new DateOnly(2025, 7, 30));
 
         var overview = await service.GetOwnerOverviewAsync(From, To, null, CancellationToken.None);
         var response = PropertyAdmin.Api.V1.Reports.GetOwnerOverview.Mapping.ToResponse(new PropertyAdmin.Logic.V1.Reports.GetOwnerOverview.Result(overview));
 
-        Assert.Equal(["Alpha", "Beta"], response.Select(owner => owner.OwnerName));
+        // US-9.5: Beta has only a paid invoice and is not listed.
+        Assert.Equal(["Alpha"], response.Select(owner => owner.OwnerName));
         var alpha = response[0];
         Assert.Equal(asset.OwnerId, alpha.OwnerId);
         Assert.Equal(1, alpha.AssetCount);
@@ -47,30 +48,62 @@ public sealed class ReportServiceTests
         Assert.Equal(1, alpha.OpenInvoiceCount);
         // VAT once over the 21% base of 100.06 is 21.01 (rounded per line it would be 21.00).
         Assert.Equal(100.06m + 21.01m, alpha.OpenInvoiceAmount);
-        Assert.Equal(otherAsset.OwnerId, response[1].OwnerId);
-        Assert.Equal(0, response[1].OpenInvoiceCount);
+        var invoice = Assert.Single(alpha.OpenInvoices);
+        Assert.Equal(("2025-0001", new DateOnly(2025, 6, 30), new DateOnly(2025, 7, 30), 121.07m, false),
+            (invoice.Number, invoice.Date, invoice.DueDate, invoice.TotalInclVat, invoice.Overdue));
+        Assert.True(invoice.Id > 0);
+    }
+
+    [Theory]
+    [InlineData(2025, 7, 29, false)]
+    [InlineData(2025, 7, 30, false)]
+    [InlineData(2025, 7, 31, true)]
+    public async Task GetOwnerOverview_marks_an_open_invoice_overdue_only_when_its_due_date_is_before_today(int year, int month, int day, bool overdue)
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        await SeedAsync(database.Context);
+        var service = NewService(database, new DateOnly(year, month, day));
+
+        var overview = await service.GetOwnerOverviewAsync(From, To, null, CancellationToken.None);
+
+        Assert.Equal(overdue, Assert.Single(Assert.Single(overview).OpenInvoices).Overdue);
+    }
+
+    [Fact]
+    public async Task GetOwnerOverview_takes_today_from_the_local_date_of_the_system()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        await SeedAsync(database.Context);
+        // 30 July 23:30 UTC is already 31 July in Amsterdam (D-046): the invoice due 30 July is overdue.
+        var amsterdam = TimeZoneInfo.FindSystemTimeZoneById("Europe/Amsterdam");
+        var service = new ReportService(database.Context, new ZonedTime(new DateTimeOffset(2025, 7, 30, 23, 30, 0, TimeSpan.Zero), amsterdam));
+
+        var overview = await service.GetOwnerOverviewAsync(From, To, null, CancellationToken.None);
+
+        Assert.True(Assert.Single(Assert.Single(overview).OpenInvoices).Overdue);
     }
 
     [Fact]
     public async Task Owner_scope_limits_both_reports_to_that_owner()
     {
         await using var database = await MasterDataTestDatabase.CreateAsync();
-        var (_, otherAsset) = await SeedAsync(database.Context);
-        var service = new ReportService(database.Context);
+        var (asset, otherAsset) = await SeedAsync(database.Context);
+        var service = NewService(database);
 
         var results = await service.GetAssetResultsAsync(From, To, otherAsset.OwnerId, CancellationToken.None);
-        var overview = await service.GetOwnerOverviewAsync(From, To, otherAsset.OwnerId, CancellationToken.None);
+        var overviewOfOther = await service.GetOwnerOverviewAsync(From, To, otherAsset.OwnerId, CancellationToken.None);
+        var overviewOfAlpha = await service.GetOwnerOverviewAsync(From, To, asset.OwnerId, CancellationToken.None);
 
         Assert.Equal([otherAsset.Id], results.Select(row => row.AssetId));
-        Assert.Equal([otherAsset.OwnerId], overview.Select(owner => owner.OwnerId));
-        Assert.Equal(0, overview[0].OpenInvoiceCount);
+        Assert.Empty(overviewOfOther);
+        Assert.Equal([asset.OwnerId], overviewOfAlpha.Select(owner => owner.OwnerId));
     }
 
     [Fact]
     public async Task Cancelled_request_passes_the_cancellation_through()
     {
         await using var database = await MasterDataTestDatabase.CreateAsync();
-        var handler = new PropertyAdmin.Logic.V1.Reports.GetOwnerOverview.GetOwnerOverviewHandler(new ReportService(database.Context));
+        var handler = new PropertyAdmin.Logic.V1.Reports.GetOwnerOverview.GetOwnerOverviewHandler(NewService(database));
         using var cancellation = new CancellationTokenSource();
         await cancellation.CancelAsync();
 
@@ -107,7 +140,7 @@ public sealed class ReportServiceTests
     {
         await using var database = await MasterDataTestDatabase.CreateAsync();
         var (oldOwnerId, newOwnerId) = await SeedMovedAssetAsync(database.Context);
-        var service = new ReportService(database.Context);
+        var service = NewService(database);
 
         var overview = await service.GetOwnerOverviewAsync(From, To, null, CancellationToken.None);
         var scopedToOld = await service.GetOwnerOverviewAsync(From, To, oldOwnerId, CancellationToken.None);
@@ -132,7 +165,10 @@ public sealed class ReportServiceTests
 
         var invoice = new Invoice { Number = "2025-0010", OwnerId = oldOwner.Id, Date = new DateOnly(2025, 5, 1), DueDate = new DateOnly(2025, 5, 15), Status = InvoiceStatus.Open };
         invoice.Lines.Add(Line(330m));
-        context.Invoices.Add(invoice);
+        // The new owner needs an open invoice of its own to be listed (US-9.5).
+        var newOwnerInvoice = new Invoice { Number = "2025-0011", OwnerId = newOwner.Id, Date = new DateOnly(2025, 5, 2), DueDate = new DateOnly(2025, 5, 16), Status = InvoiceStatus.Open };
+        newOwnerInvoice.Lines.Add(Line(10m));
+        context.Invoices.AddRange(invoice, newOwnerInvoice);
         await context.SaveChangesAsync();
 
         var invoicedActivity = Activity(asset, new DateOnly(2025, 4, 1), 300m);
@@ -154,4 +190,21 @@ public sealed class ReportServiceTests
 
     private static InvoiceLine Line(decimal amount) =>
         new() { Description = "Line", AmountExclVat = amount, VatPercentage = 21m, SourceType = InvoiceLineSource.Activity, SourceId = 0 };
+
+    private static ReportService NewService(MasterDataTestDatabase database, DateOnly? today = null) =>
+        new(database.Context, new FixedTime(today ?? new DateOnly(2025, 7, 1)));
+
+    private sealed class FixedTime(DateOnly today) : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow() => new(today.ToDateTime(new TimeOnly(12, 0)), TimeSpan.Zero);
+
+        public override TimeZoneInfo LocalTimeZone => TimeZoneInfo.Utc;
+    }
+
+    private sealed class ZonedTime(DateTimeOffset utcNow, TimeZoneInfo localZone) : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow() => utcNow.ToUniversalTime();
+
+        public override TimeZoneInfo LocalTimeZone => localZone;
+    }
 }

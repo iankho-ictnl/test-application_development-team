@@ -29,9 +29,16 @@ public sealed class ReportsApiTests(ApiFactory api)
 
         var overview = await Expect(await viewer.GetAsync("/api/v1/reports/owner-overview?from=2025-01-01&to=2025-12-31"), HttpStatusCode.OK);
         var owner = overview.EnumerateArray().Single(item => item.GetProperty("ownerId").GetInt32() == ownerId);
-        HasShape(owner, "ownerId", "ownerName", "assetCount", "income", "expenses", "openInvoiceCount", "openInvoiceAmount");
+        HasShape(owner, "ownerId", "ownerName", "assetCount", "income", "expenses", "openInvoiceCount", "openInvoiceAmount", "openInvoices");
         Assert.Equal(1, owner.GetProperty("openInvoiceCount").GetInt32());
         Assert.Equal(363m, owner.GetProperty("openInvoiceAmount").GetDecimal());
+        // B23, Q-117: the open invoices with the names the frontend reads.
+        var openInvoice = Assert.Single(owner.GetProperty("openInvoices").EnumerateArray().ToList());
+        HasShape(openInvoice, "id", "number", "date", "dueDate", "totalInclVat", "overdue");
+        Assert.Equal("2025-06-30", openInvoice.GetProperty("date").GetString());
+        Assert.Equal("2025-07-30", openInvoice.GetProperty("dueDate").GetString());
+        Assert.Equal(363m, openInvoice.GetProperty("totalInclVat").GetDecimal());
+        Assert.True(openInvoice.GetProperty("overdue").GetBoolean());
 
         // Current behaviour kept (Q-044): without from/to every total is 0.
         var noPeriod = await Expect(await viewer.GetAsync("/api/v1/reports/asset-results"), HttpStatusCode.OK);

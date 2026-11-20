@@ -4,7 +4,7 @@ using PropertyAdmin.Logic.V1.Reports.Models;
 
 namespace PropertyAdmin.Logic.V1.Reports;
 
-public sealed class ReportService(AppDbContext db) : IReportService
+public sealed class ReportService(AppDbContext db, TimeProvider time) : IReportService
 {
     public async Task<IReadOnlyList<AssetResultModel>> GetAssetResultsAsync(DateOnly from, DateOnly to, int? ownerScopeId, CancellationToken cancellationToken)
     {
@@ -52,15 +52,26 @@ public sealed class ReportService(AppDbContext db) : IReportService
         var expensesPerOwner = expenses.GroupBy(line => line.OwnerId).ToDictionary(group => group.Key, group => group.Sum(line => line.AmountExclVat));
         var openInvoices = await db.Invoices.AsNoTracking()
             .Where(invoice => invoice.Status == InvoiceStatus.Open && (ownerScopeId == null || invoice.OwnerId == ownerScopeId))
-            .Select(invoice => new { invoice.OwnerId, Lines = invoice.Lines.Select(line => new { line.AmountExclVat, line.VatPercentage }).ToList() })
+            .OrderBy(invoice => invoice.Date).ThenBy(invoice => invoice.Number)
+            .Select(invoice => new
+            {
+                invoice.Id, invoice.OwnerId, invoice.Number, invoice.Date, invoice.DueDate,
+                Lines = invoice.Lines.Select(line => new { line.AmountExclVat, line.VatPercentage }).ToList(),
+            })
             .ToListAsync(cancellationToken);
+        // D-046: today is the local date of the system; an invoice is overdue when its due date is before today.
+        var today = DateOnly.FromDateTime(time.GetLocalNow().DateTime);
+        var openPerOwner = openInvoices
+            .GroupBy(invoice => invoice.OwnerId)
+            .ToDictionary(group => group.Key, group => group.Select(invoice => new OpenInvoiceModel(invoice.Id, invoice.Number, invoice.Date, invoice.DueDate,
+                InvoiceTotals.TotalInclVat(invoice.Lines.Select(line => (line.AmountExclVat, line.VatPercentage))), invoice.DueDate < today)).ToList());
 
-        return owners.Select(owner =>
+        // US-9.5: an owner without open invoices is not listed.
+        return owners.Where(owner => openPerOwner.ContainsKey(owner.Id)).Select(owner =>
         {
-            var open = openInvoices.Where(invoice => invoice.OwnerId == owner.Id).ToList();
+            var open = openPerOwner[owner.Id];
             return new OwnerOverviewModel(owner.Id, owner.Name, owner.AssetCount, incomePerOwner.GetValueOrDefault(owner.Id),
-                expensesPerOwner.GetValueOrDefault(owner.Id), open.Count,
-                open.Sum(invoice => InvoiceTotals.TotalInclVat(invoice.Lines.Select(line => (line.AmountExclVat, line.VatPercentage)))));
+                expensesPerOwner.GetValueOrDefault(owner.Id), open.Count, open.Sum(invoice => invoice.TotalInclVat), open);
         }).ToList();
     }
 }
