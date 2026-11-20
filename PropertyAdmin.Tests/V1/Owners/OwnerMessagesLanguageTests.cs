@@ -6,8 +6,9 @@ using static PropertyAdmin.Tests.Characterization.Http;
 namespace PropertyAdmin.Tests.V1.Owners;
 
 /// <summary>
-/// T-114 (REQ-011, REQ-002 US-2.1b; code review T-110 should-fix 2): the KvK and BTW messages come in the
-/// request language from Accept-Language, Dutch when the header is missing or not supported.
+/// T-114, T-120 (REQ-011, REQ-002 US-2.1b; D-049): the owner messages come in the language of the query
+/// parameter <c>lang</c> (nl-NL or en-US, case-insensitive), Dutch when it is missing or not supported.
+/// Accept-Language is ignored.
 /// </summary>
 [Collection(ApiCollection.Name)]
 public sealed class OwnerMessagesLanguageTests(ApiFactory api)
@@ -23,16 +24,28 @@ public sealed class OwnerMessagesLanguageTests(ApiFactory api)
         postalCode = "1234 AB", city = "Teststad", country = "Nederland", kvkNumber = "123", vatNumber = "XX123",
     };
 
+    private static string WithLang(string path, string? lang) =>
+        lang is null ? path : $"{path}?lang={Uri.EscapeDataString(lang)}";
+
+    private static HttpRequestMessage Request(HttpMethod method, string path, string? lang, string? acceptLanguage)
+    {
+        var request = new HttpRequestMessage(method, WithLang(path, lang));
+        if (acceptLanguage is not null) request.Headers.AcceptLanguage.ParseAdd(acceptLanguage);
+        return request;
+    }
+
     [Theory]
-    [InlineData("nl-NL", KvkNl, VatNl)]
-    [InlineData("en-US", KvkEn, VatEn)]
-    [InlineData(null, KvkNl, VatNl)]
-    [InlineData("fr-FR", KvkNl, VatNl)]
-    public async Task Create_gives_the_kvk_and_btw_messages_in_the_request_language(string? language, string kvk, string vat)
+    [InlineData("nl-NL", null, KvkNl, VatNl)]
+    [InlineData("en-US", null, KvkEn, VatEn)]
+    [InlineData("EN-us", null, KvkEn, VatEn)]
+    [InlineData(null, null, KvkNl, VatNl)]
+    [InlineData("de-DE", null, KvkNl, VatNl)]
+    [InlineData(null, "en-US", KvkNl, VatNl)]
+    public async Task Create_gives_the_kvk_and_btw_messages_in_the_language_of_lang(string? lang, string? acceptLanguage, string kvk, string vat)
     {
         var admin = await api.As("Admin");
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/owners") { Content = JsonContent.Create(Body(api.Unique("Language owner"))) };
-        if (language is not null) request.Headers.AcceptLanguage.ParseAdd(language);
+        var request = Request(HttpMethod.Post, "/api/v1/owners", lang, acceptLanguage);
+        request.Content = JsonContent.Create(Body(api.Unique("Language owner")));
 
         var errors = (await ExpectProblem(await admin.SendAsync(request), HttpStatusCode.BadRequest)).GetProperty("errors");
 
@@ -43,12 +56,12 @@ public sealed class OwnerMessagesLanguageTests(ApiFactory api)
     [Theory]
     [InlineData("nl-NL", KvkNl, VatNl)]
     [InlineData("en-US", KvkEn, VatEn)]
-    public async Task Update_gives_the_kvk_and_btw_messages_in_the_request_language(string language, string kvk, string vat)
+    public async Task Update_gives_the_kvk_and_btw_messages_in_the_language_of_lang(string lang, string kvk, string vat)
     {
         var admin = await api.As("Admin");
         var id = await admin.CreateOwner(api.Unique("Language update owner"));
-        var request = new HttpRequestMessage(HttpMethod.Put, $"/api/v1/owners/{id}") { Content = JsonContent.Create(Body(api.Unique("Language update owner"))) };
-        request.Headers.AcceptLanguage.ParseAdd(language);
+        var request = Request(HttpMethod.Put, $"/api/v1/owners/{id}", lang, null);
+        request.Content = JsonContent.Create(Body(api.Unique("Language update owner")));
 
         var errors = (await ExpectProblem(await admin.SendAsync(request), HttpStatusCode.BadRequest)).GetProperty("errors");
 
@@ -59,18 +72,20 @@ public sealed class OwnerMessagesLanguageTests(ApiFactory api)
     private const string HasAssetsNl = "Eigenaar heeft nog objecten en kan niet worden verwijderd.";
     private const string HasAssetsEn = "The owner still has assets and cannot be deleted.";
 
-    /// <summary>T-120 (D-049): the 'owner still has assets' refusal in the request language, Dutch without a header.</summary>
+    /// <summary>T-120 (D-049): the 'owner still has assets' refusal in the language of lang, Dutch without it.</summary>
     [Theory]
-    [InlineData("nl-NL", HasAssetsNl)]
-    [InlineData("en-US", HasAssetsEn)]
-    [InlineData(null, HasAssetsNl)]
-    public async Task Delete_of_an_owner_with_assets_gives_the_refusal_in_the_request_language(string? language, string expected)
+    [InlineData("nl-NL", null, HasAssetsNl)]
+    [InlineData("en-US", null, HasAssetsEn)]
+    [InlineData("EN-us", null, HasAssetsEn)]
+    [InlineData(null, null, HasAssetsNl)]
+    [InlineData("de-DE", null, HasAssetsNl)]
+    [InlineData(null, "en-US", HasAssetsNl)]
+    public async Task Delete_of_an_owner_with_assets_gives_the_refusal_in_the_language_of_lang(string? lang, string? acceptLanguage, string expected)
     {
         var admin = await api.As("Admin");
         var id = await admin.CreateOwner(api.Unique("Language busy owner"));
         await admin.CreateAsset(id, api.Unique("Language busy house"));
-        var request = new HttpRequestMessage(HttpMethod.Delete, $"/api/v1/owners/{id}");
-        if (language is not null) request.Headers.AcceptLanguage.ParseAdd(language);
+        var request = Request(HttpMethod.Delete, $"/api/v1/owners/{id}", lang, acceptLanguage);
 
         var problem = await ExpectProblem(await admin.SendAsync(request), HttpStatusCode.BadRequest);
 
