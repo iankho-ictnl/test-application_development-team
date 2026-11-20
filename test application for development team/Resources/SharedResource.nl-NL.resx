@@ -23,6 +23,10 @@
   <!-- BUG-12: validation messages of the frontend page models ({1} is the maximum length). -->
   <data name="Maximum {1} characters" xml:space="preserve"><value>Maximaal {1} tekens</value></data>
   <!-- End of BUG-12 block. -->
+  <!-- BUG-14: model binding messages of empty or unreadable date and number fields (Services/ModelBindingMessages.cs). -->
+  <data name="Invalid value" xml:space="preserve"><value>Ongeldige waarde</value></data>
+  <data name="Must be a number" xml:space="preserve"><value>Moet een getal zijn</value></data>
+  <!-- End of BUG-14 block. -->
   <data name="Blocked" xml:space="preserve"><value>Geblokkeerd</value></data>
   <data name="Cancel" xml:space="preserve"><value>Annuleren</value></data>
   <data name="Category" xml:space="preserve"><value>Categorie</value></data>

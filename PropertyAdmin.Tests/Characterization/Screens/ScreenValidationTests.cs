@@ -121,7 +121,7 @@ public sealed class ScreenValidationTests(FrontendFactory web)
         Assert.DoesNotContain(invoices.EnumerateArray(), i => i.GetProperty("ownerId").GetInt32() == ownerId);
     }
 
-    [Fact(Skip = "BUG-14: the empty invoice date shows the framework's English text \"The value '' is invalid.\" on the Dutch screen")]
+    [Fact]
     [Trait("Requirement", "REQ-011")]
     [Trait("Bug", "BUG-14")]
     public async Task Invoice_form_without_a_date_shows_the_Dutch_required_message()
