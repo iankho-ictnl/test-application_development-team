@@ -59,7 +59,7 @@ public class AssetInput
 public class ExpenseInput
 {
     [Range(1, int.MaxValue, ErrorMessage = "Required"), Display(Name = "Asset")] public int AssetId { get; set; }
-    [Display(Name = "Date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    [DateInput, Display(Name = "Date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
     [Required(ErrorMessage = "Required"), MaxLength(500), Display(Name = "Description")] public string Description { get; set; } = "";
     [MaxLength(100), Display(Name = "Category")] public string? Category { get; set; }
     [Display(Name = "Amount excl. VAT")] public decimal AmountExclVat { get; set; }
@@ -73,7 +73,7 @@ public class ExpenseInput
 public class ActivityInput
 {
     [Range(1, int.MaxValue, ErrorMessage = "Required"), Display(Name = "Asset")] public int AssetId { get; set; }
-    [Display(Name = "Date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    [DateInput, Display(Name = "Date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
     [Display(Name = "Kind")] public ActivityKind Kind { get; set; }
     [Required(ErrorMessage = "Required"), MaxLength(500), Display(Name = "Description")] public string Description { get; set; } = "";
     [Display(Name = "Pricing")] public PricingType PricingType { get; set; }
@@ -90,8 +90,8 @@ public class VatRateInput
 {
     [Required(ErrorMessage = "Required"), MaxLength(50), Display(Name = "Name")] public string Name { get; set; } = "";
     [Range(0, 100, ErrorMessage = "Between 0 and 100"), Display(Name = "Percentage")] public decimal Percentage { get; set; }
-    [Display(Name = "Valid from")] public DateOnly ValidFrom { get; set; } = DateOnly.FromDateTime(DateTime.Today);
-    [Display(Name = "Valid to")] public DateOnly? ValidTo { get; set; }
+    [DateInput, Display(Name = "Valid from")] public DateOnly ValidFrom { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    [DateInput, Display(Name = "Valid to")] public DateOnly? ValidTo { get; set; }
 
     public VatRateSaveRequest ToRequest() => new(Name, Percentage, ValidFrom, ValidTo);
     public static VatRateInput From(VatRateDto v) => new() { Name = v.Name, Percentage = v.Percentage, ValidFrom = v.ValidFrom, ValidTo = v.ValidTo };

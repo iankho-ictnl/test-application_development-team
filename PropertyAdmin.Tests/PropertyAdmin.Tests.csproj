@@ -25,6 +25,17 @@
   <ItemGroup>
     <ProjectReference Include="..\PropertyAdmin.Api\PropertyAdmin.Api.csproj" />
     <ProjectReference Include="..\PropertyAdmin.Contracts\PropertyAdmin.Contracts.csproj" />
+    <!-- The admin frontend; aliased because it also has a Program class (D-030). -->
+    <ProjectReference Include="..\test application for development team\test application for development team.csproj" Aliases="Frontend" />
   </ItemGroup>
+
+  <!-- The Aliases metadata does not reach the compiler for this reference (CS0430), so set it on the resolved reference. -->
+  <Target Name="AliasFrontendReference" AfterTargets="FindReferenceAssembliesForReferences" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <ReferencePathWithRefAssemblies Condition="'%(Filename)' == 'test application for development team'">
+        <Aliases>Frontend</Aliases>
+      </ReferencePathWithRefAssemblies>
+    </ItemGroup>
+  </Target>
 
 </Project>
