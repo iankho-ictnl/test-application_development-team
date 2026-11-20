@@ -22,7 +22,6 @@
   <data name="Between 0 and 100" xml:space="preserve"><value>Tussen 0 en 100</value></data>
   <!-- BUG-12: validation messages of the frontend page models ({1} is the maximum length). -->
   <data name="Maximum {1} characters" xml:space="preserve"><value>Maximaal {1} tekens</value></data>
-  <data name="Between 0 and 365" xml:space="preserve"><value>Tussen 0 en 365</value></data>
   <!-- End of BUG-12 block. -->
   <data name="Blocked" xml:space="preserve"><value>Geblokkeerd</value></data>
   <data name="Cancel" xml:space="preserve"><value>Annuleren</value></data>
@@ -114,7 +113,7 @@
   <data name="VAT rate deleted." xml:space="preserve"><value>Btw-tarief verwijderd.</value></data>
   <data name="VAT rate saved." xml:space="preserve"><value>Btw-tarief opgeslagen.</value></data>
   <data name="Password" xml:space="preserve"><value>Wachtwoord</value></data>
-  <data name="Payment term (days)" xml:space="preserve"><value>Betalingstermijn (dagen)</value></data>
+  <data name="Payment term: 14 days (due date = invoice date + 14 days)" xml:space="preserve"><value>Betalingstermijn: 14 dagen (vervaldatum = factuurdatum + 14 dagen)</value></data>
   <data name="Percentage" xml:space="preserve"><value>Percentage</value></data>
   <data name="perm." xml:space="preserve"><value>rechten</value></data>
   <data name="Phone" xml:space="preserve"><value>Telefoon</value></data>

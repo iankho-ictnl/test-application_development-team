@@ -6,7 +6,7 @@ namespace PropertyAdmin.Logic.V1.Reports;
 
 public sealed class ReportService(AppDbContext db, TimeProvider time) : IReportService
 {
-    public async Task<IReadOnlyList<AssetResultModel>> GetAssetResultsAsync(DateOnly from, DateOnly to, int? ownerScopeId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<AssetResultModel>> GetAssetResultsAsync(DateOnly from, DateOnly toDate, int? ownerScopeId, CancellationToken cancellationToken)
     {
         var assets = await db.Assets.AsNoTracking()
             .Where(asset => ownerScopeId == null || asset.OwnerId == ownerScopeId)
@@ -14,11 +14,11 @@ public sealed class ReportService(AppDbContext db, TimeProvider time) : IReportS
             .Select(asset => new { asset.Id, asset.Name, asset.OwnerId, OwnerName = asset.Owner.Name })
             .ToListAsync(cancellationToken);
         var income = await db.Activities.AsNoTracking()
-            .Where(activity => activity.Date >= from && activity.Date <= to && (ownerScopeId == null || activity.Asset.OwnerId == ownerScopeId))
+            .Where(activity => activity.Date >= from && activity.Date <= toDate && (ownerScopeId == null || activity.Asset.OwnerId == ownerScopeId))
             .Select(activity => new { activity.AssetId, activity.AmountExclVat })
             .ToListAsync(cancellationToken);
         var expenses = await db.Expenses.AsNoTracking()
-            .Where(expense => expense.Date >= from && expense.Date <= to && (ownerScopeId == null || expense.Asset.OwnerId == ownerScopeId))
+            .Where(expense => expense.Date >= from && expense.Date <= toDate && (ownerScopeId == null || expense.Asset.OwnerId == ownerScopeId))
             .Select(expense => new { expense.AssetId, expense.AmountExclVat })
             .ToListAsync(cancellationToken);
 
@@ -29,7 +29,7 @@ public sealed class ReportService(AppDbContext db, TimeProvider time) : IReportS
             incomePerAsset.GetValueOrDefault(asset.Id), expensesPerAsset.GetValueOrDefault(asset.Id))).ToList();
     }
 
-    public async Task<IReadOnlyList<OwnerOverviewModel>> GetOwnerOverviewAsync(DateOnly from, DateOnly to, int? ownerScopeId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<OwnerOverviewModel>> GetOwnerOverviewAsync(DateOnly from, DateOnly toDate, int? ownerScopeId, CancellationToken cancellationToken)
     {
         var owners = await db.Owners.AsNoTracking()
             .Where(owner => ownerScopeId == null || owner.Id == ownerScopeId)
@@ -39,12 +39,12 @@ public sealed class ReportService(AppDbContext db, TimeProvider time) : IReportS
         // Q-112 b, Q-113: an invoiced line counts under the invoice's owner, an uninvoiced line under the
         // asset's current owner. The owner scope filters on that same per-line owner (T-143).
         var income = await db.Activities.AsNoTracking()
-            .Where(activity => activity.Date >= from && activity.Date <= to)
+            .Where(activity => activity.Date >= from && activity.Date <= toDate)
             .Select(activity => new { OwnerId = activity.InvoiceId != null ? activity.Invoice!.OwnerId : activity.Asset.OwnerId, activity.AmountExclVat })
             .Where(line => ownerScopeId == null || line.OwnerId == ownerScopeId)
             .ToListAsync(cancellationToken);
         var expenses = await db.Expenses.AsNoTracking()
-            .Where(expense => expense.Date >= from && expense.Date <= to)
+            .Where(expense => expense.Date >= from && expense.Date <= toDate)
             .Select(expense => new { OwnerId = expense.InvoiceId != null ? expense.Invoice!.OwnerId : expense.Asset.OwnerId, expense.AmountExclVat })
             .Where(line => ownerScopeId == null || line.OwnerId == ownerScopeId)
             .ToListAsync(cancellationToken);

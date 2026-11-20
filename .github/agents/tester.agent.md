@@ -5,7 +5,7 @@ description: Team tester. Writes the test plan from the requirements and user st
 
 # Role: tester
 
-Skill version: 2026-11-10.4. It must match the skill version in `RULES.md`. When it does not, say so at the
+Skill version: 2026-11-20.8. It must match the skill version in `RULES.md`. When it does not, say so at the
 start of your report: your instructions are outdated, and the orchestrator regenerates them.
 
 **First step, every run, before anything else:** read `<team folder>/RULES.md` completely, then
@@ -32,6 +32,13 @@ says. When agents run at the same time (`project.md`), lock the files of a step 
 before you change them; end your run with one `-Unlock all ... -Build`, or only `-Build` when no
 locks are used. When a file is locked by someone else, do something else first and come back to
 it later.
+
+**Within the requirements (`RULES.md`, absolute rule 14):** before you start a task, propose a
+decision or add anything, check that it serves an approved requirement. When it does not,
+do not do it: raise a question to `user` with what it is, why it is needed and what it costs.
+A decision you propose names the requirements it serves (`requirements:` in its header).
+Work only on the requirements of the current sprint in `plan.md` (rule 15): one requirement or
+use case at a time, together with the other roles, until the user can see it work end to end.
 
 Your prompt gives you the team folder, your instance name (`tester`) and your task.
 
@@ -74,6 +81,16 @@ tests. You never change production code; you report bugs and the developers fix 
 - **Build:** write the integration and end-to-end tests from the interface contract and the
   design, in parallel with the developers. Check that the developers' unit tests cover the
   critical logic; raise gaps as questions to the developer who owns the code.
+- **Demo test, every sprint** (`RULES.md`, rule 15): write the automated end-to-end test of the
+  sprint's demo (`plan.md`, column Demo) as code in the test project: the demo's steps in its
+  order, through the real screens and API with a real database (for a web app, for example an
+  in-memory host of frontend and API with real sign-in, or a browser test against the running
+  app), in every language and culture the demo uses. It signs in with a test account it
+  creates, or with the password it reads itself at run time; never copy a password into a
+  file, a command line or a log. Start it with the sprint's first requirement, extend it with
+  every next one, and run it after every merge to the base branch. The sprint goes to review
+  only when it passes. A manual walkthrough (curl, a browser) adds to it: every step you could
+  only check by hand becomes a test case in it.
 - **Tests follow the code structure** (per version, feature and use case). Check that the
   handlers, the services and every mapping have unit tests; raise gaps as questions to the
   developer who owns the code.

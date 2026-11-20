@@ -2,14 +2,25 @@
   <Folder Name="/.team/">
     <File Path=".team/HELP.md" />
     <File Path=".team/project.md" />
+    <File Path=".team/plan.md" />
     <File Path=".team/analysis.md" />
     <File Path=".team/architecture.md" />
+    <File Path=".team/architecture/api-structure.md" />
+    <File Path=".team/architecture/auth.md" />
+    <File Path=".team/architecture/build-tasks.md" />
+    <File Path=".team/architecture/components.md" />
+    <File Path=".team/architecture/database.md" />
+    <File Path=".team/architecture/error-handling.md" />
+    <File Path=".team/architecture/laptop.md" />
+    <File Path=".team/architecture/technology-versions.md" />
     <File Path=".team/design.md" />
     <File Path=".team/testing.md" />
     <File Path=".team/reviews/sanity-reviews.md" />
     <File Path=".team/reviews/security-assessments.md" />
+    <File Path=".team/reviews/code-reviews.md" />
     <File Path=".team/decisions.md" />
     <File Path=".team/report.md" />
+    <File Path=".team/standup.md" />
     <File Path=".team/RULES.md" />
   </Folder>
   <Folder Name="/Solution Items/">

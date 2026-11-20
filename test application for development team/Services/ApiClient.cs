@@ -21,12 +21,12 @@ public record ApiResult<T>(bool Ok, string? Error, HttpStatusCode Status, T? Val
 /// <summary>Adds the signed-in user's API token to every outgoing request.</summary>
 public class AccessTokenHandler(IHttpContextAccessor accessor) : DelegatingHandler
 {
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var token = accessor.HttpContext?.User.FindFirst(AuthConstants.AccessTokenClaim)?.Value;
         if (!string.IsNullOrEmpty(token))
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var response = await base.SendAsync(request, ct);
+        var response = await base.SendAsync(request, cancellationToken);
         if (response.StatusCode == HttpStatusCode.Unauthorized && !string.IsNullOrEmpty(token))
             throw new ApiUnauthorizedException();
         return response;
@@ -39,11 +39,11 @@ public class LanguageQueryHandler : DelegatingHandler
 {
     public const string Key = "lang";
 
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         if (request.RequestUri is not null)
             request.RequestUri = WithLanguage(request.RequestUri, System.Globalization.CultureInfo.CurrentUICulture.Name);
-        return base.SendAsync(request, ct);
+        return base.SendAsync(request, cancellationToken);
     }
 
     /// <summary>Appends <c>lang</c> (URL-encoded) with <c>?</c>, or with <c>&amp;</c> when the URI already has a query.</summary>
@@ -102,7 +102,7 @@ public class ApiClient(HttpClient http)
         return new(false, ErrorText(r, body), r.StatusCode, default) { FieldErrors = FieldErrorsOf(r, body) };
     }
 
-    private static IReadOnlyDictionary<string, string[]> FieldErrorsOf(HttpResponseMessage r, string body)
+    private static Dictionary<string, string[]> FieldErrorsOf(HttpResponseMessage r, string body)
     {
         var result = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
         if (r.StatusCode != HttpStatusCode.BadRequest) return result;

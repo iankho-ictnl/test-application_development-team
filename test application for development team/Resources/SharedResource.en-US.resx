@@ -22,7 +22,6 @@
   <data name="Between 0 and 100" xml:space="preserve"><value>Between 0 and 100</value></data>
   <!-- BUG-12: validation messages of the frontend page models ({1} is the maximum length). -->
   <data name="Maximum {1} characters" xml:space="preserve"><value>Maximum {1} characters</value></data>
-  <data name="Between 0 and 365" xml:space="preserve"><value>Between 0 and 365</value></data>
   <!-- End of BUG-12 block. -->
   <data name="Blocked" xml:space="preserve"><value>Blocked</value></data>
   <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
@@ -114,7 +113,7 @@
   <data name="VAT rate deleted." xml:space="preserve"><value>VAT rate deleted.</value></data>
   <data name="VAT rate saved." xml:space="preserve"><value>VAT rate saved.</value></data>
   <data name="Password" xml:space="preserve"><value>Password</value></data>
-  <data name="Payment term (days)" xml:space="preserve"><value>Payment term (days)</value></data>
+  <data name="Payment term: 14 days (due date = invoice date + 14 days)" xml:space="preserve"><value>Payment term: 14 days (due date = invoice date + 14 days)</value></data>
   <data name="Percentage" xml:space="preserve"><value>Percentage</value></data>
   <data name="perm." xml:space="preserve"><value>perm.</value></data>
   <data name="Phone" xml:space="preserve"><value>Phone</value></data>

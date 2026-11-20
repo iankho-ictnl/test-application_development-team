@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -50,7 +51,7 @@ public class TokenService(IOptions<JwtOptions> options, IMemoryCache cache) : IT
             new(AppClaims.Purpose, AppClaims.AccessPurpose),
         };
         if (subject.OwnerId is int ownerId)
-            claims.Add(new Claim(AppClaims.OwnerId, ownerId.ToString()));
+            claims.Add(new Claim(AppClaims.OwnerId, ownerId.ToString(CultureInfo.InvariantCulture)));
         claims.AddRange(subject.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
         claims.AddRange(subject.Permissions.Select(p => new Claim(Permissions.ClaimType, p)));
 

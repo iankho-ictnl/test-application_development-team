@@ -10,6 +10,20 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
 {
     private const int MaxNumberAttempts = 3;
 
+    /// <summary>The payment term of every invoice: due date = invoice date + 14 days (BR-11, Q-028, BUG-6).</summary>
+    public const int PaymentTermDays = 14;
+
+    /// <summary>Business-rule key (D-050); the Dutch text is in BusinessRuleMessages.nl.resx.</summary>
+    public const string InvalidPaymentTerm = "The payment term is 14 days.";
+
+    /// <summary>Business-rule key (D-050, D-056); the Dutch text is in BusinessRuleMessages.nl.resx.</summary>
+    public const string OnlyMostRecentDeletable = "Only the most recent unpaid invoice can be deleted.";
+
+    /// <summary>First key of the per-year transaction lock on the invoice numbers (Q-118 b, D-056); the second key is the year.</summary>
+    internal const int InvoiceNumberLockClass = 7001;
+
+    private const string PostgreSqlProvider = "Npgsql.EntityFrameworkCore.PostgreSQL";
+
     public async Task<IReadOnlyList<InvoiceModel>> GetAllAsync(int? ownerScopeId, int? ownerId, InvoiceStatus? status, CancellationToken cancellationToken) =>
         await db.Invoices.AsNoTracking()
             .Where(invoice => (ownerScopeId == null || invoice.OwnerId == ownerScopeId)
@@ -55,6 +69,7 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
 
     public async Task<InvoiceModel> CreateAsync(InvoiceCreateModel model, CancellationToken cancellationToken)
     {
+        if (model.PaymentTermDays != PaymentTermDays) throw new BusinessRuleException(InvalidPaymentTerm);
         if (!await db.Owners.AnyAsync(owner => owner.Id == model.OwnerId, cancellationToken))
             throw new BusinessRuleException("Eigenaar bestaat niet.");
 
@@ -63,6 +78,7 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
             await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
             try
             {
+                await LockYearAsync(model.Date.Year, cancellationToken);
                 var invoice = await BuildInvoiceAsync(model, cancellationToken);
                 db.Invoices.Add(invoice);
                 await db.SaveChangesAsync(cancellationToken);
@@ -97,11 +113,16 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
 
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
     {
+        // The check and the delete in one transaction (D-056 point 2).
+        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
         var invoice = await db.Invoices.Include(item => item.Lines).FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
         if (invoice is null) return false;
         if (invoice.Status == InvoiceStatus.Paid) throw new BusinessRuleException("Een betaalde factuur kan niet worden verwijderd.");
+        // Wait for a create or delete of the same year, then check again with the numbers as they are now (Q-118 b).
+        await LockYearAsync(invoice.Date.Year, cancellationToken);
+        if (!await db.Invoices.AnyAsync(item => item.Id == id, cancellationToken)) return false;
+        if (!await IsMostRecentAsync(invoice, cancellationToken)) throw new BusinessRuleException(OnlyMostRecentDeletable);
 
-        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
         foreach (var activity in await db.Activities.Where(activity => activity.InvoiceId == id).ToListAsync(cancellationToken))
             activity.InvoiceId = null;
         foreach (var expense in await db.Expenses.Where(expense => expense.InvoiceId == id).ToListAsync(cancellationToken))
@@ -128,7 +149,7 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
             Number = await NextNumberAsync(model.Date.Year, cancellationToken),
             OwnerId = model.OwnerId,
             Date = model.Date,
-            DueDate = model.Date.AddDays(model.PaymentTermDays),
+            DueDate = model.Date.AddDays(PaymentTermDays),
             Status = InvoiceStatus.Open,
         };
         foreach (var activity in activities)
@@ -156,14 +177,40 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
         SourceId = sourceId,
     };
 
-    private async Task<string> NextNumberAsync(int year, CancellationToken cancellationToken)
+    /// <summary>
+    /// Takes the per-year PostgreSQL transaction lock on the invoice numbers, held until the transaction ends, so a create and
+    /// a delete of the same year never read the numbers at the same time (Q-118 b, D-056). Other providers (the SQLite test
+    /// database) have no advisory locks and skip it.
+    /// </summary>
+    private async Task LockYearAsync(int year, CancellationToken cancellationToken)
+    {
+        if (!UsesYearLock(db.Database.ProviderName)) return;
+        await db.Database.ExecuteSqlInterpolatedAsync($"SELECT pg_advisory_xact_lock({InvoiceNumberLockClass}, {year})", cancellationToken);
+    }
+
+    internal static bool UsesYearLock(string? providerName) => string.Equals(providerName, PostgreSqlProvider, StringComparison.Ordinal);
+
+    private async Task<string> NextNumberAsync(int year, CancellationToken cancellationToken) =>
+        $"{year}-{await HighestSequenceAsync(year, cancellationToken) + 1:0000}";
+
+    /// <summary>The most recent invoice is the highest number of the latest year: the last one issued (D-056).</summary>
+    private async Task<bool> IsMostRecentAsync(Invoice invoice, CancellationToken cancellationToken)
+    {
+        var year = invoice.Date.Year;
+        if (await db.Invoices.AnyAsync(other => other.Date.Year > year, cancellationToken)) return false;
+        return Sequence(invoice.Number, $"{year}-") >= await HighestSequenceAsync(year, cancellationToken);
+    }
+
+    private async Task<int> HighestSequenceAsync(int year, CancellationToken cancellationToken)
     {
         var prefix = $"{year}-";
         var numbers = await db.Invoices.AsNoTracking()
             .Where(invoice => invoice.Number.StartsWith(prefix))
             .Select(invoice => invoice.Number)
             .ToListAsync(cancellationToken);
-        var max = numbers.Select(number => int.TryParse(number[prefix.Length..], out var value) ? value : 0).DefaultIfEmpty(0).Max();
-        return $"{prefix}{max + 1:0000}";
+        return numbers.Select(number => Sequence(number, prefix)).DefaultIfEmpty(0).Max();
     }
+
+    private static int Sequence(string number, string prefix) =>
+        number.StartsWith(prefix, StringComparison.Ordinal) && int.TryParse(number[prefix.Length..], System.Globalization.CultureInfo.InvariantCulture, out var value) ? value : 0;
 }

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -69,13 +70,13 @@ public sealed partial class S2DemoTests(DemoStack stack)
         var assetId = LinkId(browser.Html, "Assets", asset);
         await browser.PostFormAsync("/Activities/Edit", new Dictionary<string, string>
         {
-            ["Input.AssetId"] = assetId.ToString(), ["Input.Kind"] = "Administration", ["Input.Description"] = "Jaarafrekening",
+            ["Input.AssetId"] = assetId.ToString(CultureInfo.InvariantCulture), ["Input.Kind"] = "Administration", ["Input.Description"] = "Jaarafrekening",
             ["Input.PricingType"] = "Fixed", ["Input.FixedPrice"] = "100", ["Input.VatRateName"] = "Hoog",
         });
         Assert.Equal($"/Assets/Details/{assetId}", browser.Path);
         await browser.PostFormAsync("/Invoices/Create", new Dictionary<string, string>
         {
-            ["OwnerId"] = leavingId.ToString(), ["PaymentTermDays"] = "14",
+            ["OwnerId"] = leavingId.ToString(CultureInfo.InvariantCulture), ["PaymentTermDays"] = "14",
         });
         var invoice = InvoicePath().Match(browser.Path);
         Assert.True(invoice.Success, $"invoice not created ({culture}): {browser.Path}");
@@ -119,7 +120,7 @@ public sealed partial class S2DemoTests(DemoStack stack)
     // D-041: the asset address as five required fields.
     private static Dictionary<string, string> Asset(int ownerId, string name) => new()
     {
-        ["Input.OwnerId"] = ownerId.ToString(), ["Input.Type"] = "Building", ["Input.Name"] = name,
+        ["Input.OwnerId"] = ownerId.ToString(CultureInfo.InvariantCulture), ["Input.Type"] = "Building", ["Input.Name"] = name,
         ["Input.Street"] = "Dorpsstraat", ["Input.HouseNumber"] = "1", ["Input.PostalCode"] = "1234 AB",
         ["Input.City"] = "Ergens", ["Input.Country"] = "Nederland",
     };
@@ -138,7 +139,7 @@ public sealed partial class S2DemoTests(DemoStack stack)
     {
         var m = Regex.Match(html, $"href=\"/{feature}/Details/(\\d+)\">{Regex.Escape(WebUtility.HtmlEncode(name))}<");
         Assert.True(m.Success, $"no link to {name} in /{feature}");
-        return int.Parse(m.Groups[1].Value);
+        return int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture);
     }
 
     [GeneratedRegex("^/Invoices/Details/\\d+$")]

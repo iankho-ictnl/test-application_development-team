@@ -1,5 +1,7 @@
 .team/
 .worktrees/
+.tmp/
+TestResults/
 .env
 bin/
 obj/

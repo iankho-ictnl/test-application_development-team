@@ -150,7 +150,7 @@ public sealed class ProfileTwoFactorDisableTests
     private sealed class EchoLocalizer : IStringLocalizer<SharedResource>
     {
         public LocalizedString this[string name] => new(name, name);
-        public LocalizedString this[string name, params object[] arguments] => new(name, string.Format(name, arguments));
+        public LocalizedString this[string name, params object[] arguments] => new(name, string.Format(System.Globalization.CultureInfo.CurrentCulture, name, arguments));
         public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures) => [];
     }
 
