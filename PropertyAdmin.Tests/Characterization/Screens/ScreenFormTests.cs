@@ -103,61 +103,97 @@ public sealed class ScreenFormTests(FrontendFactory web)
 
     [Fact]
     [Trait("Requirement", "REQ-004")]
-    public async Task Expense_create_saves_through_the_API_with_VAT()
+    public async Task Expense_create_and_edit_save_through_the_API_with_VAT()
     {
         var admin = await web.Api.As("Admin");
         var assetId = await admin.CreateAsset(await admin.CreateOwner(web.Api.Unique("Formeigenaar")), web.Api.Unique("Formpand"));
         var description = web.Api.Unique("Ramen wassen");
         var browser = await web.SignInAs("Admin");
-
-        var response = await browser.Submit("/Expenses/Edit", new()
+        var fields = new Dictionary<string, string>
         {
             ["Input.AssetId"] = $"{assetId}", ["Input.Date"] = "2026-04-01", ["Input.Description"] = description, ["Input.Category"] = "Schoonmaak",
             ["Input.AmountExclVat"] = "50", ["Input.VatRateName"] = "Hoog", ["Input.Reinvoiceable"] = "true",
-        });
+        };
+
+        var response = await browser.Submit("/Expenses/Edit", fields);
 
         Assert.Contains(description, await browser.Page(Browser.ExpectRedirect(response, $"/Assets/Details/{assetId}").PathAndQuery));
         var expense = Named(await Http.Expect(await admin.GetAsync($"/api/expenses?assetId={assetId}"), HttpStatusCode.OK), "description", description);
         Assert.Equal(60.50m, expense.GetProperty("amountInclVat").GetDecimal());
         Assert.True(expense.GetProperty("reinvoiceable").GetBoolean());
+        var id = expense.GetProperty("id").GetInt32();
+
+        var changed = web.Api.Unique("Goten reinigen");
+        fields["Input.Description"] = changed;
+        fields["Input.AmountExclVat"] = "100";
+        response = await browser.Submit($"/Expenses/Edit/{id}", fields);
+
+        Assert.Contains(changed, await browser.Page(Browser.ExpectRedirect(response, $"/Assets/Details/{assetId}").PathAndQuery));
+        var saved = await Http.Expect(await admin.GetAsync($"/api/expenses/{id}"), HttpStatusCode.OK);
+        Assert.Equal(changed, saved.GetProperty("description").GetString());
+        Assert.Equal(121.00m, saved.GetProperty("amountInclVat").GetDecimal());
     }
 
     [Fact]
     [Trait("Requirement", "REQ-005")]
-    public async Task Activity_create_saves_through_the_API_with_hours_times_rate_and_VAT()
+    public async Task Activity_create_and_edit_save_through_the_API_with_hours_times_rate_and_VAT()
     {
         // BUG-7 fixed: kind and pricing type travel as numbers.
         var admin = await web.Api.As("Admin");
         var assetId = await admin.CreateAsset(await admin.CreateOwner(web.Api.Unique("Formeigenaar")), web.Api.Unique("Formpand"));
         var description = web.Api.Unique("Cv-ketel onderhoud");
         var browser = await web.SignInAs("Admin");
-
-        var response = await browser.Submit("/Activities/Edit", new()
+        var fields = new Dictionary<string, string>
         {
             ["Input.AssetId"] = $"{assetId}", ["Input.Date"] = "2026-04-01", ["Input.Kind"] = "Maintenance", ["Input.Description"] = description,
             ["Input.PricingType"] = "Hourly", ["Input.Hours"] = "2", ["Input.HourlyRate"] = "50", ["Input.VatRateName"] = "Hoog",
-        });
+        };
+
+        var response = await browser.Submit("/Activities/Edit", fields);
 
         Assert.Contains(description, await browser.Page(Browser.ExpectRedirect(response, $"/Assets/Details/{assetId}").PathAndQuery));
         var activity = Named(await Http.Expect(await admin.GetAsync($"/api/activities?assetId={assetId}"), HttpStatusCode.OK), "description", description);
         Assert.Equal("2026-04-01", activity.GetProperty("date").GetString());
         Assert.Equal(100.00m, activity.GetProperty("amountExclVat").GetDecimal());
         Assert.Equal(121.00m, activity.GetProperty("amountInclVat").GetDecimal());
+        var id = activity.GetProperty("id").GetInt32();
+
+        var changed = web.Api.Unique("Dakgoot repareren");
+        fields["Input.Description"] = changed;
+        fields["Input.Hours"] = "3";
+        response = await browser.Submit($"/Activities/Edit/{id}", fields);
+
+        Assert.Contains(changed, await browser.Page(Browser.ExpectRedirect(response, $"/Assets/Details/{assetId}").PathAndQuery));
+        var saved = await Http.Expect(await admin.GetAsync($"/api/activities/{id}"), HttpStatusCode.OK);
+        Assert.Equal(changed, saved.GetProperty("description").GetString());
+        Assert.Equal(150.00m, saved.GetProperty("amountExclVat").GetDecimal());
+        Assert.Equal(181.50m, saved.GetProperty("amountInclVat").GetDecimal());
     }
 
     [Fact]
     [Trait("Requirement", "REQ-006")]
-    public async Task Vat_rate_create_saves_through_the_API()
+    public async Task Vat_rate_create_and_edit_save_through_the_API()
     {
         var name = web.Api.Unique("Tarief");
         var browser = await web.SignInAs("Admin");
+        var admin = await web.Api.As("Admin");
 
         var response = await browser.Submit("/VatRates", new() { ["Input.Name"] = name, ["Input.Percentage"] = "5", ["Input.ValidFrom"] = "2026-01-01" });
 
         Assert.Contains(name, await browser.Page(Browser.ExpectRedirect(response, "/VatRates").PathAndQuery));
-        var rate = Named(await Http.Expect(await (await web.Api.As("Admin")).GetAsync("/api/vatrates"), HttpStatusCode.OK), "name", name);
+        var rate = Named(await Http.Expect(await admin.GetAsync("/api/vatrates"), HttpStatusCode.OK), "name", name);
         Assert.Equal(5m, rate.GetProperty("percentage").GetDecimal());
         Assert.Equal("2026-01-01", rate.GetProperty("validFrom").GetString());
+        var id = rate.GetProperty("id").GetInt32();
+
+        // The edit form is the same page opened with ?edit={id}; it posts the id in a hidden field.
+        response = await browser.Submit($"/VatRates?edit={id}", new() { ["Input.Name"] = name, ["Input.Percentage"] = "6", ["Input.ValidFrom"] = "2026-02-01" }, "/VatRates");
+
+        Assert.Contains(name, await browser.Page(Browser.ExpectRedirect(response, "/VatRates").PathAndQuery));
+        var saved = Named(await Http.Expect(await admin.GetAsync("/api/vatrates"), HttpStatusCode.OK), "name", name);
+        Assert.Equal(id, saved.GetProperty("id").GetInt32());
+        Assert.Equal(6m, saved.GetProperty("percentage").GetDecimal());
+        Assert.Equal("2026-02-01", saved.GetProperty("validFrom").GetString());
     }
 
     [Fact]
@@ -214,5 +250,55 @@ public sealed class ScreenFormTests(FrontendFactory web)
         var user = await web.SignIn(userName);
         await user.Page("/Reports");
         Browser.ExpectRedirect(await user.GetAsync("/VatRates"), "/Account/AccessDenied");
+    }
+
+    [Fact]
+    [Trait("Requirement", "REQ-012")]
+    public async Task User_edit_saves_email_and_roles_through_the_API()
+    {
+        var userName = web.Api.Unique("screen.edit");
+        await web.Api.CreateUserAsync(userName, "Viewer");
+        var admin = await web.Api.As("Admin");
+        var id = (await Http.Expect(await admin.GetAsync("/api/users"), HttpStatusCode.OK)).EnumerateArray()
+            .Single(u => u.GetProperty("userName").GetString() == userName).GetProperty("id").GetString()!;
+        var browser = await web.SignInAs("Admin");
+
+        var response = await browser.Submit($"/Admin/Users/Edit/{id}", new()
+        {
+            ["UserName"] = userName, ["Email"] = $"{userName}.changed@example.test", ["Roles"] = "Staff",
+        });
+
+        Assert.Contains($"{userName}.changed@example.test", await browser.Page(Browser.ExpectRedirect(response, "/Admin/Users").PathAndQuery));
+        var saved = await Http.Expect(await admin.GetAsync($"/api/users/{id}"), HttpStatusCode.OK);
+        Assert.Equal($"{userName}.changed@example.test", saved.GetProperty("email").GetString());
+        Assert.Equal(["Staff"], saved.GetProperty("roles").EnumerateArray().Select(r => r.GetString()));
+        Assert.False(saved.GetProperty("lockedOut").GetBoolean());
+    }
+
+    [Fact]
+    [Trait("Requirement", "REQ-013")]
+    public async Task Profile_two_factor_enable_saves_through_the_screen_and_sign_in_then_asks_for_the_code()
+    {
+        var userName = web.Api.Unique("screen.profile2fa");
+        await web.Api.CreateUserAsync(userName, "Viewer");
+        var browser = await web.SignIn(userName);
+        await browser.Page("/Profile");
+        // Current behaviour of BUG-13 (testing.md): the first visit to /Profile ends the API session,
+        // so sign in again before the form is used. When BUG-13 is fixed, this line can go.
+        browser = await web.SignIn(userName);
+        var page = await browser.Page("/Profile");
+        var sharedKey = System.Text.RegularExpressions.Regex.Match(page, "font-monospace\">([A-Za-z0-9 ]+)</span>").Groups[1].Value;
+        Assert.False(string.IsNullOrWhiteSpace(sharedKey), "The profile page shows no authenticator key");
+
+        var response = await browser.Submit("/Profile", new() { ["Code"] = AuthTests.CreateAuthenticatorCode(sharedKey) }, "/Profile?handler=Enable");
+
+        // The page shows the recovery codes and the user is signed out to sign in with the code.
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.DoesNotContain("validation-summary-errors", await response.Content.ReadAsStringAsync());
+        await browser.ExpectSignInRedirect("/Owners");
+        var again = web.NewBrowser();
+        Browser.ExpectRedirect(await again.Submit("/Account/Login", new() { ["UserName"] = userName, ["Password"] = ApiFactory.Password }), "/Account/LoginTwoFactor");
+        Browser.ExpectRedirect(await again.Submit("/Account/LoginTwoFactor", new() { ["Code"] = AuthTests.CreateAuthenticatorCode(sharedKey) }), "/");
+        await again.Page("/Owners");
     }
 }
