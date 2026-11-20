@@ -89,6 +89,25 @@
   <data name="Overview per owner" xml:space="preserve"><value>Overview per owner</value></data>
   <data name="Owner" xml:space="preserve"><value>Owner</value></data>
   <data name="Owners" xml:space="preserve"><value>Owners</value></data>
+  <data name="Activity deleted." xml:space="preserve"><value>Activity deleted.</value></data>
+  <data name="Activity saved." xml:space="preserve"><value>Activity saved.</value></data>
+  <data name="Asset deleted." xml:space="preserve"><value>Asset deleted.</value></data>
+  <data name="Asset saved." xml:space="preserve"><value>Asset saved.</value></data>
+  <data name="Expense deleted." xml:space="preserve"><value>Expense deleted.</value></data>
+  <data name="Expense saved." xml:space="preserve"><value>Expense saved.</value></data>
+  <data name="Invoice created." xml:space="preserve"><value>Invoice created.</value></data>
+  <data name="Invoice deleted." xml:space="preserve"><value>Invoice deleted.</value></data>
+  <data name="Invoice marked as paid." xml:space="preserve"><value>Invoice marked as paid.</value></data>
+  <data name="Owner deleted." xml:space="preserve"><value>Owner deleted.</value></data>
+  <data name="Owner saved." xml:space="preserve"><value>Owner saved.</value></data>
+  <data name="Role deleted." xml:space="preserve"><value>Role deleted.</value></data>
+  <data name="Role saved." xml:space="preserve"><value>Role saved.</value></data>
+  <data name="Two-factor sign-in reset." xml:space="preserve"><value>Two-factor sign-in reset.</value></data>
+  <data name="User deleted." xml:space="preserve"><value>User deleted.</value></data>
+  <data name="User saved." xml:space="preserve"><value>User saved.</value></data>
+  <data name="User signed out everywhere." xml:space="preserve"><value>User signed out everywhere.</value></data>
+  <data name="VAT rate deleted." xml:space="preserve"><value>VAT rate deleted.</value></data>
+  <data name="VAT rate saved." xml:space="preserve"><value>VAT rate saved.</value></data>
   <data name="Password" xml:space="preserve"><value>Password</value></data>
   <data name="Payment term (days)" xml:space="preserve"><value>Payment term (days)</value></data>
   <data name="Percentage" xml:space="preserve"><value>Percentage</value></data>
