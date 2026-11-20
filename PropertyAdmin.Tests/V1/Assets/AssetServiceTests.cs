@@ -10,8 +10,9 @@ namespace PropertyAdmin.Tests.V1.Assets;
 public sealed class AssetServiceTests
 {
     [Fact]
-    public async Task Update_rejects_owner_change_while_uninvoiced_activity_exists()
+    public async Task Update_moves_uninvoiced_lines_with_the_asset_and_keeps_invoiced_lines_with_the_old_owner()
     {
+        // BUG-4, Q-027, US-3.4
         await using var database = await MasterDataTestDatabase.CreateAsync();
         var firstOwner = new Owner { Name = "First" };
         var secondOwner = new Owner { Name = "Second" };
@@ -22,19 +23,30 @@ public sealed class AssetServiceTests
         var asset = await service.CreateAsync(
             new AssetSaveModel(firstOwner.Id, AssetType.Building, "House", "Road", "1", "1000", "City", "NL"),
             CancellationToken.None);
-        database.Context.Activities.Add(new Activity
-        {
-            AssetId = asset.Id,
-            Date = new DateOnly(2026, 1, 1),
-            Description = "Work",
-            VatRateName = "High",
-        });
+        var invoice = new Invoice { Number = "2026-0001", OwnerId = firstOwner.Id, Date = new DateOnly(2026, 1, 31), DueDate = new DateOnly(2026, 2, 14) };
+        database.Context.Invoices.Add(invoice);
+        var open = new Activity { AssetId = asset.Id, Date = new DateOnly(2026, 2, 1), Description = "Open work", VatRateName = "High" };
+        var invoiced = new Activity { AssetId = asset.Id, Date = new DateOnly(2026, 1, 1), Description = "Invoiced work", VatRateName = "High", Invoice = invoice };
+        var expense = new Expense { AssetId = asset.Id, Date = new DateOnly(2026, 2, 2), Description = "Paint", VatRateName = "High", Reinvoiceable = true };
+        database.Context.AddRange(open, invoiced, expense);
         await database.Context.SaveChangesAsync();
 
-        await Assert.ThrowsAsync<PropertyAdmin.Logic.BusinessRuleException>(() => service.UpdateAsync(
+        var moved = await service.UpdateAsync(
             asset.Id,
-            new AssetSaveModel(secondOwner.Id, AssetType.Home, "House", "Road", "1", "1000", "City", "NL"),
-            CancellationToken.None));
+            new AssetSaveModel(secondOwner.Id, AssetType.Building, "House", "Road", "1", "1000", "City", "NL"),
+            CancellationToken.None);
+
+        Assert.Equal((secondOwner.Id, "Second"), (moved!.OwnerId, moved.OwnerName));
+        database.Context.ChangeTracker.Clear();
+        var invoices = new PropertyAdmin.Logic.V1.Invoices.InvoiceService(database.Context);
+        var newOwnerLines = await invoices.GetUninvoicedAsync(secondOwner.Id, CancellationToken.None);
+        Assert.Equal([open.Id], newOwnerLines.Activities.Select(line => line.Id));
+        Assert.Equal([expense.Id], newOwnerLines.Expenses.Select(line => line.Id));
+        var oldOwnerLines = await invoices.GetUninvoicedAsync(firstOwner.Id, CancellationToken.None);
+        Assert.Empty(oldOwnerLines.Activities);
+        Assert.Empty(oldOwnerLines.Expenses);
+        Assert.Equal(firstOwner.Id, (await database.Context.Invoices.FindAsync(invoice.Id))!.OwnerId);
+        Assert.Equal(invoice.Id, (await database.Context.Activities.FindAsync(invoiced.Id))!.InvoiceId);
     }
 
     [Fact]

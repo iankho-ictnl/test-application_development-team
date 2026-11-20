@@ -8,7 +8,6 @@ public sealed class AssetService(AppDbContext db) : IAssetService
 {
     /// <summary>Business-rule messages as English keys; the Dutch text is in Resources/BusinessRuleMessages.nl.resx (D-050).</summary>
     public const string OwnerNotFound = "The owner does not exist.";
-    public const string HasUninvoicedLines = "The asset still has uninvoiced lines; invoice them before changing the owner.";
     public const string HasLines = "The asset still has expenses or activities and cannot be deleted.";
 
     public async Task<IReadOnlyList<AssetModel>> GetAllAsync(int? ownerScopeId, int? ownerId, CancellationToken cancellationToken) =>
@@ -42,11 +41,9 @@ public sealed class AssetService(AppDbContext db) : IAssetService
         if (asset is null) return null;
 
         await EnsureOwnerAsync(model.OwnerId, cancellationToken);
-        if (asset.OwnerId != model.OwnerId
-            && (await db.Activities.AnyAsync(item => item.AssetId == id && item.InvoiceId == null, cancellationToken)
-                || await db.Expenses.AnyAsync(item => item.AssetId == id && item.InvoiceId == null && item.Reinvoiceable, cancellationToken)))
-            throw new BusinessRuleException(HasUninvoicedLines);
 
+        // Q-027 (BUG-4): an owner change is allowed with uninvoiced lines. Lines belong to the asset, so the
+        // uninvoiced ones move with it to the new owner; invoiced lines stay on their invoice, which keeps its own owner.
         Apply(asset, model);
         await db.SaveChangesAsync(cancellationToken);
         await db.Entry(asset).Reference(item => item.Owner).LoadAsync(cancellationToken);

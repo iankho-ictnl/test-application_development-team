@@ -134,7 +134,7 @@ public class AssetsTests(ApiFactory api)
         await ExpectStatus(await (await api.As("Staff")).PostAsJsonAsync("/api/assets", AssetBody(1, "X")), HttpStatusCode.Forbidden);
 
     [Fact]
-    public async Task Update_returns_200_404_and_400_when_owner_changes_with_uninvoiced_lines()
+    public async Task Update_returns_200_404_and_moves_uninvoiced_lines_when_owner_changes()
     {
         var admin = await api.As("Admin");
         var ownerId = await admin.CreateOwner(api.Unique("Eigenaar"));
@@ -144,8 +144,13 @@ public class AssetsTests(ApiFactory api)
         HasShape(await Expect(await admin.PutAsJsonAsync($"/api/assets/{id}", body), HttpStatusCode.OK), AssetShape);
         await ExpectStatus(await admin.PutAsJsonAsync("/api/assets/999999", body), HttpStatusCode.NotFound);
 
-        await admin.CreateActivity(id);
-        await ExpectProblem(await admin.PutAsJsonAsync($"/api/assets/{id}", body with { ownerId = otherOwner }), HttpStatusCode.BadRequest, DomainTitle);
+        // BUG-4, Q-027: the uninvoiced activity moves with the asset to the new owner.
+        var activityId = await admin.CreateActivity(id);
+        await Expect(await admin.PutAsJsonAsync($"/api/assets/{id}", body with { ownerId = otherOwner }), HttpStatusCode.OK);
+        var moved = await Expect(await admin.GetAsync($"/api/invoices/uninvoiced/{otherOwner}"), HttpStatusCode.OK);
+        Assert.Equal([activityId], Ids(moved.GetProperty("activities")));
+        var left = await Expect(await admin.GetAsync($"/api/invoices/uninvoiced/{ownerId}"), HttpStatusCode.OK);
+        Assert.Empty(Ids(left.GetProperty("activities")));
     }
 
     [Fact]
