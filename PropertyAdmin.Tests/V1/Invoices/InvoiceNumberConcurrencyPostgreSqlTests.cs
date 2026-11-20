@@ -117,6 +117,154 @@ public sealed class InvoiceNumberConcurrencyPostgreSqlTests(ITestOutputHelper ou
         output.WriteLine($"{Rounds} rounds: delete first (number reused) {deleted}, create first (delete refused) {refused}");
     }
 
+    /// <summary>
+    /// TC-REQ7-2 (REQ-007, D-056, code review of #24 Should fix, T-163): two deletes of the same newest invoice at the same
+    /// moment on two connections: one deletes it (true, the API's 204), the other finds it gone (false, the API's 404), never
+    /// an exception (the API's 500). The invoice is gone and its activity is uninvoiced again.
+    /// </summary>
+    [Fact]
+    public async Task Two_deletes_of_the_same_invoice_at_the_same_moment_give_one_deleted_and_one_not_found_TC_REQ7_2()
+    {
+        var (assetId, ownerId) = await AddOwnerWithAssetAsync("Dubbel Verwijderen BV");
+        for (var round = 1; round <= 10; round++)
+        {
+            InvoiceModel invoice;
+            await using (var prepare = NewContext())
+            {
+                AddActivity(prepare, assetId);
+                await prepare.SaveChangesAsync();
+                invoice = await new InvoiceService(prepare).CreateAsync(new InvoiceCreateModel(ownerId, InvoiceDate, InvoiceService.PaymentTermDays), CancellationToken.None);
+            }
+
+            await using var first = NewContext();
+            await using var second = NewContext();
+            await first.Database.OpenConnectionAsync();
+            await second.Database.OpenConnectionAsync();
+            var start = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var deleteFirst = Task.Run(async () => { await start.Task; return await new InvoiceService(first).DeleteAsync(invoice.Id, CancellationToken.None); });
+            var deleteSecond = Task.Run(async () => { await start.Task; return await new InvoiceService(second).DeleteAsync(invoice.Id, CancellationToken.None); });
+            start.SetResult();
+            var results = await Task.WhenAll(deleteFirst, deleteSecond);
+
+            Assert.True(results.Count(deleted => deleted) == 1, $"round {round}: results {string.Join(", ", results)}");
+            await using var check = NewContext();
+            Assert.False(await check.Invoices.AnyAsync(item => item.Id == invoice.Id));
+            Assert.Equal(1, await check.Activities.CountAsync(activity => activity.InvoiceId == null));
+            check.Activities.RemoveRange(check.Activities.Where(activity => activity.InvoiceId == null));
+            await check.SaveChangesAsync();
+        }
+    }
+
+    /// <summary>
+    /// TC-REQ7-3 (REQ-007, D-056, T-163): five invoices for five owners created at the same moment on five connections get the
+    /// consecutive numbers 2026-0001 to 2026-0005, each once.
+    /// </summary>
+    [Fact]
+    public async Task Invoices_created_at_the_same_moment_get_consecutive_numbers_TC_REQ7_3()
+    {
+        var owners = new List<int>();
+        for (var index = 1; index <= 5; index++)
+        {
+            var (assetId, ownerId) = await AddOwnerWithAssetAsync($"Tegelijk {index} BV");
+            await using var setup = NewContext();
+            AddActivity(setup, assetId);
+            await setup.SaveChangesAsync();
+            owners.Add(ownerId);
+        }
+
+        var contexts = owners.Select(_ => NewContext()).ToList();
+        try
+        {
+            foreach (var context in contexts) await context.Database.OpenConnectionAsync();
+            var start = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var creates = owners.Select((ownerId, index) => Task.Run(async () =>
+            {
+                await start.Task;
+                return await new InvoiceService(contexts[index]).CreateAsync(new InvoiceCreateModel(ownerId, InvoiceDate, InvoiceService.PaymentTermDays), CancellationToken.None);
+            })).ToList();
+            start.SetResult();
+            var created = await Task.WhenAll(creates);
+
+            Assert.Equal(["2026-0001", "2026-0002", "2026-0003", "2026-0004", "2026-0005"], created.Select(invoice => invoice.Number).Order(StringComparer.Ordinal));
+            Assert.Equal(owners.Order(), created.Select(invoice => invoice.OwnerId).Order());
+        }
+        finally
+        {
+            foreach (var context in contexts) await context.DisposeAsync();
+        }
+    }
+
+    /// <summary>
+    /// TC-REQ7-4 (REQ-007, D-056, T-163): when the most recent invoice is deleted, the next invoice gets its number again.
+    /// </summary>
+    [Fact]
+    public async Task A_deleted_most_recent_number_is_reused_TC_REQ7_4()
+    {
+        var (assetId, ownerId) = await AddOwnerWithAssetAsync("Hergebruik BV");
+        await using var context = NewContext();
+        var service = new InvoiceService(context);
+        AddActivity(context, assetId);
+        await context.SaveChangesAsync();
+        await service.CreateAsync(new InvoiceCreateModel(ownerId, InvoiceDate, InvoiceService.PaymentTermDays), CancellationToken.None);
+        AddActivity(context, assetId);
+        await context.SaveChangesAsync();
+        var newest = await service.CreateAsync(new InvoiceCreateModel(ownerId, InvoiceDate, InvoiceService.PaymentTermDays), CancellationToken.None);
+        Assert.Equal("2026-0002", newest.Number);
+
+        Assert.True(await service.DeleteAsync(newest.Id, CancellationToken.None));
+        var again = await service.CreateAsync(new InvoiceCreateModel(ownerId, InvoiceDate, InvoiceService.PaymentTermDays), CancellationToken.None);
+
+        Assert.Equal("2026-0002", again.Number);
+    }
+
+    /// <summary>
+    /// TC-REQ7-5 (REQ-018, REQ-007, T-163): after the real migrations every money column is numeric(18,2) in PostgreSQL, and an
+    /// invoice line amount is stored and read back to the cent.
+    /// </summary>
+    [Fact]
+    public async Task Money_columns_are_numeric_18_2_and_keep_cents_TC_REQ7_5()
+    {
+        string[] columns = ["Activities.AmountExclVat", "Activities.FixedPrice", "Activities.HourlyRate", "Expenses.AmountExclVat", "InvoiceLines.AmountExclVat"];
+        await using var context = NewContext();
+        await context.Database.OpenConnectionAsync();
+        foreach (var column in columns)
+        {
+            var parts = column.Split('.');
+            await using var command = context.Database.GetDbConnection().CreateCommand();
+            command.CommandText = "SELECT data_type || '(' || numeric_precision || ',' || numeric_scale || ')' FROM information_schema.columns WHERE table_name = @table AND column_name = @column";
+            var table = command.CreateParameter();
+            table.ParameterName = "table";
+            table.Value = parts[0];
+            command.Parameters.Add(table);
+            var name = command.CreateParameter();
+            name.ParameterName = "column";
+            name.Value = parts[1];
+            command.Parameters.Add(name);
+            Assert.Equal("numeric(18,2)", (string?)await command.ExecuteScalarAsync());
+        }
+
+        var (assetId, ownerId) = await AddOwnerWithAssetAsync("Centen BV");
+        context.Activities.Add(new Activity
+        {
+            AssetId = assetId, Date = new DateOnly(2026, 3, 2), Description = "Groot onderhoud", PricingType = PricingType.Fixed,
+            FixedPrice = 1234567890123456.78m, AmountExclVat = 1234567890123456.78m, VatRateName = "Hoog", VatPercentage = 21m,
+        });
+        await context.SaveChangesAsync();
+        var invoice = await new InvoiceService(context).CreateAsync(new InvoiceCreateModel(ownerId, InvoiceDate, InvoiceService.PaymentTermDays), CancellationToken.None);
+
+        await using var check = NewContext();
+        Assert.Equal(1234567890123456.78m, (await check.InvoiceLines.AsNoTracking().SingleAsync(line => line.InvoiceId == invoice.Id)).AmountExclVat);
+    }
+
+    private async Task<(int AssetId, int OwnerId)> AddOwnerWithAssetAsync(string ownerName)
+    {
+        await using var setup = NewContext();
+        var asset = new Asset { Owner = new Owner { Name = ownerName }, Name = "Testpand", Street = "Proefweg", PostalCode = "1000 AA", City = "Proefdorp" };
+        setup.Assets.Add(asset);
+        await setup.SaveChangesAsync();
+        return (asset.Id, asset.OwnerId);
+    }
+
     private AppDbContext NewContext() => new(new DbContextOptionsBuilder<AppDbContext>().UseNpgsql(_db.GetConnectionString()).Options);
 
     private static void AddActivity(AppDbContext context, int assetId) => context.Activities.Add(new Activity
