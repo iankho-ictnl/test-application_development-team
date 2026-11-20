@@ -330,6 +330,30 @@ public sealed class InvoiceServiceTests
             PropertyAdmin.Logic.V1.Invoices.GetPdf.InvoicePdfRenderer.OwnerBlockLines(model));
     }
 
+    [Theory]
+    [InlineData("Npgsql.EntityFrameworkCore.PostgreSQL", true)]
+    [InlineData("Microsoft.EntityFrameworkCore.Sqlite", false)]
+    [InlineData("Microsoft.EntityFrameworkCore.InMemory", false)]
+    [InlineData(null, false)]
+    public void Year_lock_is_taken_only_on_PostgreSQL_Q118(string? providerName, bool expected) =>
+        Assert.Equal(expected, InvoiceService.UsesYearLock(providerName));
+
+    [Fact]
+    public async Task Create_and_delete_skip_the_year_lock_on_SQLite_and_reuse_the_freed_number_Q118()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        Assert.False(InvoiceService.UsesYearLock(database.Context.Database.ProviderName));
+        var invoice = await SeedInvoiceAsync(database.Context);
+        var service = new InvoiceService(database.Context);
+
+        Assert.True(await service.DeleteAsync(invoice.Id, CancellationToken.None));
+        database.Context.ChangeTracker.Clear();
+        var again = await service.CreateAsync(new InvoiceCreateModel(invoice.OwnerId, InvoiceDate, 14), CancellationToken.None);
+
+        Assert.Equal(invoice.Number, again.Number);
+        Assert.False(await service.DeleteAsync(invoice.Id, CancellationToken.None));
+    }
+
     private static async Task<Asset> SeedAssetAsync(AppDbContext context, string ownerName)
     {
         var asset = new Asset { Owner = new Owner { Name = ownerName }, Name = $"{ownerName} house", Street = "Road 1", PostalCode = "1000 AA", City = "City" };
