@@ -15,7 +15,11 @@ public static class Mapping
         owner.Name,
         owner.Email,
         owner.Phone,
-        owner.Address,
+        owner.Street,
+        owner.HouseNumber,
         owner.PostalCode,
-        owner.City);
+        owner.City,
+        owner.Country,
+        owner.KvkNumber,
+        owner.VatNumber);
 }

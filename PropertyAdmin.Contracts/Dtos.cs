@@ -27,8 +27,19 @@ public record RoleDto(string Name, IReadOnlyList<string> Permissions, int UserCo
 public record RoleSaveRequest([Required, MaxLength(50)] string Name, IReadOnlyList<string> Permissions);
 
 // Owners and assets
-public record OwnerDto(int Id, string Name, string? Email, string? Phone, string? Address, string? PostalCode, string? City);
-public record OwnerSaveRequest([Required, MaxLength(200)] string Name, [EmailAddress, MaxLength(200)] string? Email, [MaxLength(50)] string? Phone, [MaxLength(200)] string? Address, [MaxLength(20)] string? PostalCode, [MaxLength(100)] string? City);
+// D-041: five address fields; KvK and BTW optional (null when empty), the API returns the normalized BTW number.
+public record OwnerDto(int Id, string Name, string? Email, string? Phone, string Street, string HouseNumber, string PostalCode, string City, string Country, string? KvkNumber, string? VatNumber);
+public record OwnerSaveRequest(
+    [Required, MaxLength(200)] string Name,
+    [Required, EmailAddress, MaxLength(200)] string Email,
+    [Required, MaxLength(50)] string Phone,
+    [Required, MaxLength(200)] string Street,
+    [Required, MaxLength(20)] string HouseNumber,
+    [Required, MaxLength(20)] string PostalCode,
+    [Required, MaxLength(100)] string City,
+    [Required, MaxLength(100)] string Country,
+    string? KvkNumber,
+    string? VatNumber);
 public record AssetDto(int Id, int OwnerId, string OwnerName, AssetType Type, string Name, string Address, string PostalCode, string City);
 public record AssetSaveRequest([Range(1, int.MaxValue)] int OwnerId, AssetType Type, [Required, MaxLength(200)] string Name, [Required, MaxLength(200)] string Address, [Required, MaxLength(20)] string PostalCode, [Required, MaxLength(100)] string City);
 

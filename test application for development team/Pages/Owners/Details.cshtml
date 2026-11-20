@@ -5,8 +5,17 @@
 }
 <h1 class="h3">@Model.Owner.Name</h1>
 <p>
-    @Model.Owner.Address<br />
+    @Model.Owner.Street @Model.Owner.HouseNumber<br />
     @Model.Owner.PostalCode @Model.Owner.City<br />
+    @Model.Owner.Country<br />
+    @if (!string.IsNullOrEmpty(Model.Owner.KvkNumber))
+    {
+        <span>@L["KvK number"]: @Model.Owner.KvkNumber</span><br />
+    }
+    @if (!string.IsNullOrEmpty(Model.Owner.VatNumber))
+    {
+        <span>@L["VAT number"]: @Model.Owner.VatNumber</span><br />
+    }
     @Model.Owner.Email @Model.Owner.Phone
 </p>
 

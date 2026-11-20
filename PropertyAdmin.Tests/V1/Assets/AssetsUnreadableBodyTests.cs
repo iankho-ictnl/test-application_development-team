@@ -15,15 +15,7 @@ public sealed class AssetsUnreadableBodyTests(ApiFactory api)
     public async Task Create_with_enum_as_text_returns_400_problem_details_without_internal_details(string route)
     {
         var admin = await api.As("Admin");
-        var owner = await admin.PostAsJsonAsync("/api/v1/owners", new
-        {
-            name = api.Unique("Bug7 owner"),
-            email = "owner@example.com",
-            phone = "0101234567",
-            address = "Straat 1",
-            postalCode = "1234 AB",
-            city = "Utrecht",
-        });
+        var owner = await admin.PostAsJsonAsync("/api/v1/owners", Http.OwnerBody(api.Unique("Bug7 owner")));
         Assert.Equal(HttpStatusCode.Created, owner.StatusCode);
         var ownerId = (await owner.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>()).GetProperty("id").GetInt32();
 

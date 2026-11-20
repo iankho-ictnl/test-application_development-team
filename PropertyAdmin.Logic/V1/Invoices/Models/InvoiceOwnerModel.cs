@@ -1,3 +1,11 @@
 namespace PropertyAdmin.Logic.V1.Invoices.Models;
 
-public sealed record InvoiceOwnerModel(string Name, string? Address, string? PostalCode, string? City);
+public sealed record InvoiceOwnerModel(
+    string Name,
+    string? Street,
+    string? HouseNumber,
+    string? PostalCode,
+    string? City,
+    string? Country,
+    string? KvkNumber,
+    string? VatNumber);

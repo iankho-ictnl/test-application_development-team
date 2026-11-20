@@ -6,7 +6,7 @@
 <h1 class="h3 mb-3">@ViewData["Title"]</h1>
 <form method="post" class="col-md-6">
     <div asp-validation-summary="All" class="text-danger"></div>
-    @foreach (var field in new[] { "Name", "Email", "Phone", "Address", "PostalCode", "City" })
+    @foreach (var field in new[] { "Name", "Email", "Phone", "Street", "HouseNumber", "PostalCode", "City", "Country", "KvkNumber", "VatNumber" })
     {
         <div class="mb-2">
             <label for="Input_@field" class="form-label">@Html.DisplayName("Input." + field)</label>

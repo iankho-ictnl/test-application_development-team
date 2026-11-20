@@ -9,13 +9,18 @@ public static class Mapping
         request.Name,
         request.Email,
         request.Phone,
-        request.Address,
+        request.Street,
+        request.HouseNumber,
         request.PostalCode,
-        request.City));
+        request.City,
+        request.Country,
+        request.KvkNumber,
+        request.VatNumber));
 
     public static Response ToResponse(this Result result)
     {
         var owner = result.Owner!;
-        return new Response(owner.Id, owner.Name, owner.Email, owner.Phone, owner.Address, owner.PostalCode, owner.City);
+        return new Response(owner.Id, owner.Name, owner.Email, owner.Phone, owner.Street, owner.HouseNumber,
+            owner.PostalCode, owner.City, owner.Country, owner.KvkNumber, owner.VatNumber);
     }
 }

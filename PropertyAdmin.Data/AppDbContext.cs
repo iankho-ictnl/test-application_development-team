@@ -24,9 +24,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
             e.Property(x => x.Name).HasMaxLength(200).IsRequired();
             e.Property(x => x.Email).HasMaxLength(200);
             e.Property(x => x.Phone).HasMaxLength(50);
-            e.Property(x => x.Address).HasMaxLength(200);
-            e.Property(x => x.PostalCode).HasMaxLength(20);
-            e.Property(x => x.City).HasMaxLength(100);
+            e.Property(x => x.Street).HasMaxLength(200).IsRequired().HasDefaultValue("");
+            e.Property(x => x.HouseNumber).HasMaxLength(20).IsRequired().HasDefaultValue("");
+            e.Property(x => x.PostalCode).HasMaxLength(20).IsRequired().HasDefaultValue("");
+            e.Property(x => x.City).HasMaxLength(100).IsRequired().HasDefaultValue("");
+            e.Property(x => x.Country).HasMaxLength(100).IsRequired().HasDefaultValue("");
+            e.Property(x => x.KvkNumber).HasMaxLength(8);
+            e.Property(x => x.VatNumber).HasMaxLength(14);
         });
 
         b.Entity<Asset>(e =>

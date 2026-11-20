@@ -11,6 +11,9 @@ public class ApiUnauthorizedException : Exception;
 public record ApiResult(bool Ok, string? Error, HttpStatusCode Status)
 {
     public static ApiResult Success(HttpStatusCode s) => new(true, null, s);
+
+    /// <summary>The per-field messages of a 400 Problem Details (<c>errors</c>), keyed by the API's field name.</summary>
+    public IReadOnlyDictionary<string, string[]> FieldErrors { get; init; } = new Dictionary<string, string[]>();
 }
 
 public record ApiResult<T>(bool Ok, string? Error, HttpStatusCode Status, T? Value) : ApiResult(Ok, Error, Status);
@@ -69,10 +72,29 @@ public class ApiClient(HttpClient http)
                 value = await r.Content.ReadFromJsonAsync<T>(Json);
             return new(true, null, r.StatusCode, value);
         }
-        return new(false, await ErrorText(r), r.StatusCode, default);
+        var body = await r.Content.ReadAsStringAsync();
+        return new(false, ErrorText(r, body), r.StatusCode, default) { FieldErrors = FieldErrorsOf(r, body) };
     }
 
-    private static async Task<string> ErrorText(HttpResponseMessage r)
+    private static IReadOnlyDictionary<string, string[]> FieldErrorsOf(HttpResponseMessage r, string body)
+    {
+        var result = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+        if (r.StatusCode != HttpStatusCode.BadRequest) return result;
+        try
+        {
+            using var doc = JsonDocument.Parse(body);
+            if (doc.RootElement.ValueKind == JsonValueKind.Object
+                && doc.RootElement.TryGetProperty("errors", out var errors) && errors.ValueKind == JsonValueKind.Object)
+                foreach (var p in errors.EnumerateObject().Where(p => p.Value.ValueKind == JsonValueKind.Array))
+                    result[p.Name] = p.Value.EnumerateArray().Select(v => v.GetString() ?? "").ToArray();
+        }
+        catch (JsonException)
+        {
+        }
+        return result;
+    }
+
+    private static string ErrorText(HttpResponseMessage r, string body)
     {
         switch (r.StatusCode)
         {
@@ -82,7 +104,7 @@ public class ApiClient(HttpClient http)
         }
         try
         {
-            using var doc = JsonDocument.Parse(await r.Content.ReadAsStringAsync());
+            using var doc = JsonDocument.Parse(body);
             var root = doc.RootElement;
             if (root.TryGetProperty("message", out var m)) return m.GetString() ?? "";
             if (root.TryGetProperty("errors", out var errors))

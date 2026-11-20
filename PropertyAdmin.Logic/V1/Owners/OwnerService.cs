@@ -12,14 +12,7 @@ public sealed class OwnerService(AppDbContext db, TimeProvider time) : IOwnerSer
             .Where(owner => owner.InactiveSince == null)
             .Where(owner => ownerId == null || owner.Id == ownerId)
             .OrderBy(owner => owner.Name)
-            .Select(owner => new OwnerModel(
-                owner.Id,
-                owner.Name,
-                owner.Email,
-                owner.Phone,
-                owner.Address,
-                owner.PostalCode,
-                owner.City))
+            .Select(Projection)
             .ToListAsync(cancellationToken);
     }
 
@@ -27,14 +20,7 @@ public sealed class OwnerService(AppDbContext db, TimeProvider time) : IOwnerSer
     {
         return await db.Owners.AsNoTracking()
             .Where(owner => owner.Id == id && (ownerId == null || owner.Id == ownerId))
-            .Select(owner => new OwnerModel(
-                owner.Id,
-                owner.Name,
-                owner.Email,
-                owner.Phone,
-                owner.Address,
-                owner.PostalCode,
-                owner.City))
+            .Select(Projection)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -75,19 +61,29 @@ public sealed class OwnerService(AppDbContext db, TimeProvider time) : IOwnerSer
     private static void Apply(Owner owner, OwnerSaveModel model)
     {
         owner.Name = model.Name.Trim();
-        owner.Email = model.Email;
-        owner.Phone = model.Phone;
-        owner.Address = model.Address;
-        owner.PostalCode = model.PostalCode;
-        owner.City = model.City;
+        owner.Email = model.Email?.Trim();
+        owner.Phone = model.Phone?.Trim();
+        owner.Street = model.Street.Trim();
+        owner.HouseNumber = model.HouseNumber.Trim();
+        owner.PostalCode = model.PostalCode.Trim();
+        owner.City = model.City.Trim();
+        owner.Country = model.Country.Trim();
+        owner.KvkNumber = OwnerNumbers.NormalizeKvk(model.KvkNumber);
+        owner.VatNumber = OwnerNumbers.NormalizeVat(model.VatNumber);
     }
 
-    private static OwnerModel ToModel(Owner owner) => new(
+    private static readonly System.Linq.Expressions.Expression<Func<Owner, OwnerModel>> Projection = owner => new OwnerModel(
         owner.Id,
         owner.Name,
         owner.Email,
         owner.Phone,
-        owner.Address,
+        owner.Street,
+        owner.HouseNumber,
         owner.PostalCode,
-        owner.City);
+        owner.City,
+        owner.Country,
+        owner.KvkNumber,
+        owner.VatNumber);
+
+    private static readonly Func<Owner, OwnerModel> ToModel = Projection.Compile();
 }

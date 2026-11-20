@@ -63,7 +63,7 @@ public class EditModel(ApiClient api, IStringLocalizer<SharedResource> l) : ApiP
             : await Api.PostAsync("api/owners", Input.ToRequest());
         if (!r.Ok)
         {
-            AddApiError(r);
+            AddApiError<OwnerInput>(r);
             return Page();
         }
         Done("Owner saved.");
