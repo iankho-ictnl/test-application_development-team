@@ -18,7 +18,8 @@ public abstract class ApiPageModel(ApiClient api, IStringLocalizer<SharedResourc
         ModelState.AddModelError("", r.Status == System.Net.HttpStatusCode.Forbidden ? L["You do not have permission for this action."]
             : string.IsNullOrEmpty(r.Error) ? L["Something went wrong."] : r.Error);
 
-    /// <summary>Puts the API's 400 errors at the matching field of <typeparamref name="TInput"/> (bound as <paramref name="prefix"/>); the rest goes to the summary.</summary>
+    /// <summary>Puts the API's 400 errors at the matching field of <typeparamref name="TInput"/> (bound as <paramref name="prefix"/>,
+    /// or as top-level properties when it is empty); the rest goes to the summary.</summary>
     protected void AddApiError<TInput>(ApiResult r, string prefix = "Input")
     {
         var placed = false;
@@ -27,7 +28,7 @@ public abstract class ApiPageModel(ApiClient api, IStringLocalizer<SharedResourc
             var name = key.StartsWith("$.") ? key[2..] : key;
             var property = typeof(TInput).GetProperty(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
             if (property is null) continue;
-            foreach (var m in messages) ModelState.AddModelError($"{prefix}.{property.Name}", m);
+            foreach (var m in messages) ModelState.AddModelError(prefix.Length == 0 ? property.Name : $"{prefix}.{property.Name}", m);
             placed = true;
         }
         if (!placed) AddApiError(r);
