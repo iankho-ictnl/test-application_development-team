@@ -58,7 +58,7 @@ public sealed partial class S2DemoTests(DemoStack stack)
 
         // Prepare step 4: an owner with an invoice and no assets left (its asset moves to the foreign owner).
         var leaving = $"Vertrekt BV {tag}";
-        await browser.PostFormAsync("/Owners/Edit", Owner(leaving));
+        await browser.PostFormAsync("/Owners/Edit", Owner(leaving, vat: "DE987654321", kvk: "12345678"));
         var leavingId = OwnerId(browser.Html, leaving);
         var foreignId = OwnerId(browser.Html, foreign);
         var asset = $"Pand {tag}";
@@ -103,13 +103,21 @@ public sealed partial class S2DemoTests(DemoStack stack)
         Assert.Contains(WebUtility.HtmlEncode(leaving), await browser.GetAsync(invoice.Value));
         var pdf = await browser.GetBytesAsync($"{invoice.Value}?handler=Pdf");
         Assert.StartsWith("%PDF", System.Text.Encoding.ASCII.GetString(pdf, 0, 4));
+
+        // TC-DEMO-S2-8 (US-2.1, D-041, Q-089, architecture/database.md): the PDF owner block of the inactive owner, in
+        // its order: name; street and house number; postal code and city; country; KvK; Btw-nr.
+        var lines = PdfText.Lines(pdf);
+        string[] block = [leaving, "Unter den Linden 77", "10117 Berlin", "Duitsland", "KvK: 12345678", "Btw-nr: DE987654321"];
+        var start = lines.ToList().IndexOf(leaving);
+        Assert.True(start >= 0, $"owner name not in the PDF ({culture}): {string.Join(" | ", lines)}");
+        Assert.Equal(block, lines.Skip(start).Take(block.Length));
     }
 
-    private static Dictionary<string, string> Owner(string name, string? vat = null) => new()
+    private static Dictionary<string, string> Owner(string name, string? vat = null, string? kvk = null) => new()
     {
         ["Input.Name"] = name, ["Input.Email"] = "eigenaar@example.test", ["Input.Phone"] = "+49 30 1234567",
         ["Input.Street"] = "Unter den Linden", ["Input.HouseNumber"] = "77", ["Input.PostalCode"] = "10117",
-        ["Input.City"] = "Berlin", ["Input.Country"] = "Duitsland", ["Input.KvkNumber"] = "", ["Input.VatNumber"] = vat ?? "",
+        ["Input.City"] = "Berlin", ["Input.Country"] = "Duitsland", ["Input.KvkNumber"] = kvk ?? "", ["Input.VatNumber"] = vat ?? "",
     };
 
     private static bool HasFieldError(string html, string field) =>
