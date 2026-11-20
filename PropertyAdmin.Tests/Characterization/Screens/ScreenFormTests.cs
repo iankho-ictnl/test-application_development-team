@@ -21,7 +21,8 @@ public sealed class ScreenFormTests(FrontendFactory web)
         var fields = new Dictionary<string, string>
         {
             ["Input.Name"] = name, ["Input.Email"] = "form@example.test", ["Input.Phone"] = "0101234567",
-            ["Input.Address"] = "Formweg 3", ["Input.PostalCode"] = "1234 EF", ["Input.City"] = "Formstad",
+            ["Input.Street"] = "Formweg", ["Input.HouseNumber"] = "3", ["Input.PostalCode"] = "1234 EF", ["Input.City"] = "Formstad",
+            ["Input.Country"] = "Nederland", ["Input.KvkNumber"] = "12345678", ["Input.VatNumber"] = "NL123456789B01",
         };
 
         Browser.ExpectRedirect(await browser.Submit("/Owners/Edit", fields), "/Owners");
@@ -37,17 +38,18 @@ public sealed class ScreenFormTests(FrontendFactory web)
 
     [Fact]
     [Trait("Requirement", "REQ-002")]
-    [Trait("Differs", "BUG-3")]
-    public async Task Owner_delete_removes_the_owner()
+    public async Task Owner_delete_marks_the_owner_inactive()
     {
         var admin = await web.Api.As("Admin");
-        var id = await admin.CreateOwner(web.Api.Unique("Formeigenaar"));
+        var name = web.Api.Unique("Formeigenaar");
+        var id = await admin.CreateOwner(name);
         var browser = await web.SignInAs("Admin");
 
         Browser.ExpectRedirect(await browser.Submit("/Owners", new(), $"/Owners?id={id}&handler=Delete"), "/Owners");
 
-        // Current behaviour; BUG-3: the owner should only be marked inactive.
-        await Http.ExpectStatus(await admin.GetAsync($"/api/owners/{id}"), HttpStatusCode.NotFound);
+        // D-045 (BUG-3 fixed): the owner leaves the list but stays readable by id.
+        await Http.Expect(await admin.GetAsync($"/api/owners/{id}"), HttpStatusCode.OK);
+        Assert.DoesNotContain(name, await browser.Page("/Owners"));
     }
 
     [Fact]
