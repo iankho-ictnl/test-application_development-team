@@ -110,7 +110,9 @@ public class AuthTests(ApiFactory api)
 
         Span<byte> counterBytes = stackalloc byte[8];
         BinaryPrimitives.WriteInt64BigEndian(counterBytes, DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 30);
+#pragma warning disable CA5350 // RFC 6238 TOTP uses HMAC-SHA1 (D-054)
         using var hmac = new HMACSHA1(key.ToArray());
+#pragma warning restore CA5350
         var hash = hmac.ComputeHash(counterBytes.ToArray());
         var offset = hash[^1] & 0x0f;
         var value = BinaryPrimitives.ReadInt32BigEndian(hash.AsSpan(offset, 4)) & int.MaxValue;

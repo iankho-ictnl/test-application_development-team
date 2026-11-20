@@ -1,7 +1,8 @@
 # Code style for the solution (D-051 part 2, REQ-032).
 # Describes the style the code already uses; EnforceCodeStyleInBuild
 # (Directory.Build.props) reports the rules marked :warning in every build.
-# No rule is switched off here: findings stay visible as warnings (Q-111).
+# Findings stay visible as warnings (Q-111); the only rules switched off are
+# CA1707 and CA1711 in PropertyAdmin.Tests (D-054, section at the end).
 root = true
 
 [*]
@@ -54,3 +55,9 @@ csharp_new_line_before_finally = true
 # Entity Framework Core migrations are generated code
 [**/Migrations/*.cs]
 generated_code = true
+
+# Test project only (D-054): underscore test names (D-027) and xUnit
+# collection fixtures named ...Collection. Product projects keep both rules.
+[PropertyAdmin.Tests/**.cs]
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1711.severity = none
