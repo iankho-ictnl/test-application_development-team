@@ -14,11 +14,12 @@
         <label asp-for="Input.Type" class="form-label"></label>
         <select asp-for="Input.Type" asp-items="Model.Types" class="form-select"></select>
     </div>
-    @foreach (var field in new[] { "Name", "Address", "PostalCode", "City" })
+    @foreach (var field in new[] { "Name", "Street", "HouseNumber", "PostalCode", "City", "Country" })
     {
         <div class="mb-2">
             <label for="Input_@field" class="form-label">@Html.DisplayName("Input." + field)</label>
             @Html.TextBox("Input." + field, null, new { @class = "form-control" })
+            @Html.ValidationMessage("Input." + field, null, new { @class = "text-danger" })
         </div>
     }
     <button type="submit" class="btn btn-primary">@L["Save"]</button>

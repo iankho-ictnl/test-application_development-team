@@ -17,7 +17,7 @@ public sealed class AssetsUndefinedEnumTests(ApiFactory api)
         var admin = await api.As("Admin");
         var ownerId = await admin.CreateOwner(api.Unique("S34 owner"));
 
-        var response = await admin.PostAsJsonAsync(route, new { ownerId, type = 7, name = "House", address = "Road 1", postalCode = "1000 AA", city = "City" });
+        var response = await admin.PostAsJsonAsync(route, new { ownerId, type = 7, name = "House", street = "Road", houseNumber = "1", postalCode = "1000 AA", city = "City", country = "NL" });
 
         await ExpectEnumError(response, "Type");
     }
@@ -29,7 +29,7 @@ public sealed class AssetsUndefinedEnumTests(ApiFactory api)
         var ownerId = await admin.CreateOwner(api.Unique("S34 owner"));
         var assetId = await admin.CreateAsset(ownerId, api.Unique("S34 house"));
 
-        var response = await admin.PutAsJsonAsync($"/api/v1/assets/{assetId}", new { ownerId, type = 7, name = "House", address = "Road 1", postalCode = "1000 AA", city = "City" });
+        var response = await admin.PutAsJsonAsync($"/api/v1/assets/{assetId}", new { ownerId, type = 7, name = "House", street = "Road", houseNumber = "1", postalCode = "1000 AA", city = "City", country = "NL" });
 
         await ExpectEnumError(response, "Type");
         var stored = await Expect(await admin.GetAsync($"/api/v1/assets/{assetId}"), System.Net.HttpStatusCode.OK);

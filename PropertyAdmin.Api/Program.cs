@@ -73,12 +73,12 @@ builder.Services.Configure<PropertyAdmin.Logic.V1.Invoices.GetPdf.CompanyOptions
 // generic message per JSON path, never a .NET type name or exception text (D-022).
 builder.Services.AddControllers()
     .AddJsonOptions(o => o.AllowInputFormatterExceptionMessages = false)
-    // T-127 (D-049): data annotation messages with an ErrorMessage key are localized through the
-    // OwnerMessages resources. MVC passes the parameter's own type (string) for record constructor
-    // parameters, not the request type, so the provider cannot pick per feature: OwnerMessages is the one
-    // data annotation resource for now. Requests without ErrorMessage keep the framework defaults.
+    // T-127 (D-049, D-052, T-140): data annotation messages with an ErrorMessage key are localized through the
+    // shared ValidationMessages resources. MVC passes the parameter's own type (string) for record constructor
+    // parameters, not the request type, so the provider cannot pick per feature: ValidationMessages is the one
+    // data annotation resource for all features. Requests without ErrorMessage keep the framework defaults.
     .AddDataAnnotationsLocalization(o => o.DataAnnotationLocalizerProvider = (_, factory) =>
-        factory.Create(typeof(PropertyAdmin.Api.V1.Owners.OwnerMessages)));
+        factory.Create(typeof(PropertyAdmin.Api.Validation.ValidationMessages)));
 // REQ-011 (T-114, D-049): messages in the language of the query parameter `lang` (nl-NL default,
 // en-US, case-insensitive; absent or another value gives Dutch). Accept-Language is not read.
 // Only the UI culture changes, number and date formatting keep the process culture.

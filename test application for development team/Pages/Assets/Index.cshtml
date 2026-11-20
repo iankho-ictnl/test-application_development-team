@@ -28,7 +28,7 @@
                 <td><a asp-page="Details" asp-route-id="@a.Id">@a.Name</a></td>
                 <td>@L[a.Type.ToString()]</td>
                 <td>@a.OwnerName</td>
-                <td>@a.Address, @a.PostalCode @a.City</td>
+                <td>@a.Street @a.HouseNumber, @a.PostalCode @a.City, @a.Country</td>
                 <td class="text-end">
                     @if (canEdit)
                     {

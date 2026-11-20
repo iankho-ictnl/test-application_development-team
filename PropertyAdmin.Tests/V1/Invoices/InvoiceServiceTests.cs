@@ -235,7 +235,7 @@ public sealed class InvoiceServiceTests
 
     private static async Task<Asset> SeedAssetAsync(AppDbContext context, string ownerName)
     {
-        var asset = new Asset { Owner = new Owner { Name = ownerName }, Name = $"{ownerName} house", Address = "Road 1", PostalCode = "1000 AA", City = "City" };
+        var asset = new Asset { Owner = new Owner { Name = ownerName }, Name = $"{ownerName} house", Street = "Road 1", PostalCode = "1000 AA", City = "City" };
         context.Assets.Add(asset);
         await context.SaveChangesAsync();
         return asset;

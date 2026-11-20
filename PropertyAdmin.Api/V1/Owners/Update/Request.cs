@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using M = PropertyAdmin.Api.V1.Owners.OwnerMessages;
+using M = PropertyAdmin.Api.Validation.ValidationMessages;
 
 namespace PropertyAdmin.Api.V1.Owners.Update;
 
 /// <summary>Owner fields as D-041: the five address fields, email and phone required; KvK and BTW optional.
-/// Messages in the language of lang through OwnerMessages (D-049, T-127).</summary>
+/// Messages in the language of lang through ValidationMessages (D-049, T-127).</summary>
 public sealed record Request(
     [Required(ErrorMessage = M.Required), MaxLength(200, ErrorMessage = M.MaxLength)] string Name,
     [Required(ErrorMessage = M.Required), EmailAddress(ErrorMessage = M.EmailFormat), MaxLength(200, ErrorMessage = M.MaxLength)] string Email,

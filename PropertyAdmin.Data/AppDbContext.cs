@@ -37,9 +37,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
         {
             e.HasOne(x => x.Owner).WithMany(o => o.Assets).HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Restrict);
             e.Property(x => x.Name).HasMaxLength(200).IsRequired();
-            e.Property(x => x.Address).HasMaxLength(200).IsRequired();
+            e.Property(x => x.Street).HasMaxLength(200).IsRequired();
+            e.Property(x => x.HouseNumber).HasMaxLength(20).IsRequired().HasDefaultValue("");
             e.Property(x => x.PostalCode).HasMaxLength(20).IsRequired();
             e.Property(x => x.City).HasMaxLength(100).IsRequired();
+            e.Property(x => x.Country).HasMaxLength(100).IsRequired().HasDefaultValue("");
             e.Property(x => x.Type).HasConversion<string>().HasMaxLength(20);
         });
 

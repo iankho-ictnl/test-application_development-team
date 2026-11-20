@@ -223,7 +223,7 @@ public sealed class ActivityServiceTests
     private static async Task<Asset> SeedAsync(AppDbContext context, string ownerName, bool seedRate = true)
     {
         var owner = new Owner { Name = ownerName };
-        var asset = new Asset { Owner = owner, Name = $"{ownerName} house", Address = "Road 1", PostalCode = "1000 AA", City = "City" };
+        var asset = new Asset { Owner = owner, Name = $"{ownerName} house", Street = "Road 1", PostalCode = "1000 AA", City = "City" };
         context.Assets.Add(asset);
         if (seedRate) context.VatRates.Add(new VatRate { Name = RateName, Percentage = 21m, ValidFrom = new DateOnly(2020, 1, 1) });
         await context.SaveChangesAsync();

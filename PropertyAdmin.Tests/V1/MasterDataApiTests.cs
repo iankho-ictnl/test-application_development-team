@@ -33,9 +33,11 @@ public sealed class MasterDataApiTests(ApiFactory api)
             ownerId = owner.GetProperty("id").GetInt32(),
             type = 0,
             name = "House",
-            address = "Road 1",
+            street = "Road",
+            houseNumber = "1",
             postalCode = "1000 AA",
             city = "City",
+            country = "NL",
         }), HttpStatusCode.Created);
         HasShape(asset, AssetShape);
         Assert.Equal("Asset Owner", asset.GetProperty("ownerName").GetString());

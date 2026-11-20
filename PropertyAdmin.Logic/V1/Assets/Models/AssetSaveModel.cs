@@ -6,6 +6,8 @@ public sealed record AssetSaveModel(
     int OwnerId,
     AssetType Type,
     string Name,
-    string Address,
+    string Street,
+    string HouseNumber,
     string PostalCode,
-    string City);
+    string City,
+    string Country);
