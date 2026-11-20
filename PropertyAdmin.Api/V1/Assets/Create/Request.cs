@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using M = PropertyAdmin.Api.V1.Owners.OwnerMessages;
+using M = PropertyAdmin.Api.Validation.ValidationMessages;
 
 namespace PropertyAdmin.Api.V1.Assets.Create;
 
 /// <summary>Asset fields as D-041: the five address fields required (trimmed, not empty), foreign addresses accepted.
-/// Messages in the language of lang through OwnerMessages (D-049, D-052).</summary>
+/// Messages in the language of lang through ValidationMessages (D-049, D-052).</summary>
 public sealed record Request(
     [Range(1, int.MaxValue, ErrorMessage = M.InvalidChoice)] int OwnerId,
     [EnumDataType(typeof(AssetType), ErrorMessage = M.InvalidChoice)] AssetType Type,

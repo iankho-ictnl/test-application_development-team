@@ -6,5 +6,5 @@ namespace PropertyAdmin.Api.V1.Owners.Create;
 public static class RequestValidation
 {
     public static IEnumerable<ValidationResult> Validate(Request request, ValidationContext context) =>
-        OwnerMessages.ValidateNumbers(request.KvkNumber, request.VatNumber, context);
+        OwnerNumberValidation.ValidateNumbers(request.KvkNumber, request.VatNumber, context);
 }
