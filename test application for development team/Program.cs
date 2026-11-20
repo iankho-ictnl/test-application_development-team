@@ -13,7 +13,8 @@ var defaultCulture = builder.Configuration["Localization:DefaultCulture"] ?? cul
 builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
 builder.Services.Configure<RequestLocalizationOptions>(o =>
 {
-    // Euro in every language (REQ-018, BUG-9); read-only, shared by every request.
+    // Euro in every language (REQ-018, BUG-9); read-only, shared by every request, so nothing can
+    // change a separator or pattern at runtime (BUG-8, T-095).
     var supported = cultures.Select(AppCultures.Create).ToList();
     var fallback = supported.FirstOrDefault(c => c.Name == defaultCulture) ?? supported[0];
     o.DefaultRequestCulture = new RequestCulture(fallback, fallback);
