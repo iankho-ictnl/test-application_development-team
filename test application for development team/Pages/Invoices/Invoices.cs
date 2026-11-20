@@ -78,7 +78,8 @@ public class CreateModel(ApiClient api, IStringLocalizer<SharedResource> l) : Ap
     public int OwnerId { get; set; }
 
     [BindProperty, DateInput, Display(Name = "Invoice date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
-    [BindProperty, Range(0, 365, ErrorMessage = "Between 0 and 365"), Display(Name = "Payment term (days)")] public int PaymentTermDays { get; set; } = 14;
+    /// <summary>The fixed payment term (D-057, BUG-6): sent with every invoice, never bound, so a posted value cannot change it.</summary>
+    public const int PaymentTermDays = 14;
 
     public async Task OnGetAsync() => await LoadAsync();
 

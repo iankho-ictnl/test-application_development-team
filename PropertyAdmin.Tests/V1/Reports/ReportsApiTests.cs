@@ -17,7 +17,7 @@ public sealed class ReportsApiTests(ApiFactory api)
         await admin.CreateActivity(assetId, "2025-06-01");
         await admin.CreateExpense(assetId, date: "2025-06-02");
         await admin.CreateExpense(assetId, reinvoiceable: false, date: "2024-06-02");
-        await Expect(await admin.PostAsJsonAsync("/api/v1/invoices", new { ownerId, date = "2025-06-30", paymentTermDays = 30 }), HttpStatusCode.Created);
+        await Expect(await admin.PostAsJsonAsync("/api/v1/invoices", new { ownerId, date = "2025-06-30", paymentTermDays = 14 }), HttpStatusCode.Created);
 
         var viewer = await api.As("Viewer");
         var results = await Expect(await viewer.GetAsync("/api/v1/reports/asset-results?from=2025-01-01&to=2025-12-31"), HttpStatusCode.OK);

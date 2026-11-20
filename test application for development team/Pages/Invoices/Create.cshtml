@@ -27,8 +27,7 @@
                 <input asp-for="Date" class="form-control" />
             </div>
             <div class="col-auto">
-                <label asp-for="PaymentTermDays" class="form-label"></label>
-                <input asp-for="PaymentTermDays" class="form-control" />
+                <p class="form-text mb-2">@L["Payment term: 14 days (due date = invoice date + 14 days)"]</p>
             </div>
             <div class="col-auto"><button type="submit" class="btn btn-primary">@L["Create invoice"]</button></div>
         </form>
