@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Net;
 using PropertyAdmin.Api.V1.Reports;
 using PropertyAdmin.Tests.Characterization;
@@ -41,8 +42,10 @@ public sealed class ReportPeriodValidationTests(ApiFactory api)
         Assert.Empty(Validate(new OwnerOverview.Request(from, to)));
         var assetQuery = AssetResults.Mapping.ToQuery(new AssetResults.Request(from, to), 7);
         var ownerQuery = OwnerOverview.Mapping.ToQuery(new OwnerOverview.Request(from, to), null);
-        Assert.Equal((DateOnly.Parse(from), DateOnly.Parse(to), (int?)7), (assetQuery.From, assetQuery.To, assetQuery.OwnerScopeId));
-        Assert.Equal((DateOnly.Parse(from), DateOnly.Parse(to), (int?)null), (ownerQuery.From, ownerQuery.To, ownerQuery.OwnerScopeId));
+        var expectedFrom = DateOnly.Parse(from, CultureInfo.InvariantCulture);
+        var expectedTo = DateOnly.Parse(to, CultureInfo.InvariantCulture);
+        Assert.Equal((expectedFrom, expectedTo, (int?)7), (assetQuery.From, assetQuery.To, assetQuery.OwnerScopeId));
+        Assert.Equal((expectedFrom, expectedTo, (int?)null), (ownerQuery.From, ownerQuery.To, ownerQuery.OwnerScopeId));
     }
 
     [Fact]
