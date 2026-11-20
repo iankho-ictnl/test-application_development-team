@@ -57,9 +57,11 @@ builder.Services.AddSingleton(new SignInRateLimiter(
     TimeSpan.FromSeconds(builder.Configuration.GetValue("SignInRateLimit:WindowSeconds", 60))));
 builder.Services.AddScoped<ApiExceptionPageFilter>();
 builder.Services.AddTransient<AccessTokenHandler>();
+builder.Services.AddTransient<LanguageQueryHandler>();
 builder.Services.AddHttpClient<ApiClient>(c =>
         c.BaseAddress = new Uri(builder.Configuration["Api:BaseUrl"] ?? throw new InvalidOperationException("Api:BaseUrl is not configured.")))
-    .AddHttpMessageHandler<AccessTokenHandler>();
+    .AddHttpMessageHandler<AccessTokenHandler>()
+    .AddHttpMessageHandler<LanguageQueryHandler>();
 
 builder.Services.Configure<ForwardedHeadersOptions>(o =>
 {
