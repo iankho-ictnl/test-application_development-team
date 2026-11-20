@@ -178,6 +178,30 @@ public sealed class OwnerServiceTests
         Assert.Equal(new OwnerModel(owner.Id, "Name", "a@b.test", "06", "Road", "1A", "1000 AA", "City", "Belgie", null, "DE123456789"), owner);
     }
 
+    /// <summary>
+    /// TC-REQ2-6 (REQ-002, D-046, Q-102): the inactive date is the local date of the system the app runs on.
+    /// The instants lie just after midnight in Amsterdam, when UTC still shows the previous day.
+    /// </summary>
+    [Theory]
+    [InlineData("2026-11-19T23:30:00Z", "Europe/Amsterdam", "2026-11-20")]
+    [InlineData("2026-11-19T23:30:00Z", "UTC", "2026-11-19")]
+    [InlineData("2026-11-19T23:00:00Z", "Europe/Amsterdam", "2026-11-20")]
+    [InlineData("2026-11-19T22:59:59Z", "Europe/Amsterdam", "2026-11-19")]
+    [InlineData("2026-07-01T22:30:00Z", "Europe/Amsterdam", "2026-07-02")]
+    [InlineData("2026-07-01T22:30:00Z", "UTC", "2026-07-01")]
+    public async Task Delete_marks_the_owner_inactive_on_the_local_date_of_the_system_around_midnight(
+        string utcInstant, string timeZoneId, string expectedDate)
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var owner = await NewService(database).CreateAsync(Save("Owner"), CancellationToken.None);
+        var clock = new ZonedTime(DateTimeOffset.Parse(utcInstant, System.Globalization.CultureInfo.InvariantCulture), TimeZoneInfo.FindSystemTimeZoneById(timeZoneId));
+
+        Assert.True(await new OwnerService(database.Context, clock).DeleteAsync(owner.Id, CancellationToken.None));
+
+        database.Context.ChangeTracker.Clear();
+        Assert.Equal(DateOnly.Parse(expectedDate, System.Globalization.CultureInfo.InvariantCulture), (await database.Context.Owners.FindAsync(owner.Id))!.InactiveSince);
+    }
+
     private static OwnerSaveModel Save(string name) => new(name, "owner@example.test", "0612345678", "Road", "1", "1000 AA", "City", "Nederland", null, null);
 
     private static OwnerService NewService(MasterDataTestDatabase database) => new(database.Context, new FixedTime(Today));
@@ -187,5 +211,13 @@ public sealed class OwnerServiceTests
         public override DateTimeOffset GetUtcNow() => new(today.ToDateTime(new TimeOnly(12, 0)), TimeSpan.Zero);
 
         public override TimeZoneInfo LocalTimeZone => TimeZoneInfo.Utc;
+    }
+
+    /// <summary>A fake clock at a fixed UTC instant whose local time zone is the given zone (the system's TZ).</summary>
+    private sealed class ZonedTime(DateTimeOffset utcNow, TimeZoneInfo localZone) : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow() => utcNow.ToUniversalTime();
+
+        public override TimeZoneInfo LocalTimeZone => localZone;
     }
 }
