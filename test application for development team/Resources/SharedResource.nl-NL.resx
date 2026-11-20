@@ -20,6 +20,10 @@
   <data name="Authentication code or recovery code" xml:space="preserve"><value>Verificatiecode of herstelcode</value></data>
   <data name="Back to home" xml:space="preserve"><value>Terug naar start</value></data>
   <data name="Between 0 and 100" xml:space="preserve"><value>Tussen 0 en 100</value></data>
+  <!-- BUG-12: validation messages of the frontend page models ({1} is the maximum length). -->
+  <data name="Maximum {1} characters" xml:space="preserve"><value>Maximaal {1} tekens</value></data>
+  <data name="Between 0 and 365" xml:space="preserve"><value>Tussen 0 en 365</value></data>
+  <!-- End of BUG-12 block. -->
   <data name="Blocked" xml:space="preserve"><value>Geblokkeerd</value></data>
   <data name="Cancel" xml:space="preserve"><value>Annuleren</value></data>
   <data name="Category" xml:space="preserve"><value>Categorie</value></data>

@@ -50,14 +50,14 @@ public abstract class ApiPageModel(ApiClient api, IStringLocalizer<SharedResourc
 
 public class OwnerInput
 {
-    [Required(ErrorMessage = "Required"), MaxLength(200), Display(Name = "Name")] public string Name { get; set; } = "";
-    [Required(ErrorMessage = "Required"), EmailAddress(ErrorMessage = "Invalid email address"), MaxLength(200), Display(Name = "Email")] public string Email { get; set; } = "";
-    [Required(ErrorMessage = "Required"), MaxLength(50), Display(Name = "Phone")] public string Phone { get; set; } = "";
-    [Required(ErrorMessage = "Required"), MaxLength(200), Display(Name = "Street")] public string Street { get; set; } = "";
-    [Required(ErrorMessage = "Required"), MaxLength(20), Display(Name = "House number")] public string HouseNumber { get; set; } = "";
-    [Required(ErrorMessage = "Required"), MaxLength(20), Display(Name = "Postal code")] public string PostalCode { get; set; } = "";
-    [Required(ErrorMessage = "Required"), MaxLength(100), Display(Name = "City")] public string City { get; set; } = "";
-    [Required(ErrorMessage = "Required"), MaxLength(100), Display(Name = "Country")] public string Country { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(200, ErrorMessage = "Maximum {1} characters"), Display(Name = "Name")] public string Name { get; set; } = "";
+    [Required(ErrorMessage = "Required"), EmailAddress(ErrorMessage = "Invalid email address"), MaxLength(200, ErrorMessage = "Maximum {1} characters"), Display(Name = "Email")] public string Email { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(50, ErrorMessage = "Maximum {1} characters"), Display(Name = "Phone")] public string Phone { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(200, ErrorMessage = "Maximum {1} characters"), Display(Name = "Street")] public string Street { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(20, ErrorMessage = "Maximum {1} characters"), Display(Name = "House number")] public string HouseNumber { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(20, ErrorMessage = "Maximum {1} characters"), Display(Name = "Postal code")] public string PostalCode { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(100, ErrorMessage = "Maximum {1} characters"), Display(Name = "City")] public string City { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(100, ErrorMessage = "Maximum {1} characters"), Display(Name = "Country")] public string Country { get; set; } = "";
     // Optional; the format (8 digits, EU VAT number) is checked by the API only (D-041).
     [Display(Name = "KvK number (optional)")] public string? KvkNumber { get; set; }
     [Display(Name = "VAT number (optional)")] public string? VatNumber { get; set; }
@@ -75,10 +75,10 @@ public class AssetInput
 {
     [Range(1, int.MaxValue, ErrorMessage = "Required"), Display(Name = "Owner")] public int OwnerId { get; set; }
     [Display(Name = "Type")] public AssetType Type { get; set; }
-    [Required(ErrorMessage = "Required"), MaxLength(200), Display(Name = "Name")] public string Name { get; set; } = "";
-    [Required(ErrorMessage = "Required"), MaxLength(200), Display(Name = "Address")] public string Address { get; set; } = "";
-    [Required(ErrorMessage = "Required"), MaxLength(20), Display(Name = "Postal code")] public string PostalCode { get; set; } = "";
-    [Required(ErrorMessage = "Required"), MaxLength(100), Display(Name = "City")] public string City { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(200, ErrorMessage = "Maximum {1} characters"), Display(Name = "Name")] public string Name { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(200, ErrorMessage = "Maximum {1} characters"), Display(Name = "Address")] public string Address { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(20, ErrorMessage = "Maximum {1} characters"), Display(Name = "Postal code")] public string PostalCode { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(100, ErrorMessage = "Maximum {1} characters"), Display(Name = "City")] public string City { get; set; } = "";
 
     public AssetSaveRequest ToRequest() => new(OwnerId, Type, Name, Address, PostalCode, City);
     public static AssetInput From(AssetDto a) => new() { OwnerId = a.OwnerId, Type = a.Type, Name = a.Name, Address = a.Address, PostalCode = a.PostalCode, City = a.City };
@@ -88,8 +88,8 @@ public class ExpenseInput
 {
     [Range(1, int.MaxValue, ErrorMessage = "Required"), Display(Name = "Asset")] public int AssetId { get; set; }
     [DateInput, Display(Name = "Date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
-    [Required(ErrorMessage = "Required"), MaxLength(500), Display(Name = "Description")] public string Description { get; set; } = "";
-    [MaxLength(100), Display(Name = "Category")] public string? Category { get; set; }
+    [Required(ErrorMessage = "Required"), MaxLength(500, ErrorMessage = "Maximum {1} characters"), Display(Name = "Description")] public string Description { get; set; } = "";
+    [MaxLength(100, ErrorMessage = "Maximum {1} characters"), Display(Name = "Category")] public string? Category { get; set; }
     [Display(Name = "Amount excl. VAT")] public decimal AmountExclVat { get; set; }
     [Required(ErrorMessage = "Required"), Display(Name = "VAT rate")] public string VatRateName { get; set; } = "";
     [Display(Name = "Re-invoice to owner")] public bool Reinvoiceable { get; set; }
@@ -103,7 +103,7 @@ public class ActivityInput
     [Range(1, int.MaxValue, ErrorMessage = "Required"), Display(Name = "Asset")] public int AssetId { get; set; }
     [DateInput, Display(Name = "Date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
     [Display(Name = "Kind")] public ActivityKind Kind { get; set; }
-    [Required(ErrorMessage = "Required"), MaxLength(500), Display(Name = "Description")] public string Description { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(500, ErrorMessage = "Maximum {1} characters"), Display(Name = "Description")] public string Description { get; set; } = "";
     [Display(Name = "Pricing")] public PricingType PricingType { get; set; }
     [Display(Name = "Hours")] public decimal? Hours { get; set; }
     [Display(Name = "Hourly rate")] public decimal? HourlyRate { get; set; }
@@ -116,7 +116,7 @@ public class ActivityInput
 
 public class VatRateInput
 {
-    [Required(ErrorMessage = "Required"), MaxLength(50), Display(Name = "Name")] public string Name { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(50, ErrorMessage = "Maximum {1} characters"), Display(Name = "Name")] public string Name { get; set; } = "";
     [Range(0, 100, ErrorMessage = "Between 0 and 100"), Display(Name = "Percentage")] public decimal Percentage { get; set; }
     [DateInput, Display(Name = "Valid from")] public DateOnly ValidFrom { get; set; } = DateOnly.FromDateTime(DateTime.Today);
     [DateInput, Display(Name = "Valid to")] public DateOnly? ValidTo { get; set; }
