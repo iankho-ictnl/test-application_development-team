@@ -24,7 +24,7 @@ public class EditModel(ApiClient api, IStringLocalizer<SharedResource> l) : ApiP
     public List<SelectListItem> Owners { get; set; } = [];
     public List<string> AllRoles { get; set; } = [];
 
-    [BindProperty, Required(ErrorMessage = "Required"), MaxLength(100), Display(Name = "User name")] public string UserName { get; set; } = "";
+    [BindProperty, Required(ErrorMessage = "Required"), MaxLength(100, ErrorMessage = "Maximum {1} characters"), Display(Name = "User name")] public string UserName { get; set; } = "";
     [BindProperty, Required(ErrorMessage = "Required"), EmailAddress(ErrorMessage = "Invalid email address"), Display(Name = "Email")] public string Email { get; set; } = "";
     [BindProperty, DataType(DataType.Password), Display(Name = "Password")] public string? Password { get; set; }
     [BindProperty, Display(Name = "Linked owner")] public int? OwnerId { get; set; }

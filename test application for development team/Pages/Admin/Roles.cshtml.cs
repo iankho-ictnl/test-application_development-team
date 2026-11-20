@@ -13,7 +13,7 @@ public class RolesModel(ApiClient api, IStringLocalizer<SharedResource> l) : Api
     public List<RoleDto> Items { get; set; } = [];
 
     [BindProperty] public string? Original { get; set; }
-    [BindProperty, Required(ErrorMessage = "Required"), MaxLength(50), Display(Name = "Name")] public string Name { get; set; } = "";
+    [BindProperty, Required(ErrorMessage = "Required"), MaxLength(50, ErrorMessage = "Maximum {1} characters"), Display(Name = "Name")] public string Name { get; set; } = "";
     [BindProperty] public List<string> SelectedPermissions { get; set; } = [];
 
     public async Task OnGetAsync(string? edit)

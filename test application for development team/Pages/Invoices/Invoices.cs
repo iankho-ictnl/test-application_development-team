@@ -78,7 +78,7 @@ public class CreateModel(ApiClient api, IStringLocalizer<SharedResource> l) : Ap
     public int OwnerId { get; set; }
 
     [BindProperty, DateInput, Display(Name = "Invoice date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
-    [BindProperty, Range(0, 365), Display(Name = "Payment term (days)")] public int PaymentTermDays { get; set; } = 14;
+    [BindProperty, Range(0, 365, ErrorMessage = "Between 0 and 365"), Display(Name = "Payment term (days)")] public int PaymentTermDays { get; set; } = 14;
 
     public async Task OnGetAsync() => await LoadAsync();
 
