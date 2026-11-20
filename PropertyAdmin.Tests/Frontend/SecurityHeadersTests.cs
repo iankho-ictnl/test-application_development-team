@@ -1,7 +1,16 @@
 extern alias Frontend;
 
+using System.Net;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.Testing;
 using FrontendProgram = Frontend::Program;
 using Frontend::test_application_for_development_team.Services;
@@ -30,6 +39,26 @@ public sealed class SecurityHeadersTests : IClassFixture<SecurityHeadersTests.Fr
 
         using var response = await client.GetAsync(path);
 
+        Assert.Equal(SecurityHeadersMiddleware.ContentSecurityPolicy, Assert.Single(response.Headers.GetValues("Content-Security-Policy")));
+        Assert.Equal("nosniff", Assert.Single(response.Headers.GetValues("X-Content-Type-Options")));
+        Assert.Equal("strict-origin-when-cross-origin", Assert.Single(response.Headers.GetValues("Referrer-Policy")));
+        Assert.Equal("DENY", Assert.Single(response.Headers.GetValues("X-Frame-Options")));
+    }
+
+    /// <summary>
+    /// Security finding S-33: in production an unhandled exception renders the /Error page with
+    /// status 500; that page must carry the security headers too.
+    /// </summary>
+    [Fact]
+    public async Task The_production_error_page_has_the_security_headers()
+    {
+        await using var factory = new ThrowingProductionFactory();
+        // Production cookies and antiforgery require HTTPS, as behind the Caddy proxy.
+        var client = factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false, BaseAddress = new Uri("https://localhost") });
+
+        using var response = await client.GetAsync(ThrowingProductionFactory.ThrowingPath);
+
+        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         Assert.Equal(SecurityHeadersMiddleware.ContentSecurityPolicy, Assert.Single(response.Headers.GetValues("Content-Security-Policy")));
         Assert.Equal("nosniff", Assert.Single(response.Headers.GetValues("X-Content-Type-Options")));
         Assert.Equal("strict-origin-when-cross-origin", Assert.Single(response.Headers.GetValues("Referrer-Policy")));
@@ -92,6 +121,62 @@ public sealed class SecurityHeadersTests : IClassFixture<SecurityHeadersTests.Fr
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseSetting("Api:BaseUrl", "http://api.test/");
+        }
+    }
+
+    /// <summary>
+    /// The frontend in the Production environment (exception handler on), with one extra path that
+    /// throws. The throwing step exists in this test host only: it is added after the app's own
+    /// pipeline, so it runs inside the exception handler for a path no page matches.
+    /// </summary>
+    private sealed class ThrowingProductionFactory : WebApplicationFactory<FrontendProgram>
+    {
+        public const string ThrowingPath = "/test-only-throws";
+
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            builder.UseEnvironment("Production");
+            builder.UseSetting("Api:BaseUrl", "http://api.test/");
+            builder.ConfigureServices(services =>
+            {
+                services.AddTransient<IStartupFilter, ThrowingStartupFilter>();
+                // The error page requires a signed-in user (fallback policy); sign the request in.
+                services.AddAuthentication(o =>
+                    {
+                        o.DefaultAuthenticateScheme = SignedInHandler.SchemeName;
+                        o.DefaultChallengeScheme = SignedInHandler.SchemeName;
+                    })
+                    .AddScheme<AuthenticationSchemeOptions, SignedInHandler>(SignedInHandler.SchemeName, _ => { });
+            });
+        }
+
+        private sealed class SignedInHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder)
+            : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
+        {
+            public const string SchemeName = "S33Test";
+
+            protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+            {
+                var identity = new ClaimsIdentity([new Claim(ClaimTypes.Name, "staff@test")], SchemeName);
+                return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(identity), SchemeName)));
+            }
+        }
+
+        private sealed class ThrowingStartupFilter : IStartupFilter
+        {
+            public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+            {
+                next(app);
+                app.Run(context => context.Request.Path == ThrowingPath
+                    ? throw new InvalidOperationException("Test-only failure (S-33).")
+                    : WriteNotFound(context));
+            };
+
+            private static Task WriteNotFound(HttpContext context)
+            {
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
+                return Task.CompletedTask;
+            }
         }
     }
 }
