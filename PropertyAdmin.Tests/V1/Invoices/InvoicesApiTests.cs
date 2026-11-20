@@ -24,6 +24,37 @@ public sealed class InvoicesApiTests(ApiFactory api)
         Assert.Equal("2026-04-14", created.GetProperty("dueDate").GetString());
     }
 
+    /// <summary>
+    /// T-163 TC-16.2 (REQ-007, D-056, Q-083 c; code review of #23): deleting an open invoice that is not the most recent is
+    /// refused on both routes with 400 and the reason in the requested language; the most recent one is deleted (204).
+    /// </summary>
+    [Theory]
+    [InlineData("/api/v1/invoices", "nl-NL", "Alleen de meest recente onbetaalde factuur kan worden verwijderd.")]
+    [InlineData("/api/v1/invoices", "en-US", "Only the most recent unpaid invoice can be deleted.")]
+    [InlineData("/api/invoices", "nl-NL", "Alleen de meest recente onbetaalde factuur kan worden verwijderd.")]
+    [InlineData("/api/invoices", "en-US", "Only the most recent unpaid invoice can be deleted.")]
+    public async Task Delete_refuses_an_older_open_invoice_in_lang_on_both_routes(string route, string lang, string message)
+    {
+        var admin = await api.As("Admin");
+        var olderId = await CreateInvoice(admin, route, "Older");
+        var newestId = await CreateInvoice(admin, route, "Newest");
+
+        var problem = await ExpectProblem(await admin.DeleteAsync($"{route}/{olderId}?lang={lang}"), HttpStatusCode.BadRequest);
+        Assert.Equal(message, problem.GetProperty("detail").GetString());
+        await ExpectStatus(await admin.GetAsync($"{route}/{olderId}"), HttpStatusCode.OK);
+
+        await ExpectStatus(await admin.DeleteAsync($"{route}/{newestId}?lang={lang}"), HttpStatusCode.NoContent);
+        await ExpectStatus(await admin.DeleteAsync($"{route}/{olderId}?lang={lang}"), HttpStatusCode.NoContent);
+    }
+
+    private async Task<int> CreateInvoice(HttpClient admin, string route, string name)
+    {
+        var ownerId = await admin.CreateOwner(api.Unique($"Delete rule {name} owner"));
+        await admin.CreateActivity(await admin.CreateAsset(ownerId, api.Unique($"Delete rule {name} house")));
+        var created = await Expect(await admin.PostAsJsonAsync(route, new { ownerId, date = "2026-03-31", paymentTermDays = 14 }), HttpStatusCode.Created);
+        return created.GetProperty("id").GetInt32();
+    }
+
     [Fact]
     public async Task Invoices_v1_preserves_shape_scope_rules_and_permissions()
     {

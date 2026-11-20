@@ -19,6 +19,11 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
     /// <summary>Business-rule key (D-050, D-056); the Dutch text is in BusinessRuleMessages.nl.resx.</summary>
     public const string OnlyMostRecentDeletable = "Only the most recent unpaid invoice can be deleted.";
 
+    /// <summary>First key of the per-year transaction lock on the invoice numbers (Q-118 b, D-056); the second key is the year.</summary>
+    internal const int InvoiceNumberLockClass = 7001;
+
+    private const string PostgreSqlProvider = "Npgsql.EntityFrameworkCore.PostgreSQL";
+
     public async Task<IReadOnlyList<InvoiceModel>> GetAllAsync(int? ownerScopeId, int? ownerId, InvoiceStatus? status, CancellationToken cancellationToken) =>
         await db.Invoices.AsNoTracking()
             .Where(invoice => (ownerScopeId == null || invoice.OwnerId == ownerScopeId)
@@ -73,6 +78,7 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
             await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
             try
             {
+                await LockYearAsync(model.Date.Year, cancellationToken);
                 var invoice = await BuildInvoiceAsync(model, cancellationToken);
                 db.Invoices.Add(invoice);
                 await db.SaveChangesAsync(cancellationToken);
@@ -112,6 +118,9 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
         var invoice = await db.Invoices.Include(item => item.Lines).FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
         if (invoice is null) return false;
         if (invoice.Status == InvoiceStatus.Paid) throw new BusinessRuleException("Een betaalde factuur kan niet worden verwijderd.");
+        // Wait for a create or delete of the same year, then check again with the numbers as they are now (Q-118 b).
+        await LockYearAsync(invoice.Date.Year, cancellationToken);
+        if (!await db.Invoices.AnyAsync(item => item.Id == id, cancellationToken)) return false;
         if (!await IsMostRecentAsync(invoice, cancellationToken)) throw new BusinessRuleException(OnlyMostRecentDeletable);
 
         foreach (var activity in await db.Activities.Where(activity => activity.InvoiceId == id).ToListAsync(cancellationToken))
@@ -167,6 +176,19 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
         SourceType = sourceType,
         SourceId = sourceId,
     };
+
+    /// <summary>
+    /// Takes the per-year PostgreSQL transaction lock on the invoice numbers, held until the transaction ends, so a create and
+    /// a delete of the same year never read the numbers at the same time (Q-118 b, D-056). Other providers (the SQLite test
+    /// database) have no advisory locks and skip it.
+    /// </summary>
+    private async Task LockYearAsync(int year, CancellationToken cancellationToken)
+    {
+        if (!UsesYearLock(db.Database.ProviderName)) return;
+        await db.Database.ExecuteSqlInterpolatedAsync($"SELECT pg_advisory_xact_lock({InvoiceNumberLockClass}, {year})", cancellationToken);
+    }
+
+    internal static bool UsesYearLock(string? providerName) => string.Equals(providerName, PostgreSqlProvider, StringComparison.Ordinal);
 
     private async Task<string> NextNumberAsync(int year, CancellationToken cancellationToken) =>
         $"{year}-{await HighestSequenceAsync(year, cancellationToken) + 1:0000}";
