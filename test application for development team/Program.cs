@@ -13,8 +13,10 @@ var defaultCulture = builder.Configuration["Localization:DefaultCulture"] ?? cul
 builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
 builder.Services.Configure<RequestLocalizationOptions>(o =>
 {
-    var supported = cultures.Select(c => new CultureInfo(c)).ToList();
-    o.DefaultRequestCulture = new RequestCulture(defaultCulture);
+    // Euro in every language (REQ-018, BUG-9); read-only, shared by every request.
+    var supported = cultures.Select(AppCultures.Create).ToList();
+    var fallback = supported.FirstOrDefault(c => c.Name == defaultCulture) ?? supported[0];
+    o.DefaultRequestCulture = new RequestCulture(fallback, fallback);
     o.SupportedCultures = supported;
     o.SupportedUICultures = supported;
     o.RequestCultureProviders = [new CookieRequestCultureProvider()];
