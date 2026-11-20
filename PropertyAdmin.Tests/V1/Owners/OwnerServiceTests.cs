@@ -8,11 +8,13 @@ namespace PropertyAdmin.Tests.V1.Owners;
 
 public sealed class OwnerServiceTests
 {
+    private static readonly DateOnly Today = new(2026, 11, 11);
+
     [Fact]
     public async Task GetAll_filters_by_owner_id_and_maps_owner_response()
     {
         await using var database = await MasterDataTestDatabase.CreateAsync();
-        var service = new OwnerService(database.Context);
+        var service = NewService(database);
         var first = await service.CreateAsync(new OwnerSaveModel(" First ", null, null, null, null, null), CancellationToken.None);
         await service.CreateAsync(new OwnerSaveModel("Second", null, null, null, null, null), CancellationToken.None);
 
@@ -29,7 +31,7 @@ public sealed class OwnerServiceTests
     public async Task Delete_rejects_an_owner_with_assets()
     {
         await using var database = await MasterDataTestDatabase.CreateAsync();
-        var service = new OwnerService(database.Context);
+        var service = NewService(database);
         var owner = await service.CreateAsync(new OwnerSaveModel("Owner", null, null, null, null, null), CancellationToken.None);
         database.Context.Assets.Add(new PropertyAdmin.Data.Asset
         {
@@ -43,13 +45,67 @@ public sealed class OwnerServiceTests
 
         await Assert.ThrowsAsync<PropertyAdmin.Logic.BusinessRuleException>(
             () => service.DeleteAsync(owner.Id, CancellationToken.None));
+        Assert.Null((await database.Context.Owners.FindAsync(owner.Id))!.InactiveSince);
+    }
+
+    [Fact]
+    public async Task Delete_marks_the_owner_inactive_and_never_removes_it()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var service = NewService(database);
+        var owner = await service.CreateAsync(Save("Owner"), CancellationToken.None);
+        var active = await service.CreateAsync(Save("Active"), CancellationToken.None);
+
+        Assert.True(await service.DeleteAsync(owner.Id, CancellationToken.None));
+
+        database.Context.ChangeTracker.Clear();
+        var stored = await database.Context.Owners.FindAsync(owner.Id);
+        Assert.NotNull(stored);
+        Assert.Equal(Today, stored.InactiveSince);
+        Assert.Equal(owner, await service.GetByIdAsync(owner.Id, null, CancellationToken.None));
+        Assert.Equal([active.Id], (await service.GetAllAsync(null, CancellationToken.None)).Select(item => item.Id));
+    }
+
+    [Fact]
+    public async Task Delete_again_keeps_the_first_inactive_date()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var owner = await NewService(database).CreateAsync(Save("Owner"), CancellationToken.None);
+        await NewService(database).DeleteAsync(owner.Id, CancellationToken.None);
+
+        Assert.True(await new OwnerService(database.Context, new FixedTime(Today.AddDays(30))).DeleteAsync(owner.Id, CancellationToken.None));
+
+        database.Context.ChangeTracker.Clear();
+        Assert.Equal(Today, (await database.Context.Owners.FindAsync(owner.Id))!.InactiveSince);
+    }
+
+    [Fact]
+    public async Task Delete_marks_an_owner_with_invoices_inactive_and_keeps_the_invoices()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var service = NewService(database);
+        var owner = await service.CreateAsync(Save("Owner"), CancellationToken.None);
+        database.Context.Invoices.Add(new PropertyAdmin.Data.Invoice
+        {
+            Number = "2026-0001",
+            OwnerId = owner.Id,
+            Date = Today,
+            DueDate = Today.AddDays(14),
+        });
+        await database.Context.SaveChangesAsync();
+
+        Assert.True(await service.DeleteAsync(owner.Id, CancellationToken.None));
+
+        database.Context.ChangeTracker.Clear();
+        Assert.Equal(Today, (await database.Context.Owners.FindAsync(owner.Id))!.InactiveSince);
+        Assert.Single(database.Context.Invoices.Where(invoice => invoice.OwnerId == owner.Id));
     }
 
     [Fact]
     public async Task Handlers_create_read_update_and_delete_within_the_owner_scope()
     {
         await using var database = await MasterDataTestDatabase.CreateAsync();
-        var service = new OwnerService(database.Context);
+        var service = NewService(database);
         var create = new OwnersLogic.Create.CreateHandler(service);
         var first = (await create.HandleAsync(new(Save("First")), CancellationToken.None)).Owner;
         var second = (await create.HandleAsync(new(Save("Second")), CancellationToken.None)).Owner;
@@ -68,14 +124,16 @@ public sealed class OwnerServiceTests
 
         var delete = new OwnersLogic.Delete.DeleteHandler(service);
         Assert.True((await delete.HandleAsync(new(first.Id), CancellationToken.None)).Deleted);
-        Assert.False((await delete.HandleAsync(new(first.Id), CancellationToken.None)).Deleted);
+        Assert.True((await delete.HandleAsync(new(first.Id), CancellationToken.None)).Deleted);
+        Assert.False((await delete.HandleAsync(new(first.Id + 100), CancellationToken.None)).Deleted);
+        Assert.Equal([second.Id], (await getAll.HandleAsync(new(null), CancellationToken.None)).Owners.Select(owner => owner.Id));
     }
 
     [Fact]
     public async Task Handlers_pass_a_cancellation_through()
     {
         await using var database = await MasterDataTestDatabase.CreateAsync();
-        var service = new OwnerService(database.Context);
+        var service = NewService(database);
         using var cancellation = new CancellationTokenSource();
         await cancellation.CancelAsync();
 
@@ -110,4 +168,13 @@ public sealed class OwnerServiceTests
     }
 
     private static OwnerSaveModel Save(string name) => new(name, null, null, null, null, null);
+
+    private static OwnerService NewService(MasterDataTestDatabase database) => new(database.Context, new FixedTime(Today));
+
+    private sealed class FixedTime(DateOnly today) : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow() => new(today.ToDateTime(new TimeOnly(12, 0)), TimeSpan.Zero);
+
+        public override TimeZoneInfo LocalTimeZone => TimeZoneInfo.Utc;
+    }
 }

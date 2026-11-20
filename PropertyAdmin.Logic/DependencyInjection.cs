@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using PropertyAdmin.Data;
 using PropertyAdmin.Logic.V1.Owners;
 using PropertyAdmin.Logic.V1.Owners.Create;
@@ -18,6 +19,7 @@ public static class DependencyInjection
     public static IServiceCollection AddLogic(this IServiceCollection services, string? connectionString)
     {
         services.AddData(connectionString);
+        services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IOwnerService, OwnerService>();
         services.AddScoped<CreateHandler>();
         services.AddScoped<DeleteHandler>();
