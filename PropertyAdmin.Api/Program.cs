@@ -69,7 +69,10 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<PropertyAdmin.Logic.V1.Auth.ITokenIssuer>(sp => sp.GetRequiredService<TokenService>());
 builder.Services.Configure<PropertyAdmin.Logic.V1.Invoices.GetPdf.CompanyOptions>(builder.Configuration.GetSection("Company"));
 
-builder.Services.AddControllers();
+// D-043 (BUG-7): an unreadable JSON body gives the normal 400 validation Problem Details with a
+// generic message per JSON path, never a .NET type name or exception text (D-022).
+builder.Services.AddControllers()
+    .AddJsonOptions(o => o.AllowInputFormatterExceptionMessages = false);
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<PropertyAdmin.Api.ApiExceptionHandler>();
