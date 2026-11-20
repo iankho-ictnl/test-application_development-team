@@ -55,4 +55,25 @@ public sealed class OwnerMessagesLanguageTests(ApiFactory api)
         Assert.Equal(kvk, errors.GetProperty("KvkNumber")[0].GetString());
         Assert.Equal(vat, errors.GetProperty("VatNumber")[0].GetString());
     }
+
+    private const string HasAssetsNl = "Eigenaar heeft nog objecten en kan niet worden verwijderd.";
+    private const string HasAssetsEn = "The owner still has assets and cannot be deleted.";
+
+    /// <summary>T-120 (D-049): the 'owner still has assets' refusal in the request language, Dutch without a header.</summary>
+    [Theory]
+    [InlineData("nl-NL", HasAssetsNl)]
+    [InlineData("en-US", HasAssetsEn)]
+    [InlineData(null, HasAssetsNl)]
+    public async Task Delete_of_an_owner_with_assets_gives_the_refusal_in_the_request_language(string? language, string expected)
+    {
+        var admin = await api.As("Admin");
+        var id = await admin.CreateOwner(api.Unique("Language busy owner"));
+        await admin.CreateAsset(id, api.Unique("Language busy house"));
+        var request = new HttpRequestMessage(HttpMethod.Delete, $"/api/v1/owners/{id}");
+        if (language is not null) request.Headers.AcceptLanguage.ParseAdd(language);
+
+        var problem = await ExpectProblem(await admin.SendAsync(request), HttpStatusCode.BadRequest);
+
+        Assert.Equal(expected, problem.GetProperty("detail").GetString());
+    }
 }

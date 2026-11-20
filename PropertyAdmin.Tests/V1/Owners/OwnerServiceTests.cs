@@ -43,8 +43,9 @@ public sealed class OwnerServiceTests
         });
         await database.Context.SaveChangesAsync();
 
-        await Assert.ThrowsAsync<PropertyAdmin.Logic.BusinessRuleException>(
+        var error = await Assert.ThrowsAsync<PropertyAdmin.Logic.BusinessRuleException>(
             () => service.DeleteAsync(owner.Id, CancellationToken.None));
+        Assert.Equal(OwnerService.HasAssets, error.Message);
         Assert.Null((await database.Context.Owners.FindAsync(owner.Id))!.InactiveSince);
     }
 
