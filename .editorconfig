@@ -1,0 +1,63 @@
+# Code style for the solution (D-051 part 2, REQ-032).
+# Describes the style the code already uses; EnforceCodeStyleInBuild
+# (Directory.Build.props) reports the rules marked :warning in every build.
+# Findings stay visible as warnings (Q-111); the only rules switched off are
+# CA1707 and CA1711 in PropertyAdmin.Tests (D-054, section at the end).
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{csproj,props,targets,xml,json,resx}]
+indent_style = space
+indent_size = 2
+
+[*.cs]
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+
+# Usings
+dotnet_sort_system_directives_first = true
+csharp_using_directive_placement = outside_namespace:warning
+
+# Namespaces and constructors
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_style_prefer_primary_constructors = true:suggestion
+
+# var
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = true:suggestion
+
+# Braces and expression bodies
+csharp_prefer_braces = true:suggestion
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+
+# Language keywords instead of framework type names
+dotnet_style_predefined_type_for_locals_parameters_members = true:warning
+dotnet_style_predefined_type_for_member_access = true:warning
+
+# Modifiers
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
+# Unnecessary code
+dotnet_style_readonly_field = true:warning
+
+# New lines (Allman braces, as the code uses)
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+# Entity Framework Core migrations are generated code
+[**/Migrations/*.cs]
+generated_code = true
+
+# Test project only (D-054): underscore test names (D-027) and xUnit
+# collection fixtures named ...Collection. Product projects keep both rules.
+[PropertyAdmin.Tests/**.cs]
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1711.severity = none

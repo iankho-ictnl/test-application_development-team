@@ -4,7 +4,7 @@ namespace PropertyAdmin.Logic.V1.Expenses;
 
 public interface IExpenseService
 {
-    Task<IReadOnlyList<ExpenseModel>> GetAllAsync(int? ownerScopeId, int? assetId, DateOnly? from, DateOnly? to, CancellationToken cancellationToken);
+    Task<IReadOnlyList<ExpenseModel>> GetAllAsync(int? ownerScopeId, int? assetId, DateOnly? from, DateOnly? toDate, CancellationToken cancellationToken);
     Task<ExpenseModel?> GetByIdAsync(int id, int? ownerScopeId, CancellationToken cancellationToken);
     Task<ExpenseModel> CreateAsync(ExpenseSaveModel model, CancellationToken cancellationToken);
     Task<ExpenseModel?> UpdateAsync(int id, ExpenseSaveModel model, CancellationToken cancellationToken);

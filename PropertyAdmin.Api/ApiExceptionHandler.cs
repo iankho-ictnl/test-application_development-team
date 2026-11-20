@@ -7,39 +7,45 @@ using PropertyAdmin.Logic;
 
 namespace PropertyAdmin.Api;
 
-public sealed class ApiExceptionHandler(
+public sealed partial class ApiExceptionHandler(
     IProblemDetailsService problemDetails,
     IStringLocalizer<BusinessRuleMessages> messages,
     ILogger<ApiExceptionHandler> logger) : IExceptionHandler
 {
     public const int ClientClosedRequest = 499;
 
-    public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken cancellationToken)
+    public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        if (exception is OperationCanceledException && context.RequestAborted.IsCancellationRequested)
+        if (exception is OperationCanceledException && httpContext.RequestAborted.IsCancellationRequested)
         {
-            logger.LogDebug("Request {Path} was cancelled by the client.", context.Request.Path);
-            context.Response.StatusCode = ClientClosedRequest;
+            LogRequestCancelled(logger, httpContext.Request.Path);
+            httpContext.Response.StatusCode = ClientClosedRequest;
             return true;
         }
 
         var (status, title, detail) = exception switch
         {
-            BusinessRuleException e => (StatusCodes.Status400BadRequest, "Ongeldige aanvraag", Localize(context, e.Message)),
+            BusinessRuleException e => (StatusCodes.Status400BadRequest, "Ongeldige aanvraag", Localize(httpContext, e.Message)),
             KeyNotFoundException => (StatusCodes.Status404NotFound, "Niet gevonden", null),
             _ => (StatusCodes.Status500InternalServerError, "Er is een onverwachte fout opgetreden", null),
         };
         if (status == StatusCodes.Status500InternalServerError)
-            logger.LogError(exception, "Unhandled exception for {Path}.", context.Request.Path);
+            LogUnhandledException(logger, exception, httpContext.Request.Path);
 
-        context.Response.StatusCode = status;
+        httpContext.Response.StatusCode = status;
         return await problemDetails.TryWriteAsync(new ProblemDetailsContext
         {
-            HttpContext = context,
+            HttpContext = httpContext,
             Exception = exception,
             ProblemDetails = new ProblemDetails { Status = status, Title = title, Detail = detail },
         });
     }
+
+    [LoggerMessage(Level = LogLevel.Debug, Message = "Request {Path} was cancelled by the client.")]
+    private static partial void LogRequestCancelled(ILogger logger, PathString path);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Unhandled exception for {Path}.")]
+    private static partial void LogUnhandledException(ILogger logger, Exception exception, PathString path);
 
     /// <summary>
     /// The business-rule message in the request language (D-049). The handler runs outside the request
