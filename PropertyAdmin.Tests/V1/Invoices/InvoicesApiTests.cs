@@ -8,6 +8,22 @@ namespace PropertyAdmin.Tests.V1.Invoices;
 [Collection(ApiCollection.Name)]
 public sealed class InvoicesApiTests(ApiFactory api)
 {
+    [Theory]
+    [InlineData("nl-NL", "De betalingstermijn is 14 dagen.")]
+    [InlineData("en-US", "The payment term is 14 days.")]
+    public async Task Create_refuses_another_payment_term_than_14_days_in_lang_BUG6(string lang, string message)
+    {
+        var admin = await api.As("Admin");
+        var ownerId = await admin.CreateOwner(api.Unique("BUG-6 owner"));
+        await admin.CreateActivity(await admin.CreateAsset(ownerId, api.Unique("BUG-6 house")));
+
+        var problem = await ExpectProblem(await admin.PostAsJsonAsync($"/api/v1/invoices?lang={lang}", new { ownerId, date = "2026-03-31", paymentTermDays = 30 }), HttpStatusCode.BadRequest);
+        Assert.Equal(message, problem.GetProperty("detail").GetString());
+
+        var created = await Expect(await admin.PostAsJsonAsync($"/api/v1/invoices?lang={lang}", new { ownerId, date = "2026-03-31", paymentTermDays = 14 }), HttpStatusCode.Created);
+        Assert.Equal("2026-04-14", created.GetProperty("dueDate").GetString());
+    }
+
     [Fact]
     public async Task Invoices_v1_preserves_shape_scope_rules_and_permissions()
     {

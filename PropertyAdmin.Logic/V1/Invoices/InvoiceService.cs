@@ -10,6 +10,12 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
 {
     private const int MaxNumberAttempts = 3;
 
+    /// <summary>The payment term of every invoice: due date = invoice date + 14 days (BR-11, Q-028, BUG-6).</summary>
+    public const int PaymentTermDays = 14;
+
+    /// <summary>Business-rule key (D-050); the Dutch text is in BusinessRuleMessages.nl.resx.</summary>
+    public const string InvalidPaymentTerm = "The payment term is 14 days.";
+
     public async Task<IReadOnlyList<InvoiceModel>> GetAllAsync(int? ownerScopeId, int? ownerId, InvoiceStatus? status, CancellationToken cancellationToken) =>
         await db.Invoices.AsNoTracking()
             .Where(invoice => (ownerScopeId == null || invoice.OwnerId == ownerScopeId)
@@ -55,6 +61,7 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
 
     public async Task<InvoiceModel> CreateAsync(InvoiceCreateModel model, CancellationToken cancellationToken)
     {
+        if (model.PaymentTermDays != PaymentTermDays) throw new BusinessRuleException(InvalidPaymentTerm);
         if (!await db.Owners.AnyAsync(owner => owner.Id == model.OwnerId, cancellationToken))
             throw new BusinessRuleException("Eigenaar bestaat niet.");
 
@@ -128,7 +135,7 @@ public sealed class InvoiceService(AppDbContext db) : IInvoiceService
             Number = await NextNumberAsync(model.Date.Year, cancellationToken),
             OwnerId = model.OwnerId,
             Date = model.Date,
-            DueDate = model.Date.AddDays(model.PaymentTermDays),
+            DueDate = model.Date.AddDays(PaymentTermDays),
             Status = InvoiceStatus.Open,
         };
         foreach (var activity in activities)

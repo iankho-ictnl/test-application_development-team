@@ -55,9 +55,30 @@ public sealed class InvoiceServiceTests
             service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, InvoiceDate, 14), CancellationToken.None));
         Assert.Equal("Er zijn geen te factureren activiteiten of kosten voor deze eigenaar.", nothingLeft.Message);
 
-        var second = await service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, new DateOnly(2026, 4, 30), 30), CancellationToken.None);
+        var second = await service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, new DateOnly(2026, 4, 30), 14), CancellationToken.None);
         Assert.Equal("2026-0002", second.Number);
         Assert.Equal(75m, second.TotalExclVat);
+        Assert.Equal(new DateOnly(2026, 5, 14), second.DueDate);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(13)]
+    [InlineData(30)]
+    public async Task Create_refuses_a_payment_term_other_than_14_days_BUG6(int paymentTermDays)
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var asset = await SeedAssetAsync(database.Context, "Owner");
+        AddActivity(database.Context, asset, new DateOnly(2026, 3, 2), 200m);
+        await database.Context.SaveChangesAsync();
+        var service = new InvoiceService(database.Context);
+
+        var error = await Assert.ThrowsAsync<BusinessRuleException>(() =>
+            service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, InvoiceDate, paymentTermDays), CancellationToken.None));
+
+        Assert.Equal(InvoiceService.InvalidPaymentTerm, error.Message);
+        database.Context.ChangeTracker.Clear();
+        Assert.Empty(database.Context.Invoices);
     }
 
     [Fact]
