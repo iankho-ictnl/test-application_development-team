@@ -45,7 +45,7 @@ public sealed class InvoicePdfRenderer : IInvoicePdfRenderer
 
         var to = section.AddParagraph();
         to.Format.SpaceBefore = Unit.FromCentimeter(1);
-        to.AddText($"{owner.Name}\n{owner.Address}\n{owner.PostalCode} {owner.City}");
+        to.AddText(string.Join("\n", OwnerBlockLines(owner)));
 
         var title = section.AddParagraph($"Factuur {invoice.Number}");
         title.Format.SpaceBefore = Unit.FromCentimeter(1);
@@ -95,6 +95,27 @@ public sealed class InvoicePdfRenderer : IInvoicePdfRenderer
         renderer.PdfDocument.Save(ms, false);
         return ms.ToArray();
     }
+
+    /// <summary>
+    /// The owner block (architecture/database.md, D-041): name; street and house number; postal code and city;
+    /// country; KvK and Btw-nr. A line whose parts are all empty is left out.
+    /// </summary>
+    public static IReadOnlyList<string> OwnerBlockLines(InvoiceOwnerModel owner)
+    {
+        var lines = new[]
+        {
+            owner.Name?.Trim() ?? "",
+            Join(owner.Street, owner.HouseNumber),
+            Join(owner.PostalCode, owner.City),
+            owner.Country?.Trim() ?? "",
+            string.IsNullOrWhiteSpace(owner.KvkNumber) ? "" : $"KvK: {owner.KvkNumber.Trim()}",
+            string.IsNullOrWhiteSpace(owner.VatNumber) ? "" : $"Btw-nr: {owner.VatNumber.Trim()}",
+        };
+        return lines.Where(line => line.Length > 0).ToList();
+    }
+
+    private static string Join(string? first, string? second) =>
+        string.Join(" ", new[] { first, second }.Where(part => !string.IsNullOrWhiteSpace(part)).Select(part => part!.Trim()));
 
     private static void AddTotal(Table t, string label, decimal amount, bool bold = false)
     {
