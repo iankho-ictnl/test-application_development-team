@@ -7,8 +7,7 @@ namespace PropertyAdmin.Tests.Demo;
 /// Rule 15, D-047, T-138: the S3 demo of plan.md, step by step in its order, through the real screens, the real API
 /// and a real PostgreSQL 18, signed in through /Account/Login as the seed admin, in Dutch and in English.
 /// S3 demo: "/Assets/Edit: country required and shown in /Assets; change the owner of an asset with an uninvoiced
-/// activity; /Invoices/Create for the new owner lists it". Traces: REQ-003 (US-3.1, D-041, BUG-4), REQ-011, REQ-030.
-/// The owner move (BUG-4, T-052) is added once T-052 is pushed.
+/// activity; /Invoices/Create for the new owner lists it". Traces: REQ-003 (US-3.1, D-041, BUG-4), REQ-007, REQ-011, REQ-030.
 /// </summary>
 [Collection(DemoCollection.Name)]
 [Trait("Category", "Demo")]
@@ -17,7 +16,7 @@ public sealed class S3DemoTests(DemoStack stack)
     [Theory]
     [InlineData("nl-NL", "nl")]
     [InlineData("en-US", "en")]
-    public async Task S3_demo_assets_have_a_country(string culture, string lang)
+    public async Task S3_demo_assets_have_a_country_and_move_with_their_uninvoiced_lines(string culture, string lang)
     {
         using var browser = stack.NewBrowser();
         var tag = lang.ToUpperInvariant();
@@ -68,6 +67,34 @@ public sealed class S3DemoTests(DemoStack stack)
         Assert.True(row.Success, $"no row for {asset} in /Assets ({culture})");
         Assert.Contains("Hauptstrasse 5, 10115 Berlin, Duitsland", row.Value);
         Assert.Contains("Hauptstrasse 5, 10115 Berlin, Duitsland", await browser.GetAsync($"/Assets/Details/{assetId}"));
+
+        // Step 3 (TC-DEMO-S3-6, US-3.1, BUG-4, Q-027): an asset with an uninvoiced activity moves to another owner.
+        var activity = $"Onderhoud dak S3 {tag}";
+        await browser.PostFormAsync("/Activities/Edit", new Dictionary<string, string>
+        {
+            ["Input.AssetId"] = assetId.ToString(), ["Input.Kind"] = "Maintenance", ["Input.Description"] = activity,
+            ["Input.PricingType"] = "Fixed", ["Input.FixedPrice"] = "250", ["Input.VatRateName"] = "Hoog",
+        });
+        Assert.Equal($"/Assets/Details/{assetId}", browser.Path);
+        var newOwner = $"Nieuwe eigenaar S3 {tag}";
+        await browser.PostFormAsync("/Owners/Edit", Owner(newOwner));
+        var newOwnerId = LinkId(browser.Html, "Owners", newOwner);
+        await browser.PostFormAsync($"/Assets/Edit/{assetId}", Asset(newOwnerId, asset, country: "Duitsland"));
+        Assert.Equal("/Assets", browser.Path);
+        Assert.DoesNotContain("validation-summary-errors", browser.Html);
+        Assert.Contains(WebUtility.HtmlEncode(newOwner), await browser.GetAsync($"/Assets/Details/{assetId}"));
+
+        // Step 4 (TC-DEMO-S3-7, BUG-4, REQ-007): /Invoices/Create lists the activity for the new owner, not the old one,
+        // and the new owner's invoice holds it.
+        Assert.Contains(WebUtility.HtmlEncode(activity), await browser.GetAsync($"/Invoices/Create?OwnerId={newOwnerId}"));
+        Assert.DoesNotContain(WebUtility.HtmlEncode(activity), await browser.GetAsync($"/Invoices/Create?OwnerId={ownerId}"));
+        await browser.PostFormAsync("/Invoices/Create", new Dictionary<string, string>
+        {
+            ["OwnerId"] = newOwnerId.ToString(), ["PaymentTermDays"] = "14",
+        });
+        Assert.Matches("^/Invoices/Details/\\d+$", browser.Path);
+        Assert.Contains(WebUtility.HtmlEncode(newOwner), browser.Html);
+        Assert.Contains(WebUtility.HtmlEncode(activity), browser.Html);
     }
 
     private static Dictionary<string, string> Owner(string name) => new()
