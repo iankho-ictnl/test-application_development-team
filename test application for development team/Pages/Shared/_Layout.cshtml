@@ -57,7 +57,7 @@
                     </ul>
                     <form method="post" asp-page="/Account/Culture" class="d-flex me-2">
                         <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
-                        <select name="culture" class="form-select form-select-sm" onchange="this.form.submit()" aria-label="@L["Language"]">
+                        <select name="culture" class="form-select form-select-sm" data-autosubmit aria-label="@L["Language"]">
                             @foreach (var c in LocOptions.Value.SupportedUICultures!)
                             {
                                 <option value="@c.Name" selected="@(c.Name == currentCulture)">@c.NativeName</option>

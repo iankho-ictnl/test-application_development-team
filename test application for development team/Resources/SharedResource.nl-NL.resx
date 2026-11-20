@@ -56,6 +56,7 @@
   <data name="Income" xml:space="preserve"><value>Inkomsten</value></data>
   <data name="Invalid email address" xml:space="preserve"><value>Ongeldig e-mailadres</value></data>
   <data name="Invalid user name or password, or the account is locked." xml:space="preserve"><value>Ongeldige gebruikersnaam of wachtwoord, of het account is geblokkeerd.</value></data>
+  <data name="Too many sign-in attempts. Wait a minute and try again." xml:space="preserve"><value>Te veel aanmeldpogingen. Wacht een minuut en probeer het opnieuw.</value></data>
   <data name="Invoice" xml:space="preserve"><value>Factuur</value></data>
   <data name="Invoice date" xml:space="preserve"><value>Factuurdatum</value></data>
   <data name="Invoiced" xml:space="preserve"><value>Gefactureerd</value></data>
@@ -143,4 +144,8 @@
   <data name="You do not have permission for this action." xml:space="preserve"><value>U hebt geen toestemming voor deze actie.</value></data>
   <data name="You do not have permission for this page." xml:space="preserve"><value>U hebt geen toestemming voor deze pagina.</value></data>
   <data name="Your password has been changed. Sign in again." xml:space="preserve"><value>Uw wachtwoord is gewijzigd. Meld u opnieuw aan.</value></data>
+  <data name="Enter your current password or a code from your authenticator app." xml:space="preserve"><value>Voer uw huidige wachtwoord of een code uit uw authenticator-app in.</value></data>
+  <data name="Or a code from your authenticator app" xml:space="preserve"><value>Of een code uit uw authenticator-app</value></data>
+  <data name="The password or code is incorrect." xml:space="preserve"><value>Het wachtwoord of de code is onjuist.</value></data>
+  <data name="Too long" xml:space="preserve"><value>Te lang</value></data>
 </root>

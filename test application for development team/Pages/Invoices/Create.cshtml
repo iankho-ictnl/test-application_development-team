@@ -6,7 +6,7 @@
 <h1 class="h3 mb-3">@L["New invoice"]</h1>
 <form method="get" class="row g-2 mb-3">
     <div class="col-auto">
-        <select asp-for="OwnerId" asp-items="Model.Owners" class="form-select" onchange="this.form.submit()"><option value="0">-- @L["Choose owner"] --</option></select>
+        <select asp-for="OwnerId" asp-items="Model.Owners" class="form-select" data-autosubmit><option value="0">-- @L["Choose owner"] --</option></select>
     </div>
 </form>
 @if (Model.Uninvoiced is { } u)

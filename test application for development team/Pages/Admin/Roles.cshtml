@@ -25,7 +25,7 @@
                     <a asp-route-edit="@r.Name" class="btn btn-sm btn-outline-secondary">@L["Edit"]</a>
                     @if (r.UserCount == 0)
                     {
-                        <form method="post" asp-page-handler="Delete" asp-route-name="@r.Name" class="d-inline" onsubmit="return confirm('@L["Are you sure?"]');">
+                        <form method="post" asp-page-handler="Delete" asp-route-name="@r.Name" class="d-inline" data-confirm="@L["Are you sure?"]">
                             <button type="submit" class="btn btn-sm btn-outline-danger">@L["Delete"]</button>
                         </form>
                     }

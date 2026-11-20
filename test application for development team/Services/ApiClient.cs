@@ -32,10 +32,8 @@ public class AccessTokenHandler(IHttpContextAccessor accessor) : DelegatingHandl
 
 public class ApiClient(HttpClient http)
 {
-    private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
-    {
-        Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() },
-    };
+    // D-043: enums travel as numbers, as the API's contract fixes; no JsonStringEnumConverter here.
+    private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
 
     public async Task<T> GetAsync<T>(string url)
     {

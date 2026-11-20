@@ -13,7 +13,7 @@
 </div>
 <form method="get" class="row g-2 mb-3">
     <div class="col-auto">
-        <select asp-for="OwnerId" asp-items="Model.Owners" class="form-select" onchange="this.form.submit()">
+        <select asp-for="OwnerId" asp-items="Model.Owners" class="form-select" data-autosubmit>
             <option value="">@L["All owners"]</option>
         </select>
     </div>
@@ -33,7 +33,7 @@
                     @if (canEdit)
                     {
                         <a asp-page="Edit" asp-route-id="@a.Id" class="btn btn-sm btn-outline-secondary">@L["Edit"]</a>
-                        <form method="post" asp-page-handler="Delete" asp-route-id="@a.Id" class="d-inline" onsubmit="return confirm('@L["Are you sure?"]');">
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@a.Id" class="d-inline" data-confirm="@L["Are you sure?"]">
                             <button type="submit" class="btn btn-sm btn-outline-danger">@L["Delete"]</button>
                         </form>
                     }

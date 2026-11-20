@@ -12,6 +12,7 @@ public sealed class RoleService(RoleManager<IdentityRole> roles, AppDbContext db
     public const string UnknownPermissions = "Onbekende rechten.";
     public const string RoleExists = "Rol bestaat al.";
     public const string RoleInUse = "Rol is nog aan gebruikers toegekend.";
+    public const string ReadOwnNotAlone = "Het recht ReadOwn kan niet met andere rechten in één rol worden gecombineerd.";
 
     public async Task<IReadOnlyList<RoleModel>> GetAllAsync(CancellationToken cancellationToken)
     {
@@ -28,7 +29,7 @@ public sealed class RoleService(RoleManager<IdentityRole> roles, AppDbContext db
 
     public async Task CreateAsync(RoleSaveModel model, CancellationToken cancellationToken)
     {
-        EnsureKnownPermissions(model.Permissions);
+        EnsureValidPermissions(model.Permissions);
         cancellationToken.ThrowIfCancellationRequested();
         if (await roles.RoleExistsAsync(model.Name)) throw new BusinessRuleException(RoleExists);
         var role = new IdentityRole(model.Name);
@@ -40,7 +41,7 @@ public sealed class RoleService(RoleManager<IdentityRole> roles, AppDbContext db
 
     public async Task<bool> UpdateAsync(string name, RoleSaveModel model, CancellationToken cancellationToken)
     {
-        EnsureKnownPermissions(model.Permissions);
+        EnsureValidPermissions(model.Permissions);
         cancellationToken.ThrowIfCancellationRequested();
         var role = await roles.FindByNameAsync(name);
         if (role is null) return false;
@@ -74,8 +75,13 @@ public sealed class RoleService(RoleManager<IdentityRole> roles, AppDbContext db
         return true;
     }
 
-    private static void EnsureKnownPermissions(IReadOnlyList<string> permissions)
+    // S-28: ReadOwn (owner-scoped reading) may only stand alone in a role; combined with any other
+    // permission it would open writes and lists that are not owner-scoped.
+    private static void EnsureValidPermissions(IReadOnlyList<string> permissions)
     {
-        if (permissions.Except(Permissions.All).Any()) throw new BusinessRuleException(UnknownPermissions);
+        if (permissions.Except(Permissions.All, StringComparer.Ordinal).Any()) throw new BusinessRuleException(UnknownPermissions);
+        if (permissions.Contains(Permissions.ReadOwn, StringComparer.Ordinal)
+            && permissions.Any(permission => !string.Equals(permission, Permissions.ReadOwn, StringComparison.Ordinal)))
+            throw new BusinessRuleException(ReadOwnNotAlone);
     }
 }
