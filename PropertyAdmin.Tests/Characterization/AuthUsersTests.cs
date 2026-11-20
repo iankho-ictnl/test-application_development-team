@@ -51,10 +51,8 @@ public class AuthTests(ApiFactory api)
         Assert.False(setup.GetProperty("enabled").GetBoolean());
         Assert.StartsWith("otpauth://totp/PropertyAdmin:", setup.GetProperty("authenticatorUri").GetString());
 
-        // Current behaviour: the first set-up creates the authenticator key, which changes the
-        // security stamp, so the token used for it is revoked (401); the user signs in again.
-        await ExpectStatus(await client.GetAsync("/api/auth/2fa"), HttpStatusCode.Unauthorized);
-        client = api.WithToken(await api.LoginAsync(userName, ApiFactory.Password));
+        // BUG-13 (D-058): creating the authenticator key on the first set-up keeps the security
+        // stamp, so the same token is still accepted and the next set-up shows the same key.
         Assert.Equal(setup.GetProperty("sharedKey").GetString(), (await Expect(await client.GetAsync("/api/auth/2fa"), HttpStatusCode.OK)).GetProperty("sharedKey").GetString());
 
         await ExpectProblem(await client.PostAsJsonAsync("/api/auth/2fa/enable", new { code = "000000" }), HttpStatusCode.BadRequest, DomainTitle);
@@ -71,7 +69,6 @@ public class AuthTests(ApiFactory api)
 
         var setup = await Expect(await client.GetAsync("/api/auth/2fa"), HttpStatusCode.OK);
         HasShape(setup, "sharedKey", "authenticatorUri", "enabled");
-        client = api.WithToken(await api.LoginAsync(userName, ApiFactory.Password));
 
         var code = CreateAuthenticatorCode(setup.GetProperty("sharedKey").GetString()!);
         var enabled = await Expect(await client.PostAsJsonAsync("/api/auth/2fa/enable", new { code }), HttpStatusCode.OK);
