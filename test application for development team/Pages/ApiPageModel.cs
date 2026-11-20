@@ -24,7 +24,7 @@ public abstract class ApiPageModel(ApiClient api, IStringLocalizer<SharedResourc
         var placed = false;
         foreach (var (key, messages) in r.FieldErrors)
         {
-            var name = key.StartsWith("$.") ? key[2..] : key;
+            var name = key.StartsWith("$.", StringComparison.Ordinal) ? key[2..] : key;
             var property = typeof(TInput).GetProperty(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
             if (property is null) continue;
             foreach (var m in messages) ModelState.AddModelError($"{prefix}.{property.Name}", m);
@@ -36,10 +36,10 @@ public abstract class ApiPageModel(ApiClient api, IStringLocalizer<SharedResourc
     protected void Done(string message) => TempData["Message"] = L[message].Value;
 
     protected async Task<List<SelectListItem>> OwnerOptionsAsync() =>
-        (await Api.GetAsync<List<OwnerDto>>("api/owners")).Select(o => new SelectListItem(o.Name, o.Id.ToString())).ToList();
+        (await Api.GetAsync<List<OwnerDto>>("api/owners")).Select(o => new SelectListItem(o.Name, o.Id.ToString(System.Globalization.CultureInfo.InvariantCulture))).ToList();
 
     protected async Task<List<SelectListItem>> AssetOptionsAsync() =>
-        (await Api.GetAsync<List<AssetDto>>("api/assets")).Select(a => new SelectListItem($"{a.Name} ({a.OwnerName})", a.Id.ToString())).ToList();
+        (await Api.GetAsync<List<AssetDto>>("api/assets")).Select(a => new SelectListItem($"{a.Name} ({a.OwnerName})", a.Id.ToString(System.Globalization.CultureInfo.InvariantCulture))).ToList();
 
     protected async Task<List<SelectListItem>> VatOptionsAsync() =>
         (await Api.GetAsync<List<VatRateDto>>("api/vatrates")).Select(v => v.Name).Distinct().Select(n => new SelectListItem(n, n)).ToList();
