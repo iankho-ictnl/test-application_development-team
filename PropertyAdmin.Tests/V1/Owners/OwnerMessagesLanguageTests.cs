@@ -69,6 +69,42 @@ public sealed class OwnerMessagesLanguageTests(ApiFactory api)
         Assert.Equal(vat, errors.GetProperty("VatNumber")[0].GetString());
     }
 
+    private const string RequiredNl = "Dit veld is verplicht.";
+    private const string RequiredEn = "This field is required.";
+    private const string EmailNl = "Dit is geen geldig e-mailadres.";
+    private const string EmailEn = "This is not a valid email address.";
+    private const string MaxLengthNl = "Dit veld mag maximaal 20 tekens bevatten.";
+    private const string MaxLengthEn = "This field can contain at most 20 characters.";
+
+    /// <summary>A body with an empty name, an invalid email and a house number of 21 characters; no KvK or BTW.</summary>
+    private static object InvalidFieldsBody() => new
+    {
+        name = "", email = "no-email", phone = "0100000000", street = "Teststraat", houseNumber = new string('1', 21),
+        postalCode = "1234 AB", city = "Teststad", country = "Nederland", kvkNumber = (string?)null, vatNumber = (string?)null,
+    };
+
+    /// <summary>T-127 (B18, D-049): the required, email-format and maximum-length messages follow lang on both routes.</summary>
+    [Theory]
+    [InlineData("POST", "nl-NL", RequiredNl, EmailNl, MaxLengthNl)]
+    [InlineData("POST", "en-US", RequiredEn, EmailEn, MaxLengthEn)]
+    [InlineData("POST", null, RequiredNl, EmailNl, MaxLengthNl)]
+    [InlineData("PUT", "nl-NL", RequiredNl, EmailNl, MaxLengthNl)]
+    [InlineData("PUT", "en-US", RequiredEn, EmailEn, MaxLengthEn)]
+    public async Task Field_messages_come_in_the_language_of_lang(string method, string? lang, string required, string email, string maxLength)
+    {
+        var admin = await api.As("Admin");
+        var path = "/api/v1/owners";
+        if (method == "PUT") path += $"/{await admin.CreateOwner(api.Unique("Field language owner"))}";
+        var request = Request(new HttpMethod(method), path, lang, null);
+        request.Content = JsonContent.Create(InvalidFieldsBody());
+
+        var errors = (await ExpectProblem(await admin.SendAsync(request), HttpStatusCode.BadRequest)).GetProperty("errors");
+
+        Assert.Equal(required, errors.GetProperty("Name")[0].GetString());
+        Assert.Equal(email, errors.GetProperty("Email")[0].GetString());
+        Assert.Equal(maxLength, errors.GetProperty("HouseNumber")[0].GetString());
+    }
+
     private const string HasAssetsNl = "Eigenaar heeft nog objecten en kan niet worden verwijderd.";
     private const string HasAssetsEn = "The owner still has assets and cannot be deleted.";
 

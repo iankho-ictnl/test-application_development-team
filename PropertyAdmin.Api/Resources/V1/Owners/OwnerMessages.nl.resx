@@ -18,4 +18,13 @@
   <data name="The VAT number is not in a valid EU format." xml:space="preserve">
     <value>Btw-nummer heeft geen geldig EU-formaat.</value>
   </data>
+  <data name="This field is required." xml:space="preserve">
+    <value>Dit veld is verplicht.</value>
+  </data>
+  <data name="This is not a valid email address." xml:space="preserve">
+    <value>Dit is geen geldig e-mailadres.</value>
+  </data>
+  <data name="This field can contain at most {1} characters." xml:space="preserve">
+    <value>Dit veld mag maximaal {1} tekens bevatten.</value>
+  </data>
 </root>
