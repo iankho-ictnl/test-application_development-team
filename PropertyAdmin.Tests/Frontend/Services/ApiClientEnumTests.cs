@@ -42,7 +42,7 @@ public class ApiClientEnumTests
     {
         var handler = new CapturingHandler();
 
-        await Client(handler).PostAsync("api/assets", new AssetSaveRequest(1, AssetType.Home, "Huis", "Straat 1", "1234 AB", "Utrecht"));
+        await Client(handler).PostAsync("api/assets", new AssetSaveRequest(1, AssetType.Home, "Huis", "Straat", "1", "1234 AB", "Utrecht", "Nederland"));
 
         using var doc = JsonDocument.Parse(handler.Body!);
         var type = doc.RootElement.GetProperty("type");

@@ -25,7 +25,7 @@
     <tbody>
         @foreach (var a in Model.Assets)
         {
-            <tr><td><a asp-page="/Assets/Details" asp-route-id="@a.Id">@a.Name</a></td><td>@L[a.Type.ToString()]</td><td>@a.Address, @a.City</td></tr>
+            <tr><td><a asp-page="/Assets/Details" asp-route-id="@a.Id">@a.Name</a></td><td>@L[a.Type.ToString()]</td><td>@a.Street @a.HouseNumber, @a.City</td></tr>
         }
     </tbody>
 </table>
