@@ -34,7 +34,7 @@ public class OwnersTests(ApiFactory api)
     {
         var admin = await api.As("Admin");
         var name = api.Unique("Eigenaar");
-        var response = await admin.PostAsJsonAsync("/api/owners", new { name = $"  {name}  " });
+        var response = await admin.PostAsJsonAsync("/api/owners", OwnerBody($"  {name}  "));
         var json = await Expect(response, HttpStatusCode.Created);
         HasShape(json, OwnerShape);
         Assert.Equal(name, json.GetProperty("name").GetString());
@@ -54,10 +54,10 @@ public class OwnersTests(ApiFactory api)
     {
         var admin = await api.As("Admin");
         var id = await admin.CreateOwner(api.Unique("Eigenaar"));
-        var json = await Expect(await admin.PutAsJsonAsync($"/api/owners/{id}", new { name = "Gewijzigd", city = "Andere stad" }), HttpStatusCode.OK);
+        var json = await Expect(await admin.PutAsJsonAsync($"/api/owners/{id}", OwnerBody("Gewijzigd", "Andere stad")), HttpStatusCode.OK);
         HasShape(json, OwnerShape);
         Assert.Equal("Andere stad", json.GetProperty("city").GetString());
-        await ExpectStatus(await admin.PutAsJsonAsync("/api/owners/999999", new { name = "X" }), HttpStatusCode.NotFound);
+        await ExpectStatus(await admin.PutAsJsonAsync("/api/owners/999999", OwnerBody("X")), HttpStatusCode.NotFound);
     }
 
     /// <summary>BUG-3 fixed (T-049, Q-026): delete marks the owner inactive; it stays readable but leaves the list.</summary>

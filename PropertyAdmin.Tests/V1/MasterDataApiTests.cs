@@ -12,8 +12,8 @@ public sealed class MasterDataApiTests(ApiFactory api)
     public async Task Owners_v1_preserves_shape_and_owner_read_scope()
     {
         var admin = await api.As("Admin");
-        var own = await Expect(await admin.PostAsJsonAsync("/api/v1/owners", new { name = "Owner One" }), HttpStatusCode.Created);
-        var other = await Expect(await admin.PostAsJsonAsync("/api/v1/owners", new { name = "Owner Two" }), HttpStatusCode.Created);
+        var own = await Expect(await admin.PostAsJsonAsync("/api/v1/owners", OwnerBody("Owner One")), HttpStatusCode.Created);
+        var other = await Expect(await admin.PostAsJsonAsync("/api/v1/owners", OwnerBody("Owner Two")), HttpStatusCode.Created);
         HasShape(own, OwnerShape);
         var owner = await api.As("Owner", own.GetProperty("id").GetInt32());
 
@@ -26,8 +26,8 @@ public sealed class MasterDataApiTests(ApiFactory api)
     public async Task Assets_v1_enforces_owner_scope_and_returns_owner_name()
     {
         var admin = await api.As("Admin");
-        var owner = await Expect(await admin.PostAsJsonAsync("/api/v1/owners", new { name = "Asset Owner" }), HttpStatusCode.Created);
-        var otherOwner = await Expect(await admin.PostAsJsonAsync("/api/v1/owners", new { name = "Other Owner" }), HttpStatusCode.Created);
+        var owner = await Expect(await admin.PostAsJsonAsync("/api/v1/owners", OwnerBody("Asset Owner")), HttpStatusCode.Created);
+        var otherOwner = await Expect(await admin.PostAsJsonAsync("/api/v1/owners", OwnerBody("Other Owner")), HttpStatusCode.Created);
         var asset = await Expect(await admin.PostAsJsonAsync("/api/v1/assets", new
         {
             ownerId = owner.GetProperty("id").GetInt32(),
