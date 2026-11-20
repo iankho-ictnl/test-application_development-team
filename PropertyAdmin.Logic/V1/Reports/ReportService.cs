@@ -6,7 +6,7 @@ namespace PropertyAdmin.Logic.V1.Reports;
 
 public sealed class ReportService(AppDbContext db) : IReportService
 {
-    public async Task<IReadOnlyList<AssetResultModel>>     GetAssetResultsAsync(DateOnly from, DateOnly toDate, int? ownerScopeId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<AssetResultModel>> GetAssetResultsAsync(DateOnly from, DateOnly toDate, int? ownerScopeId, CancellationToken cancellationToken)
     {
         var assets = await db.Assets.AsNoTracking()
             .Where(asset => ownerScopeId == null || asset.OwnerId == ownerScopeId)

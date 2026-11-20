@@ -168,7 +168,7 @@ public class UsersTests(ApiFactory api)
     {
         var admin = await api.As("Admin");
         var userName = api.Unique("nieuw");
-        var response = await admin.PostAsJsonAsync("/api/users", new { userName, email = $"{userName}@example.test",         password = ApiFactory.Password, roles = StaffRole });
+        var response = await admin.PostAsJsonAsync("/api/users", new { userName, email = $"{userName}@example.test", password = ApiFactory.Password, roles = StaffRole });
         var created = await Expect(response, HttpStatusCode.Created);
         HasShape(created, UserShape);
         var id = created.GetProperty("id").GetString();
@@ -187,9 +187,9 @@ public class UsersTests(ApiFactory api)
     public async Task Invalid_creates_are_400()
     {
         var admin = await api.As("Admin");
-        await ExpectProblem(await admin.PostAsJsonAsync("/api/users", new { userName = api.Unique("u"), email = "u@example.test",         password = ApiFactory.Password, roles = NoSuchRole }), HttpStatusCode.BadRequest, DomainTitle);
+        await ExpectProblem(await admin.PostAsJsonAsync("/api/users", new { userName = api.Unique("u"),         email = "u@example.test", password = ApiFactory.Password, roles = NoSuchRole }), HttpStatusCode.BadRequest, DomainTitle);
                 await ExpectProblem(await admin.PostAsJsonAsync("/api/users", new { userName = api.Unique("u"), email = "u2@example.test", password = "short", roles = StaffRole }), HttpStatusCode.BadRequest, DomainTitle);
-                await ExpectValidationProblem(await admin.PostAsJsonAsync("/api/users", new { userName = api.Unique("u"), email = "not-an-email", password = ApiFactory.Password, roles = StaffRole }));
+        await ExpectValidationProblem(await admin.PostAsJsonAsync("/api/users", new { userName = api.Unique("u"), email = "not-an-email", password = ApiFactory.Password, roles = StaffRole }));
     }
 
     [Fact]
