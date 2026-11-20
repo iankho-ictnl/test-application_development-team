@@ -24,9 +24,11 @@ public sealed class AssetsUnreadableBodyTests(ApiFactory api)
             ownerId,
             type = "Home",
             name = "House",
-            address = "Road 1",
+            street = "Road",
+            houseNumber = "1",
             postalCode = "1000 AA",
             city = "City",
+            country = "NL",
         });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);

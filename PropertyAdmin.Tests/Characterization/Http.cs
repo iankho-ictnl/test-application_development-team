@@ -44,7 +44,7 @@ public static class Http
     public static IEnumerable<int> Ids(JsonElement array) => array.EnumerateArray().Select(x => x.GetProperty("id").GetInt32());
 
     public static readonly string[] OwnerShape = ["id", "name", "email", "phone", "street", "houseNumber", "postalCode", "city", "country", "kvkNumber", "vatNumber"];
-    public static readonly string[] AssetShape = ["id", "ownerId", "ownerName", "type", "name", "address", "postalCode", "city"];
+    public static readonly string[] AssetShape = ["id", "ownerId", "ownerName", "type", "name", "street", "houseNumber", "postalCode", "city", "country"];
     public static readonly string[] VatRateShape = ["id", "name", "percentage", "validFrom", "validTo"];
     public static readonly string[] ExpenseShape = ["id", "assetId", "assetName", "date", "description", "category", "amountExclVat", "vatRateName", "vatPercentage", "vatAmount", "amountInclVat", "reinvoiceable", "invoiceId"];
     public static readonly string[] ActivityShape = ["id", "assetId", "assetName", "date", "kind", "description", "pricingType", "hours", "hourlyRate", "fixedPrice", "amountExclVat", "vatRateName", "vatPercentage", "vatAmount", "amountInclVat", "invoiceId"];
@@ -61,9 +61,13 @@ public static class Http
         return json.GetProperty("id").GetInt32();
     }
 
+    /// <summary>A complete asset body as D-041 (REQ-003, BUG-5): the five address fields filled.</summary>
+    public static object AssetBody(int ownerId, string name, int type = 0) =>
+        new { ownerId, type, name, street = "Objectweg", houseNumber = "2", postalCode = "1234 CD", city = "Teststad", country = "Nederland" };
+
     public static async Task<int> CreateAsset(this HttpClient admin, int ownerId, string name)
     {
-        var json = await Expect(await admin.PostAsJsonAsync("/api/assets", new { ownerId, type = 0, name, address = "Objectweg 2", postalCode = "1234 CD", city = "Teststad" }), HttpStatusCode.Created);
+        var json = await Expect(await admin.PostAsJsonAsync("/api/assets", AssetBody(ownerId, name)), HttpStatusCode.Created);
         return json.GetProperty("id").GetInt32();
     }
 

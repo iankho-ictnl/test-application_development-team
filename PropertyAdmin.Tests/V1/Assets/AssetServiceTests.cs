@@ -20,7 +20,7 @@ public sealed class AssetServiceTests
 
         var service = new AssetService(database.Context);
         var asset = await service.CreateAsync(
-            new AssetSaveModel(firstOwner.Id, AssetType.Building, "House", "Road", "1000", "City"),
+            new AssetSaveModel(firstOwner.Id, AssetType.Building, "House", "Road", "1", "1000", "City", "NL"),
             CancellationToken.None);
         database.Context.Activities.Add(new Activity
         {
@@ -33,7 +33,7 @@ public sealed class AssetServiceTests
 
         await Assert.ThrowsAsync<PropertyAdmin.Logic.BusinessRuleException>(() => service.UpdateAsync(
             asset.Id,
-            new AssetSaveModel(secondOwner.Id, AssetType.Home, "House", "Road", "1000", "City"),
+            new AssetSaveModel(secondOwner.Id, AssetType.Home, "House", "Road", "1", "1000", "City", "NL"),
             CancellationToken.None));
     }
 
@@ -46,8 +46,8 @@ public sealed class AssetServiceTests
         database.Context.Owners.AddRange(owner, otherOwner);
         await database.Context.SaveChangesAsync();
         var service = new AssetService(database.Context);
-        await service.CreateAsync(new AssetSaveModel(owner.Id, AssetType.Building, "Mine", "Road", "1000", "City"), CancellationToken.None);
-        await service.CreateAsync(new AssetSaveModel(otherOwner.Id, AssetType.Home, "Other", "Road", "1000", "City"), CancellationToken.None);
+        await service.CreateAsync(new AssetSaveModel(owner.Id, AssetType.Building, "Mine", "Road", "1", "1000", "City", "NL"), CancellationToken.None);
+        await service.CreateAsync(new AssetSaveModel(otherOwner.Id, AssetType.Home, "Other", "Road", "1", "1000", "City", "NL"), CancellationToken.None);
 
         var result = await service.GetAllAsync(owner.Id, null, CancellationToken.None);
         var response = PropertyAdmin.Api.V1.Assets.GetAll.Mapping.ToResponse(
@@ -109,9 +109,9 @@ public sealed class AssetServiceTests
     [Fact]
     public void Mappings_copy_every_field_and_convert_the_asset_type()
     {
-        var asset = new AssetModel(7, 3, "Owner", AssetType.Home, "House", "Road 1", "1000 AA", "City");
-        var save = new AssetSaveModel(3, AssetType.Home, "House", "Road 1", "1000 AA", "City");
-        var expected = new { Id = 7, OwnerId = 3, OwnerName = "Owner", Type = PropertyAdmin.Api.V1.AssetType.Home, Name = "House", Address = "Road 1", PostalCode = "1000 AA", City = "City" };
+        var asset = new AssetModel(7, 3, "Owner", AssetType.Home, "House", "Road", "1A", "1000 AA", "City", "Belgium");
+        var save = new AssetSaveModel(3, AssetType.Home, "House", "Road", "1A", "1000 AA", "City", "Belgium");
+        var expected = new { Id = 7, OwnerId = 3, OwnerName = "Owner", Type = PropertyAdmin.Api.V1.AssetType.Home, Name = "House", Street = "Road", HouseNumber = "1A", PostalCode = "1000 AA", City = "City", Country = "Belgium" };
 
         Assert.Equal(new AssetsLogic.GetAll.Query(5, 3), AssetsApi.GetAll.Mapping.ToQuery(new AssetsApi.GetAll.Request(3), 5));
         Assert.Equivalent(expected, Assert.Single(AssetsApi.GetAll.Mapping.ToResponse(new AssetsLogic.GetAll.Result([asset]))), strict: true);
@@ -119,17 +119,33 @@ public sealed class AssetServiceTests
         Assert.Equivalent(expected, AssetsApi.GetById.Mapping.ToResponse(new AssetsLogic.GetById.Result(asset)), strict: true);
 
         Assert.Equal(new AssetsLogic.Create.Command(save), AssetsApi.Create.Mapping.ToCommand(
-            new AssetsApi.Create.Request(3, PropertyAdmin.Api.V1.AssetType.Home, "House", "Road 1", "1000 AA", "City")));
+            new AssetsApi.Create.Request(3, PropertyAdmin.Api.V1.AssetType.Home, "House", "Road", "1A", "1000 AA", "City", "Belgium")));
         Assert.Equivalent(expected, AssetsApi.Create.Mapping.ToResponse(new AssetsLogic.Create.Result(asset)), strict: true);
 
         Assert.Equal(new AssetsLogic.Update.Command(7, save), AssetsApi.Update.Mapping.ToCommand(
-            new AssetsApi.Update.Request(3, PropertyAdmin.Api.V1.AssetType.Home, "House", "Road 1", "1000 AA", "City"), 7));
+            new AssetsApi.Update.Request(3, PropertyAdmin.Api.V1.AssetType.Home, "House", "Road", "1A", "1000 AA", "City", "Belgium"), 7));
         Assert.Equivalent(expected, AssetsApi.Update.Mapping.ToResponse(new AssetsLogic.Update.Result(asset)), strict: true);
 
         Assert.Equal(new AssetsLogic.Delete.Command(7), AssetsApi.Delete.Mapping.ToCommand(new AssetsApi.Delete.Request(7)));
         Assert.True(AssetsApi.Delete.Mapping.ToResponse(new AssetsLogic.Delete.Result(true)).Deleted);
     }
 
+    [Fact]
+    public async Task Create_trims_the_address_fields_and_keeps_a_foreign_country()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var owner = new Owner { Name = "Owner" };
+        database.Context.Owners.Add(owner);
+        await database.Context.SaveChangesAsync();
+
+        var asset = await new AssetService(database.Context).CreateAsync(
+            new AssetSaveModel(owner.Id, AssetType.Home, " House ", " Rue Haute ", " 12A ", " 1000 ", " Bruxelles ", " Belgique "),
+            CancellationToken.None);
+
+        Assert.Equal(("House", "Rue Haute", "12A", "1000", "Bruxelles", "Belgique"),
+            (asset.Name, asset.Street, asset.HouseNumber, asset.PostalCode, asset.City, asset.Country));
+    }
+
     private static AssetSaveModel Save(int ownerId, string name) =>
-        new(ownerId, AssetType.Building, name, "Road", "1000", "City");
+        new(ownerId, AssetType.Building, name, "Road", "1", "1000", "City", "NL");
 }

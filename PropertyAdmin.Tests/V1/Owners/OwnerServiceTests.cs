@@ -37,7 +37,7 @@ public sealed class OwnerServiceTests
         {
             OwnerId = owner.Id,
             Name = "Asset",
-            Address = "Street",
+            Street = "Street",
             PostalCode = "1000",
             City = "City",
         });

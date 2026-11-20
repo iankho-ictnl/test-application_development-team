@@ -17,6 +17,8 @@ public sealed class OwnerMessages
     public const string EmailFormat = "This is not a valid email address.";
     /// <summary>{1} is the maximum length (MaxLengthAttribute's second format argument).</summary>
     public const string MaxLength = "This field can contain at most {1} characters.";
+    /// <summary>For a Range or EnumDataType check (asset owner and type, T-053).</summary>
+    public const string InvalidChoice = "Choose a valid value.";
 
     public const string KvkFormat = "The KvK number must consist of 8 digits.";
     public const string VatFormat = "The VAT number is not in a valid EU format.";

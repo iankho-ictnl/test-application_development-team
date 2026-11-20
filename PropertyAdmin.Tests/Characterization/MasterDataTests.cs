@@ -104,7 +104,7 @@ public class AssetsTests(ApiFactory api)
         var admin = await api.As("Admin");
         var ownerName = api.Unique("Eigenaar");
         var ownerId = await admin.CreateOwner(ownerName);
-        var response = await admin.PostAsJsonAsync("/api/assets", new { ownerId, type = 1, name = "  Woning A  ", address = "Weg 1", postalCode = "1000 AA", city = "Stad" });
+        var response = await admin.PostAsJsonAsync("/api/assets", new { ownerId, type = 1, name = "  Woning A  ", street = "Weg", houseNumber = "1", postalCode = "1000 AA", city = "Stad", country = "Nederland" });
         var created = await Expect(response, HttpStatusCode.Created);
         HasShape(created, AssetShape);
         Assert.Equal("Woning A", created.GetProperty("name").GetString());
@@ -127,11 +127,11 @@ public class AssetsTests(ApiFactory api)
 
     [Fact]
     public async Task Create_for_unknown_owner_is_400_domain_problem() =>
-        await ExpectProblem(await (await api.As("Admin")).PostAsJsonAsync("/api/assets", new { ownerId = 999999, type = 0, name = "X", address = "Y", postalCode = "Z", city = "Q" }), HttpStatusCode.BadRequest, DomainTitle);
+        await ExpectProblem(await (await api.As("Admin")).PostAsJsonAsync("/api/assets", AssetBody(999999, "X")), HttpStatusCode.BadRequest, DomainTitle);
 
     [Fact]
     public async Task Create_without_permission_is_403() =>
-        await ExpectStatus(await (await api.As("Staff")).PostAsJsonAsync("/api/assets", new { ownerId = 1, type = 0, name = "X", address = "Y", postalCode = "Z", city = "Q" }), HttpStatusCode.Forbidden);
+        await ExpectStatus(await (await api.As("Staff")).PostAsJsonAsync("/api/assets", AssetBody(1, "X")), HttpStatusCode.Forbidden);
 
     [Fact]
     public async Task Update_returns_200_404_and_400_when_owner_changes_with_uninvoiced_lines()
@@ -140,7 +140,7 @@ public class AssetsTests(ApiFactory api)
         var ownerId = await admin.CreateOwner(api.Unique("Eigenaar"));
         var otherOwner = await admin.CreateOwner(api.Unique("Eigenaar"));
         var id = await admin.CreateAsset(ownerId, api.Unique("Object"));
-        var body = new { ownerId, type = 0, name = "Nieuw", address = "Weg", postalCode = "1", city = "Stad" };
+        var body = new { ownerId, type = 0, name = "Nieuw", street = "Weg", houseNumber = "1", postalCode = "1", city = "Stad", country = "Nederland" };
         HasShape(await Expect(await admin.PutAsJsonAsync($"/api/assets/{id}", body), HttpStatusCode.OK), AssetShape);
         await ExpectStatus(await admin.PutAsJsonAsync("/api/assets/999999", body), HttpStatusCode.NotFound);
 

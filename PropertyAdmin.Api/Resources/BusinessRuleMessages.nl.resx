@@ -15,4 +15,13 @@
   <data name="The owner still has assets and cannot be deleted." xml:space="preserve">
     <value>Eigenaar heeft nog objecten en kan niet worden verwijderd.</value>
   </data>
+  <data name="The owner does not exist." xml:space="preserve">
+    <value>Eigenaar bestaat niet.</value>
+  </data>
+  <data name="The asset still has uninvoiced lines; invoice them before changing the owner." xml:space="preserve">
+    <value>Object heeft nog niet-gefactureerde regels; factureer die eerst voordat de eigenaar wijzigt.</value>
+  </data>
+  <data name="The asset still has expenses or activities and cannot be deleted." xml:space="preserve">
+    <value>Object heeft nog kosten of activiteiten en kan niet worden verwijderd.</value>
+  </data>
 </root>

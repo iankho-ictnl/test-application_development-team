@@ -80,8 +80,8 @@ public sealed class ReportServiceTests
 
     private static async Task<(Asset Asset, Asset OtherAsset)> SeedAsync(AppDbContext context)
     {
-        var asset = new Asset { Owner = new Owner { Name = "Alpha" }, Name = "Alpha house", Address = "Road 1", PostalCode = "1000 AA", City = "City" };
-        var otherAsset = new Asset { Owner = new Owner { Name = "Beta" }, Name = "Beta house", Address = "Road 2", PostalCode = "1000 AA", City = "City" };
+        var asset = new Asset { Owner = new Owner { Name = "Alpha" }, Name = "Alpha house",         Street = "Road 1", PostalCode = "1000 AA", City = "City" };
+                var otherAsset = new Asset { Owner = new Owner { Name = "Beta" }, Name = "Beta house", Street = "Road 2", PostalCode = "1000 AA", City = "City" };
         context.Assets.AddRange(asset, otherAsset);
         await context.SaveChangesAsync();
 
