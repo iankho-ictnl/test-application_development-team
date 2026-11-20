@@ -13,8 +13,11 @@ var defaultCulture = builder.Configuration["Localization:DefaultCulture"] ?? cul
 builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
 builder.Services.Configure<RequestLocalizationOptions>(o =>
 {
-    var supported = cultures.Select(c => new CultureInfo(c)).ToList();
-    o.DefaultRequestCulture = new RequestCulture(defaultCulture);
+    // Euro in every language (REQ-018, BUG-9); read-only, shared by every request, so nothing can
+    // change a separator or pattern at runtime (BUG-8, T-095).
+    var supported = cultures.Select(AppCultures.Create).ToList();
+    var fallback = supported.FirstOrDefault(c => c.Name == defaultCulture) ?? supported[0];
+    o.DefaultRequestCulture = new RequestCulture(fallback, fallback);
     o.SupportedCultures = supported;
     o.SupportedUICultures = supported;
     o.RequestCultureProviders = [new CookieRequestCultureProvider()];
@@ -49,11 +52,16 @@ builder.Services.AddAntiforgery(o =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<SignInService>();
+builder.Services.AddSingleton(new SignInRateLimiter(
+    builder.Configuration.GetValue("SignInRateLimit:PermitLimit", 10),
+    TimeSpan.FromSeconds(builder.Configuration.GetValue("SignInRateLimit:WindowSeconds", 60))));
 builder.Services.AddScoped<ApiExceptionPageFilter>();
 builder.Services.AddTransient<AccessTokenHandler>();
+builder.Services.AddTransient<LanguageQueryHandler>();
 builder.Services.AddHttpClient<ApiClient>(c =>
         c.BaseAddress = new Uri(builder.Configuration["Api:BaseUrl"] ?? throw new InvalidOperationException("Api:BaseUrl is not configured.")))
-    .AddHttpMessageHandler<AccessTokenHandler>();
+    .AddHttpMessageHandler<AccessTokenHandler>()
+    .AddHttpMessageHandler<LanguageQueryHandler>();
 
 builder.Services.Configure<ForwardedHeadersOptions>(o =>
 {
@@ -71,6 +79,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(o =>
 var app = builder.Build();
 
 app.UseForwardedHeaders();
+app.UseMiddleware<SecurityHeadersMiddleware>();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");

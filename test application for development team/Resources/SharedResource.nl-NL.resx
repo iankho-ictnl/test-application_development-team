@@ -20,6 +20,10 @@
   <data name="Authentication code or recovery code" xml:space="preserve"><value>Verificatiecode of herstelcode</value></data>
   <data name="Back to home" xml:space="preserve"><value>Terug naar start</value></data>
   <data name="Between 0 and 100" xml:space="preserve"><value>Tussen 0 en 100</value></data>
+  <!-- BUG-12: validation messages of the frontend page models ({1} is the maximum length). -->
+  <data name="Maximum {1} characters" xml:space="preserve"><value>Maximaal {1} tekens</value></data>
+  <data name="Between 0 and 365" xml:space="preserve"><value>Tussen 0 en 365</value></data>
+  <!-- End of BUG-12 block. -->
   <data name="Blocked" xml:space="preserve"><value>Geblokkeerd</value></data>
   <data name="Cancel" xml:space="preserve"><value>Annuleren</value></data>
   <data name="Category" xml:space="preserve"><value>Categorie</value></data>
@@ -56,6 +60,7 @@
   <data name="Income" xml:space="preserve"><value>Inkomsten</value></data>
   <data name="Invalid email address" xml:space="preserve"><value>Ongeldig e-mailadres</value></data>
   <data name="Invalid user name or password, or the account is locked." xml:space="preserve"><value>Ongeldige gebruikersnaam of wachtwoord, of het account is geblokkeerd.</value></data>
+  <data name="Too many sign-in attempts. Wait a minute and try again." xml:space="preserve"><value>Te veel aanmeldpogingen. Wacht een minuut en probeer het opnieuw.</value></data>
   <data name="Invoice" xml:space="preserve"><value>Factuur</value></data>
   <data name="Invoice date" xml:space="preserve"><value>Factuurdatum</value></data>
   <data name="Invoiced" xml:space="preserve"><value>Gefactureerd</value></data>
@@ -88,6 +93,25 @@
   <data name="Overview per owner" xml:space="preserve"><value>Overzicht per eigenaar</value></data>
   <data name="Owner" xml:space="preserve"><value>Eigenaar</value></data>
   <data name="Owners" xml:space="preserve"><value>Eigenaren</value></data>
+  <data name="Activity deleted." xml:space="preserve"><value>Activiteit verwijderd.</value></data>
+  <data name="Activity saved." xml:space="preserve"><value>Activiteit opgeslagen.</value></data>
+  <data name="Asset deleted." xml:space="preserve"><value>Object verwijderd.</value></data>
+  <data name="Asset saved." xml:space="preserve"><value>Object opgeslagen.</value></data>
+  <data name="Expense deleted." xml:space="preserve"><value>Uitgave verwijderd.</value></data>
+  <data name="Expense saved." xml:space="preserve"><value>Uitgave opgeslagen.</value></data>
+  <data name="Invoice created." xml:space="preserve"><value>Factuur aangemaakt.</value></data>
+  <data name="Invoice deleted." xml:space="preserve"><value>Factuur verwijderd.</value></data>
+  <data name="Invoice marked as paid." xml:space="preserve"><value>Factuur gemarkeerd als betaald.</value></data>
+  <data name="Owner deleted." xml:space="preserve"><value>Eigenaar verwijderd.</value></data>
+  <data name="Owner saved." xml:space="preserve"><value>Eigenaar opgeslagen.</value></data>
+  <data name="Role deleted." xml:space="preserve"><value>Rol verwijderd.</value></data>
+  <data name="Role saved." xml:space="preserve"><value>Rol opgeslagen.</value></data>
+  <data name="Two-factor sign-in reset." xml:space="preserve"><value>Tweestapsaanmelding gereset.</value></data>
+  <data name="User deleted." xml:space="preserve"><value>Gebruiker verwijderd.</value></data>
+  <data name="User saved." xml:space="preserve"><value>Gebruiker opgeslagen.</value></data>
+  <data name="User signed out everywhere." xml:space="preserve"><value>Gebruiker overal afgemeld.</value></data>
+  <data name="VAT rate deleted." xml:space="preserve"><value>Btw-tarief verwijderd.</value></data>
+  <data name="VAT rate saved." xml:space="preserve"><value>Btw-tarief opgeslagen.</value></data>
   <data name="Password" xml:space="preserve"><value>Wachtwoord</value></data>
   <data name="Payment term (days)" xml:space="preserve"><value>Betalingstermijn (dagen)</value></data>
   <data name="Percentage" xml:space="preserve"><value>Percentage</value></data>
@@ -143,4 +167,15 @@
   <data name="You do not have permission for this action." xml:space="preserve"><value>U hebt geen toestemming voor deze actie.</value></data>
   <data name="You do not have permission for this page." xml:space="preserve"><value>U hebt geen toestemming voor deze pagina.</value></data>
   <data name="Your password has been changed. Sign in again." xml:space="preserve"><value>Uw wachtwoord is gewijzigd. Meld u opnieuw aan.</value></data>
+  <data name="Enter your current password or a code from your authenticator app." xml:space="preserve"><value>Voer uw huidige wachtwoord of een code uit uw authenticator-app in.</value></data>
+  <data name="Or a code from your authenticator app" xml:space="preserve"><value>Of een code uit uw authenticator-app</value></data>
+  <data name="The password or code is incorrect." xml:space="preserve"><value>Het wachtwoord of de code is onjuist.</value></data>
+  <data name="Too long" xml:space="preserve"><value>Te lang</value></data>
+  <data name="Street" xml:space="preserve"><value>Straat</value></data>
+  <data name="House number" xml:space="preserve"><value>Huisnummer</value></data>
+  <data name="Country" xml:space="preserve"><value>Land</value></data>
+  <data name="KvK number" xml:space="preserve"><value>KvK-nummer</value></data>
+  <data name="KvK number (optional)" xml:space="preserve"><value>KvK-nummer (optioneel)</value></data>
+  <data name="VAT number" xml:space="preserve"><value>Btw-nummer</value></data>
+  <data name="VAT number (optional)" xml:space="preserve"><value>Btw-nummer (optioneel)</value></data>
 </root>

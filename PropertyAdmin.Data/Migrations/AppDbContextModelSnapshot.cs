@@ -17,7 +17,7 @@ namespace PropertyAdmin.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -154,7 +154,7 @@ namespace PropertyAdmin.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.Activity", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.Activity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -220,7 +220,7 @@ namespace PropertyAdmin.Data.Migrations
                     b.ToTable("Activities");
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.ApplicationUser", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -289,7 +289,7 @@ namespace PropertyAdmin.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.Asset", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.Asset", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -332,7 +332,7 @@ namespace PropertyAdmin.Data.Migrations
                     b.ToTable("Assets");
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.Expense", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.Expense", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -383,7 +383,7 @@ namespace PropertyAdmin.Data.Migrations
                     b.ToTable("Expenses");
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.Invoice", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.Invoice", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -423,7 +423,7 @@ namespace PropertyAdmin.Data.Migrations
                     b.ToTable("Invoices");
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.InvoiceLine", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.InvoiceLine", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -462,7 +462,7 @@ namespace PropertyAdmin.Data.Migrations
                     b.ToTable("InvoiceLines");
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.Owner", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.Owner", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -470,17 +470,37 @@ namespace PropertyAdmin.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
                     b.Property<string>("City")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasDefaultValue("");
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<string>("HouseNumber")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("");
+
+                    b.Property<DateOnly?>("InactiveSince")
+                        .HasColumnType("date");
+
+                    b.Property<string>("KvkNumber")
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -492,15 +512,29 @@ namespace PropertyAdmin.Data.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasDefaultValue("");
+
+                    b.Property<string>("VatNumber")
+                        .HasMaxLength(14)
+                        .HasColumnType("character varying(14)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Owners");
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.VatRate", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.VatRate", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -542,7 +576,7 @@ namespace PropertyAdmin.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("PropertyAdmin.Api.Data.ApplicationUser", null)
+                    b.HasOne("PropertyAdmin.Data.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -551,7 +585,7 @@ namespace PropertyAdmin.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("PropertyAdmin.Api.Data.ApplicationUser", null)
+                    b.HasOne("PropertyAdmin.Data.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -566,7 +600,7 @@ namespace PropertyAdmin.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PropertyAdmin.Api.Data.ApplicationUser", null)
+                    b.HasOne("PropertyAdmin.Data.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -575,22 +609,22 @@ namespace PropertyAdmin.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("PropertyAdmin.Api.Data.ApplicationUser", null)
+                    b.HasOne("PropertyAdmin.Data.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.Activity", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.Activity", b =>
                 {
-                    b.HasOne("PropertyAdmin.Api.Data.Asset", "Asset")
+                    b.HasOne("PropertyAdmin.Data.Asset", "Asset")
                         .WithMany()
                         .HasForeignKey("AssetId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PropertyAdmin.Api.Data.Invoice", "Invoice")
+                    b.HasOne("PropertyAdmin.Data.Invoice", "Invoice")
                         .WithMany()
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -600,9 +634,9 @@ namespace PropertyAdmin.Data.Migrations
                     b.Navigation("Invoice");
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.ApplicationUser", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.ApplicationUser", b =>
                 {
-                    b.HasOne("PropertyAdmin.Api.Data.Owner", "Owner")
+                    b.HasOne("PropertyAdmin.Data.Owner", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -610,9 +644,9 @@ namespace PropertyAdmin.Data.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.Asset", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.Asset", b =>
                 {
-                    b.HasOne("PropertyAdmin.Api.Data.Owner", "Owner")
+                    b.HasOne("PropertyAdmin.Data.Owner", "Owner")
                         .WithMany("Assets")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -621,15 +655,15 @@ namespace PropertyAdmin.Data.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.Expense", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.Expense", b =>
                 {
-                    b.HasOne("PropertyAdmin.Api.Data.Asset", "Asset")
+                    b.HasOne("PropertyAdmin.Data.Asset", "Asset")
                         .WithMany()
                         .HasForeignKey("AssetId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PropertyAdmin.Api.Data.Invoice", "Invoice")
+                    b.HasOne("PropertyAdmin.Data.Invoice", "Invoice")
                         .WithMany()
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -639,9 +673,9 @@ namespace PropertyAdmin.Data.Migrations
                     b.Navigation("Invoice");
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.Invoice", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.Invoice", b =>
                 {
-                    b.HasOne("PropertyAdmin.Api.Data.Owner", "Owner")
+                    b.HasOne("PropertyAdmin.Data.Owner", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -650,21 +684,21 @@ namespace PropertyAdmin.Data.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.InvoiceLine", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.InvoiceLine", b =>
                 {
-                    b.HasOne("PropertyAdmin.Api.Data.Invoice", null)
+                    b.HasOne("PropertyAdmin.Data.Invoice", null)
                         .WithMany("Lines")
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.Invoice", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.Invoice", b =>
                 {
                     b.Navigation("Lines");
                 });
 
-            modelBuilder.Entity("PropertyAdmin.Api.Data.Owner", b =>
+            modelBuilder.Entity("PropertyAdmin.Data.Owner", b =>
                 {
                     b.Navigation("Assets");
                 });

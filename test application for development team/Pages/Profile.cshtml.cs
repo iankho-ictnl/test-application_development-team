@@ -23,6 +23,12 @@ public class ProfileModel(ApiClient api, SignInService signIn, IStringLocalizer<
     [BindProperty, DataType(DataType.Password), Display(Name = "New password")]
     public string? NewPassword { get; set; }
 
+    [BindProperty, DataType(DataType.Password), Display(Name = "Current password"), StringLength(128, ErrorMessage = "Too long")]
+    public string? DisablePassword { get; set; }
+
+    [BindProperty, Display(Name = "Or a code from your authenticator app"), StringLength(64, ErrorMessage = "Too long")]
+    public string? DisableCode { get; set; }
+
     public async Task OnGetAsync() => await LoadAsync();
 
     public async Task<IActionResult> OnPostEnableAsync()
@@ -41,11 +47,30 @@ public class ProfileModel(ApiClient api, SignInService signIn, IStringLocalizer<
 
     public async Task<IActionResult> OnPostDisableAsync()
     {
-        await api.PostAsync("api/auth/2fa/disable", null);
+        // S-19: turning off the second factor needs the current password or an authenticator code (D-036).
+        if (string.IsNullOrEmpty(DisablePassword) && string.IsNullOrWhiteSpace(DisableCode))
+            ModelState.AddModelError(nameof(DisablePassword), L["Enter your current password or a code from your authenticator app."]);
+        if (!ModelState.IsValid)
+        {
+            await LoadAsync();
+            return Page();
+        }
+
+        var r = await api.PostAsync("api/auth/2fa/disable",
+            new TwoFactorDisableRequest(NullIfEmpty(DisablePassword), NullIfEmpty(DisableCode?.Trim())));
+        if (!r.Ok)
+        {
+            ModelState.AddModelError(nameof(DisablePassword),
+                r.Status == System.Net.HttpStatusCode.BadRequest ? L["The password or code is incorrect."] : r.Error ?? L["Something went wrong."]);
+            await LoadAsync();
+            return Page();
+        }
         await signIn.SignOutAsync();
         TempData["Error"] = L["Two-factor sign-in is turned off. Sign in again."].Value;
         return RedirectToPage("/Account/Login");
     }
+
+    private static string? NullIfEmpty(string? value) => string.IsNullOrEmpty(value) ? null : value;
 
     public async Task<IActionResult> OnPostPasswordAsync()
     {
@@ -64,7 +89,7 @@ public class ProfileModel(ApiClient api, SignInService signIn, IStringLocalizer<
     private async Task LoadAsync()
     {
         Setup = await api.GetAsync<TwoFactorSetupResponse>("api/auth/2fa");
-        if (!Setup.Enabled)
+        if (!Setup.Enabled && !string.IsNullOrEmpty(Setup.AuthenticatorUri))
         {
             using var generator = new QRCodeGenerator();
             using var data = generator.CreateQrCode(Setup.AuthenticatorUri, QRCodeGenerator.ECCLevel.Q);

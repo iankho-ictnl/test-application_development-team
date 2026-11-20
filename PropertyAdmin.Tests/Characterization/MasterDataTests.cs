@@ -34,7 +34,7 @@ public class OwnersTests(ApiFactory api)
     {
         var admin = await api.As("Admin");
         var name = api.Unique("Eigenaar");
-        var response = await admin.PostAsJsonAsync("/api/owners", new { name = $"  {name}  " });
+        var response = await admin.PostAsJsonAsync("/api/owners", OwnerBody($"  {name}  "));
         var json = await Expect(response, HttpStatusCode.Created);
         HasShape(json, OwnerShape);
         Assert.Equal(name, json.GetProperty("name").GetString());
@@ -54,19 +54,23 @@ public class OwnersTests(ApiFactory api)
     {
         var admin = await api.As("Admin");
         var id = await admin.CreateOwner(api.Unique("Eigenaar"));
-        var json = await Expect(await admin.PutAsJsonAsync($"/api/owners/{id}", new { name = "Gewijzigd", city = "Andere stad" }), HttpStatusCode.OK);
+        var json = await Expect(await admin.PutAsJsonAsync($"/api/owners/{id}", OwnerBody("Gewijzigd", "Andere stad")), HttpStatusCode.OK);
         HasShape(json, OwnerShape);
         Assert.Equal("Andere stad", json.GetProperty("city").GetString());
-        await ExpectStatus(await admin.PutAsJsonAsync("/api/owners/999999", new { name = "X" }), HttpStatusCode.NotFound);
+        await ExpectStatus(await admin.PutAsJsonAsync("/api/owners/999999", OwnerBody("X")), HttpStatusCode.NotFound);
     }
 
+    /// <summary>BUG-3 fixed (T-049, Q-026): delete marks the owner inactive; it stays readable but leaves the list.</summary>
     [Fact]
-    public async Task Delete_returns_204_404_and_400_when_owner_has_assets()
+    public async Task Delete_marks_inactive_returns_204_404_and_400_when_owner_has_assets()
     {
         var admin = await api.As("Admin");
         var free = await admin.CreateOwner(api.Unique("Eigenaar"));
         await ExpectStatus(await admin.DeleteAsync($"/api/owners/{free}"), HttpStatusCode.NoContent);
-        await ExpectStatus(await admin.DeleteAsync($"/api/owners/{free}"), HttpStatusCode.NotFound);
+        await ExpectStatus(await admin.DeleteAsync($"/api/owners/{free}"), HttpStatusCode.NoContent);
+        HasShape(await Expect(await admin.GetAsync($"/api/owners/{free}"), HttpStatusCode.OK), OwnerShape);
+        Assert.DoesNotContain(free, Ids(await Expect(await admin.GetAsync("/api/owners"), HttpStatusCode.OK)));
+        await ExpectStatus(await admin.DeleteAsync("/api/owners/999999"), HttpStatusCode.NotFound);
 
         var busy = await admin.CreateOwner(api.Unique("Eigenaar"));
         await admin.CreateAsset(busy, api.Unique("Object"));

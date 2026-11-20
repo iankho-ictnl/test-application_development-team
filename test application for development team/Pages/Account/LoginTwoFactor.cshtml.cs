@@ -7,7 +7,7 @@ using test_application_for_development_team.Services;
 
 namespace test_application_for_development_team.Pages.Account;
 
-public class LoginTwoFactorModel(ApiClient api, SignInService signIn, IStringLocalizer<SharedResource> L) : PageModel
+public class LoginTwoFactorModel(ApiClient api, SignInService signIn, SignInRateLimiter limiter, IStringLocalizer<SharedResource> L) : PageModel
 {
     [BindProperty, Required(ErrorMessage = "Required"), Display(Name = "Authentication code or recovery code")]
     public string Code { get; set; } = "";
@@ -26,6 +26,12 @@ public class LoginTwoFactorModel(ApiClient api, SignInService signIn, IStringLoc
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (!limiter.TryAcquire(SignInRateLimiter.TwoFactorStep, HttpContext))
+        {
+            Response.StatusCode = StatusCodes.Status429TooManyRequests;
+            ModelState.AddModelError("", L["Too many sign-in attempts. Wait a minute and try again."]);
+            return Page();
+        }
         if (!ModelState.IsValid || Challenge is null) return Page();
         var result = await api.PostAsync<LoginResponse>("api/auth/login-2fa", new TwoFactorLoginRequest(Challenge, Code));
         if (!result.Ok || result.Value?.AccessToken is null)

@@ -14,9 +14,17 @@ public class Owner
     public string Name { get; set; } = "";
     public string? Email { get; set; }
     public string? Phone { get; set; }
-    public string? Address { get; set; }
-    public string? PostalCode { get; set; }
-    public string? City { get; set; }
+    public string Street { get; set; } = "";
+    public string HouseNumber { get; set; } = "";
+    public string PostalCode { get; set; } = "";
+    public string City { get; set; } = "";
+    public string Country { get; set; } = "";
+    /// <summary>Chamber of Commerce (KvK) number, exactly 8 digits when given (D-041).</summary>
+    public string? KvkNumber { get; set; }
+    /// <summary>EU VAT (BTW) number, normalized, when given (D-041, Q-088).</summary>
+    public string? VatNumber { get; set; }
+    /// <summary>Owners are never deleted (Q-026); the 7-year anonymization term counts from this date (REQ-024).</summary>
+    public DateOnly? InactiveSince { get; set; }
     public List<Asset> Assets { get; set; } = [];
 }
 

@@ -5,6 +5,10 @@ public sealed record Response(
     string Name,
     string? Email,
     string? Phone,
-    string? Address,
-    string? PostalCode,
-    string? City);
+    string Street,
+    string HouseNumber,
+    string PostalCode,
+    string City,
+    string Country,
+    string? KvkNumber,
+    string? VatNumber);

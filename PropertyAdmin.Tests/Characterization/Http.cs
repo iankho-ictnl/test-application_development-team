@@ -43,7 +43,7 @@ public static class Http
 
     public static IEnumerable<int> Ids(JsonElement array) => array.EnumerateArray().Select(x => x.GetProperty("id").GetInt32());
 
-    public static readonly string[] OwnerShape = ["id", "name", "email", "phone", "address", "postalCode", "city"];
+    public static readonly string[] OwnerShape = ["id", "name", "email", "phone", "street", "houseNumber", "postalCode", "city", "country", "kvkNumber", "vatNumber"];
     public static readonly string[] AssetShape = ["id", "ownerId", "ownerName", "type", "name", "address", "postalCode", "city"];
     public static readonly string[] VatRateShape = ["id", "name", "percentage", "validFrom", "validTo"];
     public static readonly string[] ExpenseShape = ["id", "assetId", "assetName", "date", "description", "category", "amountExclVat", "vatRateName", "vatPercentage", "vatAmount", "amountInclVat", "reinvoiceable", "invoiceId"];
@@ -51,9 +51,13 @@ public static class Http
     public static readonly string[] InvoiceShape = ["id", "number", "ownerId", "ownerName", "date", "dueDate", "status", "paidDate", "totalExclVat", "totalVat", "totalInclVat", "lines", "vatSummary"];
     public static readonly string[] UserShape = ["id", "userName", "email", "twoFactorEnabled", "lockedOut", "ownerId", "roles"];
 
+    /// <summary>A complete owner body as D-041 (REQ-002, BUG-2): the required fields filled, KvK and BTW empty.</summary>
+    public static object OwnerBody(string name, string city = "Teststad") =>
+        new { name, email = "eigenaar@example.test", phone = "0100000000", street = "Teststraat", houseNumber = "1", postalCode = "1234 AB", city, country = "Nederland" };
+
     public static async Task<int> CreateOwner(this HttpClient admin, string name)
     {
-        var json = await Expect(await admin.PostAsJsonAsync("/api/owners", new { name, email = "eigenaar@example.test", phone = "0100000000", address = "Teststraat 1", postalCode = "1234 AB", city = "Teststad" }), HttpStatusCode.Created);
+        var json = await Expect(await admin.PostAsJsonAsync("/api/owners", OwnerBody(name)), HttpStatusCode.Created);
         return json.GetProperty("id").GetInt32();
     }
 

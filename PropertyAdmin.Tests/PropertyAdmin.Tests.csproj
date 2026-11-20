@@ -14,6 +14,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.14" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <!-- D-047, T-112: throwaway PostgreSQL 18 for the sprint demo test; exact version, test project only (T-115 C1, Q-104). -->
+    <PackageReference Include="Testcontainers.PostgreSql" Version="[4.17.0]" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
   </ItemGroup>
@@ -25,11 +27,11 @@
   <ItemGroup>
     <ProjectReference Include="..\PropertyAdmin.Api\PropertyAdmin.Api.csproj" />
     <ProjectReference Include="..\PropertyAdmin.Contracts\PropertyAdmin.Contracts.csproj" />
-    <!-- Both hosts have a global Program (D-030): the frontend is only reachable as Frontend::. -->
+    <!-- The admin frontend; aliased because it also has a Program class (D-030). -->
     <ProjectReference Include="..\test application for development team\test application for development team.csproj" Aliases="Frontend" />
   </ItemGroup>
 
-  <!-- The Aliases metadata of the web project reference does not reach the compiler on its own. -->
+  <!-- The Aliases metadata does not reach the compiler for this reference (CS0430), so set it on the resolved reference. -->
   <Target Name="AliasFrontendReference" AfterTargets="FindReferenceAssembliesForReferences" BeforeTargets="CoreCompile">
     <ItemGroup>
       <ReferencePathWithRefAssemblies Condition="'%(Filename)' == 'test application for development team'">

@@ -193,6 +193,46 @@ public sealed class InvoiceServiceTests
             new PropertyAdmin.Logic.V1.Invoices.GetPdf.Query(invoice.Id, null), cancellation.Token));
     }
 
+    [Fact]
+    public void OwnerBlockLines_shows_the_full_address_and_kvk_and_btw_when_filled_in()
+    {
+        var lines = PropertyAdmin.Logic.V1.Invoices.GetPdf.InvoicePdfRenderer.OwnerBlockLines(
+            new InvoiceOwnerModel("Jansen BV", "Dorpsstraat", "12a", "1234 AB", "Utrecht", "Nederland", "12345678", "NL123456789B01"));
+
+        Assert.Equal(["Jansen BV", "Dorpsstraat 12a", "1234 AB Utrecht", "Nederland", "KvK: 12345678", "Btw-nr: NL123456789B01"], lines);
+    }
+
+    [Fact]
+    public void OwnerBlockLines_leaves_out_empty_kvk_and_btw_lines()
+    {
+        var lines = PropertyAdmin.Logic.V1.Invoices.GetPdf.InvoicePdfRenderer.OwnerBlockLines(
+            new InvoiceOwnerModel("Müller", "Hauptstraße", "5", "10115", "Berlin", "Duitsland", null, "  "));
+
+        Assert.Equal(["Müller", "Hauptstraße 5", "10115 Berlin", "Duitsland"], lines);
+    }
+
+    [Fact]
+    public async Task GetOwnerAsync_reads_the_current_owner_details_after_a_change()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var invoice = await SeedInvoiceAsync(database.Context);
+        var owner = await database.Context.Owners.FindAsync(invoice.OwnerId);
+        owner!.Street = "Nieuweweg";
+        owner.HouseNumber = "7";
+        owner.PostalCode = "4321 BA";
+        owner.City = "Gouda";
+        owner.Country = "Nederland";
+        owner.KvkNumber = "87654321";
+        owner.VatNumber = null;
+        await database.Context.SaveChangesAsync();
+        var service = new InvoiceService(database.Context);
+
+        var model = await service.GetOwnerAsync(invoice.OwnerId, CancellationToken.None);
+
+        Assert.Equal(["Owner", "Nieuweweg 7", "4321 BA Gouda", "Nederland", "KvK: 87654321"],
+            PropertyAdmin.Logic.V1.Invoices.GetPdf.InvoicePdfRenderer.OwnerBlockLines(model));
+    }
+
     private static async Task<Asset> SeedAssetAsync(AppDbContext context, string ownerName)
     {
         var asset = new Asset { Owner = new Owner { Name = ownerName }, Name = $"{ownerName} house", Address = "Road 1", PostalCode = "1000 AA", City = "City" };

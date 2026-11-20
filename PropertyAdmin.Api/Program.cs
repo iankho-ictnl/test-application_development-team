@@ -69,7 +69,28 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<PropertyAdmin.Logic.V1.Auth.ITokenIssuer>(sp => sp.GetRequiredService<TokenService>());
 builder.Services.Configure<PropertyAdmin.Logic.V1.Invoices.GetPdf.CompanyOptions>(builder.Configuration.GetSection("Company"));
 
-builder.Services.AddControllers();
+// D-043 (BUG-7): an unreadable JSON body gives the normal 400 validation Problem Details with a
+// generic message per JSON path, never a .NET type name or exception text (D-022).
+builder.Services.AddControllers()
+    .AddJsonOptions(o => o.AllowInputFormatterExceptionMessages = false)
+    // T-127 (D-049): data annotation messages with an ErrorMessage key are localized through the
+    // OwnerMessages resources. MVC passes the parameter's own type (string) for record constructor
+    // parameters, not the request type, so the provider cannot pick per feature: OwnerMessages is the one
+    // data annotation resource for now. Requests without ErrorMessage keep the framework defaults.
+    .AddDataAnnotationsLocalization(o => o.DataAnnotationLocalizerProvider = (_, factory) =>
+        factory.Create(typeof(PropertyAdmin.Api.V1.Owners.OwnerMessages)));
+// REQ-011 (T-114, D-049): messages in the language of the query parameter `lang` (nl-NL default,
+// en-US, case-insensitive; absent or another value gives Dutch). Accept-Language is not read.
+// Only the UI culture changes, number and date formatting keep the process culture.
+builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
+builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>(o =>
+{
+    var culture = System.Globalization.CultureInfo.CurrentCulture;
+    o.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture(culture, new System.Globalization.CultureInfo("nl-NL"));
+    o.SupportedCultures = [culture];
+    o.SupportedUICultures = [new System.Globalization.CultureInfo("nl-NL"), new System.Globalization.CultureInfo("en-US")];
+    o.RequestCultureProviders = [new Microsoft.AspNetCore.Localization.QueryStringRequestCultureProvider { QueryStringKey = "lang", UIQueryStringKey = "lang" }];
+});
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<PropertyAdmin.Api.ApiExceptionHandler>();
@@ -92,6 +113,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();
+app.UseRequestLocalization();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

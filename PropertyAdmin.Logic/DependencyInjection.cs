@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using PropertyAdmin.Data;
 using PropertyAdmin.Logic.V1.Owners;
 using PropertyAdmin.Logic.V1.Owners.Create;
@@ -18,6 +19,7 @@ public static class DependencyInjection
     public static IServiceCollection AddLogic(this IServiceCollection services, string? connectionString)
     {
         services.AddData(connectionString);
+        services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IOwnerService, OwnerService>();
         services.AddScoped<CreateHandler>();
         services.AddScoped<DeleteHandler>();
@@ -67,6 +69,7 @@ public static class DependencyInjection
         services.AddScoped<PropertyAdmin.Logic.V1.Auth.EnableTwoFactor.EnableTwoFactorHandler>();
         services.AddScoped<PropertyAdmin.Logic.V1.Auth.DisableTwoFactor.DisableTwoFactorHandler>();
         services.AddScoped<PropertyAdmin.Logic.V1.Auth.ChangePassword.ChangePasswordHandler>();
+        services.AddScoped<PropertyAdmin.Logic.V1.Auth.Logout.LogoutHandler>();
         services.AddScoped<PropertyAdmin.Logic.V1.Users.IUserService, PropertyAdmin.Logic.V1.Users.UserService>();
         services.AddScoped<PropertyAdmin.Logic.V1.Users.GetAll.GetAllHandler>();
         services.AddScoped<PropertyAdmin.Logic.V1.Users.GetById.GetByIdHandler>();

@@ -11,6 +11,9 @@ public class ApiUnauthorizedException : Exception;
 public record ApiResult(bool Ok, string? Error, HttpStatusCode Status)
 {
     public static ApiResult Success(HttpStatusCode s) => new(true, null, s);
+
+    /// <summary>The per-field messages of a 400 Problem Details (<c>errors</c>), keyed by the API's field name.</summary>
+    public IReadOnlyDictionary<string, string[]> FieldErrors { get; init; } = new Dictionary<string, string[]>();
 }
 
 public record ApiResult<T>(bool Ok, string? Error, HttpStatusCode Status, T? Value) : ApiResult(Ok, Error, Status);
@@ -30,12 +33,36 @@ public class AccessTokenHandler(IHttpContextAccessor accessor) : DelegatingHandl
     }
 }
 
+/// <summary>D-049: adds <c>lang=&lt;the user's screen language&gt;</c> to the query of every API request, keeping any existing
+/// query, so the API answers its messages in that language. Pages and <see cref="ApiClient"/> methods never pass it themselves.</summary>
+public class LanguageQueryHandler : DelegatingHandler
+{
+    public const string Key = "lang";
+
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
+    {
+        if (request.RequestUri is not null)
+            request.RequestUri = WithLanguage(request.RequestUri, System.Globalization.CultureInfo.CurrentUICulture.Name);
+        return base.SendAsync(request, ct);
+    }
+
+    /// <summary>Appends <c>lang</c> (URL-encoded) with <c>?</c>, or with <c>&amp;</c> when the URI already has a query.</summary>
+    public static Uri WithLanguage(Uri uri, string language)
+    {
+        var parameter = $"{Key}={Uri.EscapeDataString(language)}";
+        var text = uri.OriginalString;
+        var hash = text.IndexOf('#');
+        var fragment = hash >= 0 ? text[hash..] : "";
+        var path = hash >= 0 ? text[..hash] : text;
+        var separator = !path.Contains('?') ? "?" : path.EndsWith('?') || path.EndsWith('&') ? "" : "&";
+        return new Uri(path + separator + parameter + fragment, uri.IsAbsoluteUri ? UriKind.Absolute : UriKind.Relative);
+    }
+}
+
 public class ApiClient(HttpClient http)
 {
-    private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
-    {
-        Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() },
-    };
+    // D-043: enums travel as numbers, as the API's contract fixes; no JsonStringEnumConverter here.
+    private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
 
     public async Task<T> GetAsync<T>(string url)
     {
@@ -71,10 +98,29 @@ public class ApiClient(HttpClient http)
                 value = await r.Content.ReadFromJsonAsync<T>(Json);
             return new(true, null, r.StatusCode, value);
         }
-        return new(false, await ErrorText(r), r.StatusCode, default);
+        var body = await r.Content.ReadAsStringAsync();
+        return new(false, ErrorText(r, body), r.StatusCode, default) { FieldErrors = FieldErrorsOf(r, body) };
     }
 
-    private static async Task<string> ErrorText(HttpResponseMessage r)
+    private static IReadOnlyDictionary<string, string[]> FieldErrorsOf(HttpResponseMessage r, string body)
+    {
+        var result = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+        if (r.StatusCode != HttpStatusCode.BadRequest) return result;
+        try
+        {
+            using var doc = JsonDocument.Parse(body);
+            if (doc.RootElement.ValueKind == JsonValueKind.Object
+                && doc.RootElement.TryGetProperty("errors", out var errors) && errors.ValueKind == JsonValueKind.Object)
+                foreach (var p in errors.EnumerateObject().Where(p => p.Value.ValueKind == JsonValueKind.Array))
+                    result[p.Name] = p.Value.EnumerateArray().Select(v => v.GetString() ?? "").ToArray();
+        }
+        catch (JsonException)
+        {
+        }
+        return result;
+    }
+
+    private static string ErrorText(HttpResponseMessage r, string body)
     {
         switch (r.StatusCode)
         {
@@ -84,11 +130,14 @@ public class ApiClient(HttpClient http)
         }
         try
         {
-            using var doc = JsonDocument.Parse(await r.Content.ReadAsStringAsync());
+            using var doc = JsonDocument.Parse(body);
             var root = doc.RootElement;
             if (root.TryGetProperty("message", out var m)) return m.GetString() ?? "";
             if (root.TryGetProperty("errors", out var errors))
                 return string.Join(" ", errors.EnumerateObject().SelectMany(p => p.Value.EnumerateArray().Select(v => v.GetString())));
+            // Problem Details: the detail says why (BUG-10, e.g. an owner that still has assets); the title is only the kind of error.
+            if (root.TryGetProperty("detail", out var d) && d.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(d.GetString()))
+                return d.GetString()!;
             if (root.TryGetProperty("title", out var t)) return t.GetString() ?? "";
         }
         catch (JsonException)

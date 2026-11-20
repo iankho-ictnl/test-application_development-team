@@ -4,21 +4,18 @@ using PropertyAdmin.Logic.V1.Owners.Models;
 
 namespace PropertyAdmin.Logic.V1.Owners;
 
-public sealed class OwnerService(AppDbContext db) : IOwnerService
+public sealed class OwnerService(AppDbContext db, TimeProvider time) : IOwnerService
 {
+    /// <summary>Business-rule message key (English); the API returns it in the request language (D-049).</summary>
+    public const string HasAssets = "The owner still has assets and cannot be deleted.";
+
     public async Task<IReadOnlyList<OwnerModel>> GetAllAsync(int? ownerId, CancellationToken cancellationToken)
     {
         return await db.Owners.AsNoTracking()
+            .Where(owner => owner.InactiveSince == null)
             .Where(owner => ownerId == null || owner.Id == ownerId)
             .OrderBy(owner => owner.Name)
-            .Select(owner => new OwnerModel(
-                owner.Id,
-                owner.Name,
-                owner.Email,
-                owner.Phone,
-                owner.Address,
-                owner.PostalCode,
-                owner.City))
+            .Select(Projection)
             .ToListAsync(cancellationToken);
     }
 
@@ -26,14 +23,7 @@ public sealed class OwnerService(AppDbContext db) : IOwnerService
     {
         return await db.Owners.AsNoTracking()
             .Where(owner => owner.Id == id && (ownerId == null || owner.Id == ownerId))
-            .Select(owner => new OwnerModel(
-                owner.Id,
-                owner.Name,
-                owner.Email,
-                owner.Phone,
-                owner.Address,
-                owner.PostalCode,
-                owner.City))
+            .Select(Projection)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -56,16 +46,17 @@ public sealed class OwnerService(AppDbContext db) : IOwnerService
         return ToModel(owner);
     }
 
+    /// <summary>Marks the owner inactive; an owner is never deleted (Q-026, BUG-3). A repeat keeps the first date.</summary>
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
     {
         var owner = await db.Owners.FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
         if (owner is null) return false;
+        if (owner.InactiveSince is not null) return true;
 
-        if (await db.Assets.AnyAsync(asset => asset.OwnerId == id, cancellationToken)
-            || await db.Invoices.AnyAsync(invoice => invoice.OwnerId == id, cancellationToken))
-            throw new BusinessRuleException("Eigenaar heeft nog objecten of facturen en kan niet worden verwijderd.");
+        if (await db.Assets.AnyAsync(asset => asset.OwnerId == id, cancellationToken))
+            throw new BusinessRuleException(HasAssets);
 
-        db.Owners.Remove(owner);
+        owner.InactiveSince = DateOnly.FromDateTime(time.GetLocalNow().DateTime);
         await db.SaveChangesAsync(cancellationToken);
         return true;
     }
@@ -73,19 +64,29 @@ public sealed class OwnerService(AppDbContext db) : IOwnerService
     private static void Apply(Owner owner, OwnerSaveModel model)
     {
         owner.Name = model.Name.Trim();
-        owner.Email = model.Email;
-        owner.Phone = model.Phone;
-        owner.Address = model.Address;
-        owner.PostalCode = model.PostalCode;
-        owner.City = model.City;
+        owner.Email = model.Email?.Trim();
+        owner.Phone = model.Phone?.Trim();
+        owner.Street = model.Street.Trim();
+        owner.HouseNumber = model.HouseNumber.Trim();
+        owner.PostalCode = model.PostalCode.Trim();
+        owner.City = model.City.Trim();
+        owner.Country = model.Country.Trim();
+        owner.KvkNumber = OwnerNumbers.NormalizeKvk(model.KvkNumber);
+        owner.VatNumber = OwnerNumbers.NormalizeVat(model.VatNumber);
     }
 
-    private static OwnerModel ToModel(Owner owner) => new(
+    private static readonly System.Linq.Expressions.Expression<Func<Owner, OwnerModel>> Projection = owner => new OwnerModel(
         owner.Id,
         owner.Name,
         owner.Email,
         owner.Phone,
-        owner.Address,
+        owner.Street,
+        owner.HouseNumber,
         owner.PostalCode,
-        owner.City);
+        owner.City,
+        owner.Country,
+        owner.KvkNumber,
+        owner.VatNumber);
+
+    private static readonly Func<Owner, OwnerModel> ToModel = Projection.Compile();
 }

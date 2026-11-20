@@ -12,8 +12,26 @@ public abstract class ApiPageModel(ApiClient api, IStringLocalizer<SharedResourc
     protected ApiClient Api { get; } = api;
     protected IStringLocalizer<SharedResource> L { get; } = localizer;
 
+    /// <summary>Puts the API's message in the summary as received: the API answers in the user's language (D-049, the
+    /// <c>lang</c> query parameter added by <see cref="LanguageQueryHandler"/>).</summary>
     protected void AddApiError(ApiResult r) =>
-        ModelState.AddModelError("", r.Status == System.Net.HttpStatusCode.Forbidden ? L["You do not have permission for this action."] : r.Error ?? L["Something went wrong."]);
+        ModelState.AddModelError("", r.Status == System.Net.HttpStatusCode.Forbidden ? L["You do not have permission for this action."]
+            : string.IsNullOrEmpty(r.Error) ? L["Something went wrong."] : r.Error);
+
+    /// <summary>Puts the API's 400 errors at the matching field of <typeparamref name="TInput"/> (bound as <paramref name="prefix"/>); the rest goes to the summary.</summary>
+    protected void AddApiError<TInput>(ApiResult r, string prefix = "Input")
+    {
+        var placed = false;
+        foreach (var (key, messages) in r.FieldErrors)
+        {
+            var name = key.StartsWith("$.") ? key[2..] : key;
+            var property = typeof(TInput).GetProperty(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase);
+            if (property is null) continue;
+            foreach (var m in messages) ModelState.AddModelError($"{prefix}.{property.Name}", m);
+            placed = true;
+        }
+        if (!placed) AddApiError(r);
+    }
 
     protected void Done(string message) => TempData["Message"] = L[message].Value;
 
@@ -32,25 +50,35 @@ public abstract class ApiPageModel(ApiClient api, IStringLocalizer<SharedResourc
 
 public class OwnerInput
 {
-    [Required(ErrorMessage = "Required"), MaxLength(200), Display(Name = "Name")] public string Name { get; set; } = "";
-    [EmailAddress(ErrorMessage = "Invalid email address"), MaxLength(200), Display(Name = "Email")] public string? Email { get; set; }
-    [MaxLength(50), Display(Name = "Phone")] public string? Phone { get; set; }
-    [MaxLength(200), Display(Name = "Address")] public string? Address { get; set; }
-    [MaxLength(20), Display(Name = "Postal code")] public string? PostalCode { get; set; }
-    [MaxLength(100), Display(Name = "City")] public string? City { get; set; }
+    [Required(ErrorMessage = "Required"), MaxLength(200, ErrorMessage = "Maximum {1} characters"), Display(Name = "Name")] public string Name { get; set; } = "";
+    [Required(ErrorMessage = "Required"), EmailAddress(ErrorMessage = "Invalid email address"), MaxLength(200, ErrorMessage = "Maximum {1} characters"), Display(Name = "Email")] public string Email { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(50, ErrorMessage = "Maximum {1} characters"), Display(Name = "Phone")] public string Phone { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(200, ErrorMessage = "Maximum {1} characters"), Display(Name = "Street")] public string Street { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(20, ErrorMessage = "Maximum {1} characters"), Display(Name = "House number")] public string HouseNumber { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(20, ErrorMessage = "Maximum {1} characters"), Display(Name = "Postal code")] public string PostalCode { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(100, ErrorMessage = "Maximum {1} characters"), Display(Name = "City")] public string City { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(100, ErrorMessage = "Maximum {1} characters"), Display(Name = "Country")] public string Country { get; set; } = "";
+    // Optional; the format (8 digits, EU VAT number) is checked by the API only (D-041).
+    [Display(Name = "KvK number (optional)")] public string? KvkNumber { get; set; }
+    [Display(Name = "VAT number (optional)")] public string? VatNumber { get; set; }
 
-    public OwnerSaveRequest ToRequest() => new(Name, Email, Phone, Address, PostalCode, City);
-    public static OwnerInput From(OwnerDto o) => new() { Name = o.Name, Email = o.Email, Phone = o.Phone, Address = o.Address, PostalCode = o.PostalCode, City = o.City };
+    public OwnerSaveRequest ToRequest() => new(Name, Email, Phone, Street, HouseNumber, PostalCode, City, Country,
+        string.IsNullOrWhiteSpace(KvkNumber) ? null : KvkNumber, string.IsNullOrWhiteSpace(VatNumber) ? null : VatNumber);
+    public static OwnerInput From(OwnerDto o) => new()
+    {
+        Name = o.Name, Email = o.Email ?? "", Phone = o.Phone ?? "", Street = o.Street, HouseNumber = o.HouseNumber,
+        PostalCode = o.PostalCode, City = o.City, Country = o.Country, KvkNumber = o.KvkNumber, VatNumber = o.VatNumber,
+    };
 }
 
 public class AssetInput
 {
     [Range(1, int.MaxValue, ErrorMessage = "Required"), Display(Name = "Owner")] public int OwnerId { get; set; }
     [Display(Name = "Type")] public AssetType Type { get; set; }
-    [Required(ErrorMessage = "Required"), MaxLength(200), Display(Name = "Name")] public string Name { get; set; } = "";
-    [Required(ErrorMessage = "Required"), MaxLength(200), Display(Name = "Address")] public string Address { get; set; } = "";
-    [Required(ErrorMessage = "Required"), MaxLength(20), Display(Name = "Postal code")] public string PostalCode { get; set; } = "";
-    [Required(ErrorMessage = "Required"), MaxLength(100), Display(Name = "City")] public string City { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(200, ErrorMessage = "Maximum {1} characters"), Display(Name = "Name")] public string Name { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(200, ErrorMessage = "Maximum {1} characters"), Display(Name = "Address")] public string Address { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(20, ErrorMessage = "Maximum {1} characters"), Display(Name = "Postal code")] public string PostalCode { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(100, ErrorMessage = "Maximum {1} characters"), Display(Name = "City")] public string City { get; set; } = "";
 
     public AssetSaveRequest ToRequest() => new(OwnerId, Type, Name, Address, PostalCode, City);
     public static AssetInput From(AssetDto a) => new() { OwnerId = a.OwnerId, Type = a.Type, Name = a.Name, Address = a.Address, PostalCode = a.PostalCode, City = a.City };
@@ -59,9 +87,9 @@ public class AssetInput
 public class ExpenseInput
 {
     [Range(1, int.MaxValue, ErrorMessage = "Required"), Display(Name = "Asset")] public int AssetId { get; set; }
-    [Display(Name = "Date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
-    [Required(ErrorMessage = "Required"), MaxLength(500), Display(Name = "Description")] public string Description { get; set; } = "";
-    [MaxLength(100), Display(Name = "Category")] public string? Category { get; set; }
+    [DateInput, Display(Name = "Date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    [Required(ErrorMessage = "Required"), MaxLength(500, ErrorMessage = "Maximum {1} characters"), Display(Name = "Description")] public string Description { get; set; } = "";
+    [MaxLength(100, ErrorMessage = "Maximum {1} characters"), Display(Name = "Category")] public string? Category { get; set; }
     [Display(Name = "Amount excl. VAT")] public decimal AmountExclVat { get; set; }
     [Required(ErrorMessage = "Required"), Display(Name = "VAT rate")] public string VatRateName { get; set; } = "";
     [Display(Name = "Re-invoice to owner")] public bool Reinvoiceable { get; set; }
@@ -73,9 +101,9 @@ public class ExpenseInput
 public class ActivityInput
 {
     [Range(1, int.MaxValue, ErrorMessage = "Required"), Display(Name = "Asset")] public int AssetId { get; set; }
-    [Display(Name = "Date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    [DateInput, Display(Name = "Date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
     [Display(Name = "Kind")] public ActivityKind Kind { get; set; }
-    [Required(ErrorMessage = "Required"), MaxLength(500), Display(Name = "Description")] public string Description { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(500, ErrorMessage = "Maximum {1} characters"), Display(Name = "Description")] public string Description { get; set; } = "";
     [Display(Name = "Pricing")] public PricingType PricingType { get; set; }
     [Display(Name = "Hours")] public decimal? Hours { get; set; }
     [Display(Name = "Hourly rate")] public decimal? HourlyRate { get; set; }
@@ -88,10 +116,10 @@ public class ActivityInput
 
 public class VatRateInput
 {
-    [Required(ErrorMessage = "Required"), MaxLength(50), Display(Name = "Name")] public string Name { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(50, ErrorMessage = "Maximum {1} characters"), Display(Name = "Name")] public string Name { get; set; } = "";
     [Range(0, 100, ErrorMessage = "Between 0 and 100"), Display(Name = "Percentage")] public decimal Percentage { get; set; }
-    [Display(Name = "Valid from")] public DateOnly ValidFrom { get; set; } = DateOnly.FromDateTime(DateTime.Today);
-    [Display(Name = "Valid to")] public DateOnly? ValidTo { get; set; }
+    [DateInput, Display(Name = "Valid from")] public DateOnly ValidFrom { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    [DateInput, Display(Name = "Valid to")] public DateOnly? ValidTo { get; set; }
 
     public VatRateSaveRequest ToRequest() => new(Name, Percentage, ValidFrom, ValidTo);
     public static VatRateInput From(VatRateDto v) => new() { Name = v.Name, Percentage = v.Percentage, ValidFrom = v.ValidFrom, ValidTo = v.ValidTo };

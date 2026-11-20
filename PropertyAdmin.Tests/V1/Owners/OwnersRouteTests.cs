@@ -19,9 +19,11 @@ public sealed class OwnersRouteTests(ApiFactory api)
             name = api.Unique("Location owner"),
             email = "owner@example.com",
             phone = "0101234567",
-            address = "Straat 1",
+            street = "Straat",
+            houseNumber = "1",
             postalCode = "1234 AB",
             city = "Utrecht",
+            country = "Nederland",
         });
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);

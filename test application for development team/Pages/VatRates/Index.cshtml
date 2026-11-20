@@ -20,7 +20,7 @@
                 <td>@if (active) { <span class="badge bg-success">@L["Current"]</span> }</td>
                 <td class="text-end">
                     <a asp-route-edit="@v.Id" class="btn btn-sm btn-outline-secondary">@L["Edit"]</a>
-                    <form method="post" asp-page-handler="Delete" asp-route-id="@v.Id" class="d-inline" onsubmit="return confirm('@L["Are you sure?"]');">
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@v.Id" class="d-inline" data-confirm="@L["Are you sure?"]">
                         <button type="submit" class="btn btn-sm btn-outline-danger">@L["Delete"]</button>
                     </form>
                 </td>
