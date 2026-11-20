@@ -17,30 +17,35 @@ using IndexModel = Frontend::test_application_for_development_team.Pages.Owners.
 namespace PropertyAdmin.Tests.Frontend.Owners;
 
 /// <summary>
-/// REQ-002 US-2.3, BUG-10, T-113: deleting an owner that still has assets is refused with the reason the API sends
-/// in its Problem Details <c>detail</c>, not only the title "Ongeldige aanvraag"; in Dutch and in English.
-/// The API is a test double that answers as the API's error handler does.
+/// REQ-002 US-2.3, BUG-10, T-113, D-049 (T-121): deleting an owner that still has assets is refused with the reason the API
+/// sends in its Problem Details <c>detail</c>, shown as received, in Dutch and in English. The API is a test double that
+/// answers as the API's error handler does, in the language of the <c>lang</c> query parameter it receives.
 /// </summary>
 public sealed class OwnerDeleteTests
 {
-    private const string OwnerHasAssets =
-        """{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.1","title":"Ongeldige aanvraag","status":400,"detail":"Eigenaar heeft nog objecten en kan niet worden verwijderd.","traceId":"00-abc-01"}""";
+    private const string HasAssetsNl = "Eigenaar heeft nog objecten en kan niet worden verwijderd.";
+    private const string HasAssetsEn = "The owner still has assets and cannot be deleted.";
+
+    private static string OwnerHasAssets(string? lang) =>
+        $$"""{"type":"https://tools.ietf.org/html/rfc9110#section-15.5.1","title":"Bad Request","status":400,"detail":"{{(lang == "en-US" ? HasAssetsEn : HasAssetsNl)}}","traceId":"00-abc-01"}""";
 
     [Theory]
-    [InlineData("nl-NL", "Eigenaar heeft nog objecten en kan niet worden verwijderd.")]
-    [InlineData("en-US", "The owner still has assets and cannot be deleted.")]
+    [InlineData("nl-NL", HasAssetsNl)]
+    [InlineData("en-US", HasAssetsEn)]
     public async Task Delete_of_an_owner_with_assets_shows_why_it_is_refused(string culture, string expected)
     {
         var previous = CultureInfo.CurrentUICulture;
         CultureInfo.CurrentUICulture = new CultureInfo(culture);
         try
         {
-            var page = CreatePage(new StubApi(HttpStatusCode.BadRequest, OwnerHasAssets), RealLocalizer());
+            var api = new StubApi(HttpStatusCode.BadRequest, OwnerHasAssets);
+            var page = CreatePage(api, RealLocalizer());
 
             var result = await page.OnPostDeleteAsync(1);
 
             Assert.IsType<PageResult>(result);
             Assert.Equal(expected, Assert.Single(page.ModelState[""]!.Errors).ErrorMessage);
+            Assert.Equal(culture, api.DeleteLanguage);
         }
         finally
         {
@@ -51,7 +56,7 @@ public sealed class OwnerDeleteTests
     [Fact]
     public async Task A_400_without_detail_still_shows_the_title()
     {
-        var page = CreatePage(new StubApi(HttpStatusCode.BadRequest, """{"title":"Ongeldige aanvraag","status":400}"""), RealLocalizer());
+        var page = CreatePage(new StubApi(HttpStatusCode.BadRequest, _ => """{"title":"Ongeldige aanvraag","status":400}"""), RealLocalizer());
 
         await page.OnPostDeleteAsync(1);
 
@@ -61,7 +66,7 @@ public sealed class OwnerDeleteTests
     [Fact]
     public async Task Delete_of_an_owner_without_assets_returns_to_the_list()
     {
-        var page = CreatePage(new StubApi(HttpStatusCode.NoContent, ""), RealLocalizer());
+        var page = CreatePage(new StubApi(HttpStatusCode.NoContent, _ => ""), RealLocalizer());
 
         var result = await page.OnPostDeleteAsync(3);
 
@@ -76,7 +81,8 @@ public sealed class OwnerDeleteTests
     private static IndexModel CreatePage(StubApi api, IStringLocalizer<SharedResource> localizer)
     {
         var httpContext = new DefaultHttpContext();
-        var client = new ApiClient(new HttpClient(api) { BaseAddress = new Uri("http://api.test/") });
+        var handler = new LanguageQueryHandler { InnerHandler = api };
+        var client = new ApiClient(new HttpClient(handler) { BaseAddress = new Uri("http://api.test/") });
         return new IndexModel(client, localizer)
         {
             PageContext = new PageContext
@@ -88,15 +94,20 @@ public sealed class OwnerDeleteTests
         };
     }
 
-    /// <summary>Answers DELETE with the given status and body, and GET api/owners (the list shown again) with an empty list.</summary>
-    private sealed class StubApi(HttpStatusCode status, string json) : HttpMessageHandler
+    /// <summary>Answers DELETE with the given status and the body for the request's <c>lang</c>, and GET api/owners (the list
+    /// shown again) with an empty list.</summary>
+    private sealed class StubApi(HttpStatusCode status, Func<string?, string> json) : HttpMessageHandler
     {
+        public string? DeleteLanguage { get; private set; }
+
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
         {
             if (request.Method == HttpMethod.Get)
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("[]", Encoding.UTF8, "application/json") });
+            DeleteLanguage = System.Web.HttpUtility.ParseQueryString(request.RequestUri!.Query)["lang"];
+            var body = json(DeleteLanguage);
             var response = new HttpResponseMessage(status);
-            if (json.Length > 0) response.Content = new StringContent(json, Encoding.UTF8, "application/problem+json");
+            if (body.Length > 0) response.Content = new StringContent(body, Encoding.UTF8, "application/problem+json");
             return Task.FromResult(response);
         }
     }

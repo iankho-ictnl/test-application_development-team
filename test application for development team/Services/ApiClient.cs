@@ -33,6 +33,32 @@ public class AccessTokenHandler(IHttpContextAccessor accessor) : DelegatingHandl
     }
 }
 
+/// <summary>D-049: adds <c>lang=&lt;the user's screen language&gt;</c> to the query of every API request, keeping any existing
+/// query, so the API answers its messages in that language. Pages and <see cref="ApiClient"/> methods never pass it themselves.</summary>
+public class LanguageQueryHandler : DelegatingHandler
+{
+    public const string Key = "lang";
+
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
+    {
+        if (request.RequestUri is not null)
+            request.RequestUri = WithLanguage(request.RequestUri, System.Globalization.CultureInfo.CurrentUICulture.Name);
+        return base.SendAsync(request, ct);
+    }
+
+    /// <summary>Appends <c>lang</c> (URL-encoded) with <c>?</c>, or with <c>&amp;</c> when the URI already has a query.</summary>
+    public static Uri WithLanguage(Uri uri, string language)
+    {
+        var parameter = $"{Key}={Uri.EscapeDataString(language)}";
+        var text = uri.OriginalString;
+        var hash = text.IndexOf('#');
+        var fragment = hash >= 0 ? text[hash..] : "";
+        var path = hash >= 0 ? text[..hash] : text;
+        var separator = !path.Contains('?') ? "?" : path.EndsWith('?') || path.EndsWith('&') ? "" : "&";
+        return new Uri(path + separator + parameter + fragment, uri.IsAbsoluteUri ? UriKind.Absolute : UriKind.Relative);
+    }
+}
+
 public class ApiClient(HttpClient http)
 {
     // D-043: enums travel as numbers, as the API's contract fixes; no JsonStringEnumConverter here.

@@ -6,6 +6,9 @@ namespace PropertyAdmin.Logic.V1.Owners;
 
 public sealed class OwnerService(AppDbContext db, TimeProvider time) : IOwnerService
 {
+    /// <summary>Business-rule message key (English); the API returns it in the request language (D-049).</summary>
+    public const string HasAssets = "The owner still has assets and cannot be deleted.";
+
     public async Task<IReadOnlyList<OwnerModel>> GetAllAsync(int? ownerId, CancellationToken cancellationToken)
     {
         return await db.Owners.AsNoTracking()
@@ -51,7 +54,7 @@ public sealed class OwnerService(AppDbContext db, TimeProvider time) : IOwnerSer
         if (owner.InactiveSince is not null) return true;
 
         if (await db.Assets.AnyAsync(asset => asset.OwnerId == id, cancellationToken))
-            throw new BusinessRuleException("Eigenaar heeft nog objecten en kan niet worden verwijderd.");
+            throw new BusinessRuleException(HasAssets);
 
         owner.InactiveSince = DateOnly.FromDateTime(time.GetLocalNow().DateTime);
         await db.SaveChangesAsync(cancellationToken);

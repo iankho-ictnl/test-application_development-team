@@ -16,5 +16,5 @@ public sealed record Request(
     [MaxLength(50)] string? VatNumber) : IValidatableObject
 {
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
-        RequestValidation.Validate(this);
+        RequestValidation.Validate(this, validationContext);
 }

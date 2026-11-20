@@ -12,11 +12,11 @@ public abstract class ApiPageModel(ApiClient api, IStringLocalizer<SharedResourc
     protected ApiClient Api { get; } = api;
     protected IStringLocalizer<SharedResource> L { get; } = localizer;
 
-    /// <summary>Puts the API's message in the summary. The API's business-rule messages are Dutch; a known one is translated
-    /// through the resource files (keyed by the Dutch text), an unknown one is shown as the API sent it.</summary>
+    /// <summary>Puts the API's message in the summary as received: the API answers in the user's language (D-049, the
+    /// <c>lang</c> query parameter added by <see cref="LanguageQueryHandler"/>).</summary>
     protected void AddApiError(ApiResult r) =>
         ModelState.AddModelError("", r.Status == System.Net.HttpStatusCode.Forbidden ? L["You do not have permission for this action."]
-            : string.IsNullOrEmpty(r.Error) ? L["Something went wrong."] : L[r.Error]);
+            : string.IsNullOrEmpty(r.Error) ? L["Something went wrong."] : r.Error);
 
     /// <summary>Puts the API's 400 errors at the matching field of <typeparamref name="TInput"/> (bound as <paramref name="prefix"/>); the rest goes to the summary.</summary>
     protected void AddApiError<TInput>(ApiResult r, string prefix = "Input")
