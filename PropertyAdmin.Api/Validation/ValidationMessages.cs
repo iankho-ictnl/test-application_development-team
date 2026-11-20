@@ -19,4 +19,8 @@ public sealed class ValidationMessages
 
     public const string KvkFormat = "The KvK number must consist of 8 digits.";
     public const string VatFormat = "The VAT number is not in a valid EU format.";
+
+    /// <summary>Report period (D-033, T-161).</summary>
+    public const string DateFormat = "Enter a valid date as yyyy-MM-dd.";
+    public const string PeriodReversed = "The end date cannot be before the start date.";
 }
