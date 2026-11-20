@@ -13,8 +13,10 @@ var defaultCulture = builder.Configuration["Localization:DefaultCulture"] ?? cul
 builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
 builder.Services.Configure<RequestLocalizationOptions>(o =>
 {
-    var supported = cultures.Select(c => new CultureInfo(c)).ToList();
-    o.DefaultRequestCulture = new RequestCulture(defaultCulture);
+    // Shared by every request: read-only, so nothing can change a separator or pattern at runtime (BUG-8, T-095).
+    var supported = cultures.Select(c => CultureInfo.ReadOnly(new CultureInfo(c))).ToList();
+    var fallback = supported.FirstOrDefault(c => c.Name == defaultCulture) ?? supported[0];
+    o.DefaultRequestCulture = new RequestCulture(fallback, fallback);
     o.SupportedCultures = supported;
     o.SupportedUICultures = supported;
     o.RequestCultureProviders = [new CookieRequestCultureProvider()];

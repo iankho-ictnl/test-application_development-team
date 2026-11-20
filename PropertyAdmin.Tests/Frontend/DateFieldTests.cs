@@ -48,6 +48,50 @@ public sealed class DateFieldTests : IClassFixture<DateFieldTests.FrontendFactor
         Assert.Contains($"value=\"{DateTime.Today:yyyy-MM-dd}\"", input.Value);
     }
 
+    /// <summary>
+    /// BUG-8 retest (T-094, T-095): "2026:11- 20" was reported on the first load of /Activities/Edit.
+    /// A fresh host (first load) gets many parallel requests in both cultures; every render must hold
+    /// exactly today's yyyy-MM-dd, so a shared culture object changed at runtime or a first-load race shows here.
+    /// </summary>
+    [Fact]
+    public async Task Date_field_is_exact_on_first_load_under_parallel_requests_in_both_cultures()
+    {
+        await using var fresh = new FrontendFactory();
+        var expected = $"value=\"{DateTime.Today:yyyy-MM-dd}\"";
+        var paths = new[] { "/Activities/Edit", "/Expenses/Edit", "/Invoices/Create?ownerId=1", "/VatRates" };
+
+        var renders = Enumerable.Range(0, 80).Select(async i =>
+        {
+            var culture = i % 2 == 0 ? "nl-NL" : "en-US";
+            var client = fresh.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+            client.DefaultRequestHeaders.Add("Cookie", $".AspNetCore.Culture=c%3D{culture}%7Cuic%3D{culture}");
+            var path = paths[i % paths.Length];
+            var html = await client.GetStringAsync(path);
+            var input = Regex.Match(html, "<input[^>]*type=\"date\"[^>]*>");
+            return (path, culture, input.Value);
+        }).ToList();
+
+        foreach (var (path, culture, input) in await Task.WhenAll(renders))
+        {
+            Assert.True(input.Contains(expected, StringComparison.Ordinal), $"{path} in {culture} rendered: {input}");
+        }
+    }
+
+    /// <summary>
+    /// BUG-8 (T-095): the request cultures are shared by all requests, so they are read-only: code that
+    /// changes a separator or pattern at runtime fails at once instead of garbling other users' pages.
+    /// </summary>
+    [Fact]
+    public void Request_cultures_are_read_only()
+    {
+        var options = _factory.Services.GetRequiredService<IOptions<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>>().Value;
+
+        Assert.All(options.SupportedCultures!, c => Assert.True(c.IsReadOnly, $"{c.Name} culture is writable."));
+        Assert.All(options.SupportedUICultures!, c => Assert.True(c.IsReadOnly, $"{c.Name} UI culture is writable."));
+        Assert.True(options.DefaultRequestCulture.Culture.IsReadOnly, "The default culture is writable.");
+        Assert.All(options.SupportedCultures!, c => Assert.Equal("2026-11-20", new DateOnly(2026, 11, 20).ToString("yyyy-MM-dd", c)));
+    }
+
     public sealed class FrontendFactory : WebApplicationFactory<FrontendProgram>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
