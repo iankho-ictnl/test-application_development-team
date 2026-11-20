@@ -76,12 +76,18 @@ public class AssetInput
     [Range(1, int.MaxValue, ErrorMessage = "Required"), Display(Name = "Owner")] public int OwnerId { get; set; }
     [Display(Name = "Type")] public AssetType Type { get; set; }
     [Required(ErrorMessage = "Required"), MaxLength(200, ErrorMessage = "Maximum {1} characters"), Display(Name = "Name")] public string Name { get; set; } = "";
-    [Required(ErrorMessage = "Required"), MaxLength(200, ErrorMessage = "Maximum {1} characters"), Display(Name = "Address")] public string Address { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(200, ErrorMessage = "Maximum {1} characters"), Display(Name = "Street")] public string Street { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(20, ErrorMessage = "Maximum {1} characters"), Display(Name = "House number")] public string HouseNumber { get; set; } = "";
     [Required(ErrorMessage = "Required"), MaxLength(20, ErrorMessage = "Maximum {1} characters"), Display(Name = "Postal code")] public string PostalCode { get; set; } = "";
     [Required(ErrorMessage = "Required"), MaxLength(100, ErrorMessage = "Maximum {1} characters"), Display(Name = "City")] public string City { get; set; } = "";
+    [Required(ErrorMessage = "Required"), MaxLength(100, ErrorMessage = "Maximum {1} characters"), Display(Name = "Country")] public string Country { get; set; } = "";
 
-    public AssetSaveRequest ToRequest() => new(OwnerId, Type, Name, Address, PostalCode, City);
-    public static AssetInput From(AssetDto a) => new() { OwnerId = a.OwnerId, Type = a.Type, Name = a.Name, Address = a.Address, PostalCode = a.PostalCode, City = a.City };
+    public AssetSaveRequest ToRequest() => new(OwnerId, Type, Name, Street, HouseNumber, PostalCode, City, Country);
+    public static AssetInput From(AssetDto a) => new()
+    {
+        OwnerId = a.OwnerId, Type = a.Type, Name = a.Name, Street = a.Street, HouseNumber = a.HouseNumber,
+        PostalCode = a.PostalCode, City = a.City, Country = a.Country,
+    };
 }
 
 public class ExpenseInput

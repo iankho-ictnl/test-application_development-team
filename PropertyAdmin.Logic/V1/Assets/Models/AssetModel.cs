@@ -8,6 +8,8 @@ public sealed record AssetModel(
     string OwnerName,
     AssetType Type,
     string Name,
-    string Address,
+    string Street,
+    string HouseNumber,
     string PostalCode,
-    string City);
+    string City,
+    string Country);

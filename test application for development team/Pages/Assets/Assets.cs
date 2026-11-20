@@ -78,7 +78,7 @@ public class EditModel(ApiClient api, IStringLocalizer<SharedResource> l) : ApiP
                 Done("Asset saved.");
                 return RedirectToPage("Index");
             }
-            AddApiError(r);
+            AddApiError<AssetInput>(r);
         }
         await LoadAsync();
         return Page();

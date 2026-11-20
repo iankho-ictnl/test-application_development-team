@@ -40,8 +40,17 @@ public record OwnerSaveRequest(
     [Required, MaxLength(100)] string Country,
     string? KvkNumber,
     string? VatNumber);
-public record AssetDto(int Id, int OwnerId, string OwnerName, AssetType Type, string Name, string Address, string PostalCode, string City);
-public record AssetSaveRequest([Range(1, int.MaxValue)] int OwnerId, AssetType Type, [Required, MaxLength(200)] string Name, [Required, MaxLength(200)] string Address, [Required, MaxLength(20)] string PostalCode, [Required, MaxLength(100)] string City);
+// D-041: the asset has the same five required address fields as the owner.
+public record AssetDto(int Id, int OwnerId, string OwnerName, AssetType Type, string Name, string Street, string HouseNumber, string PostalCode, string City, string Country);
+public record AssetSaveRequest(
+    [Range(1, int.MaxValue)] int OwnerId,
+    AssetType Type,
+    [Required, MaxLength(200)] string Name,
+    [Required, MaxLength(200)] string Street,
+    [Required, MaxLength(20)] string HouseNumber,
+    [Required, MaxLength(20)] string PostalCode,
+    [Required, MaxLength(100)] string City,
+    [Required, MaxLength(100)] string Country);
 
 // VAT
 public record VatRateDto(int Id, string Name, decimal Percentage, DateOnly ValidFrom, DateOnly? ValidTo);

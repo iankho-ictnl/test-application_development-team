@@ -64,11 +64,7 @@ public sealed partial class S2DemoTests(DemoStack stack)
         var leavingId = OwnerId(browser.Html, leaving);
         var foreignId = OwnerId(browser.Html, foreign);
         var asset = $"Pand {tag}";
-        await browser.PostFormAsync("/Assets/Edit", new Dictionary<string, string>
-        {
-            ["Input.OwnerId"] = leavingId.ToString(), ["Input.Type"] = "Building", ["Input.Name"] = asset,
-            ["Input.Address"] = "Dorpsstraat 1", ["Input.PostalCode"] = "1234 AB", ["Input.City"] = "Ergens",
-        });
+        await browser.PostFormAsync("/Assets/Edit", Asset(leavingId, asset));
         Assert.Equal("/Assets", browser.Path);
         var assetId = LinkId(browser.Html, "Assets", asset);
         await browser.PostFormAsync("/Activities/Edit", new Dictionary<string, string>
@@ -93,11 +89,7 @@ public sealed partial class S2DemoTests(DemoStack stack)
         Assert.Contains(WebUtility.HtmlEncode(leaving), await browser.GetAsync("/Owners"));
 
         // Move the asset away (invoiced lines only), so the owner has no assets left.
-        await browser.PostFormAsync($"/Assets/Edit/{assetId}", new Dictionary<string, string>
-        {
-            ["Input.OwnerId"] = foreignId.ToString(), ["Input.Type"] = "Building", ["Input.Name"] = asset,
-            ["Input.Address"] = "Dorpsstraat 1", ["Input.PostalCode"] = "1234 AB", ["Input.City"] = "Ergens",
-        });
+        await browser.PostFormAsync($"/Assets/Edit/{assetId}", Asset(foreignId, asset));
         Assert.Equal("/Assets", browser.Path);
 
         // Step 4 (TC-DEMO-S2-6, US-2.3, D-045): delete an owner without assets: gone from the list, still on its invoice.
@@ -122,6 +114,14 @@ public sealed partial class S2DemoTests(DemoStack stack)
         ["Input.Name"] = name, ["Input.Email"] = "eigenaar@example.test", ["Input.Phone"] = "+49 30 1234567",
         ["Input.Street"] = "Unter den Linden", ["Input.HouseNumber"] = "77", ["Input.PostalCode"] = "10117",
         ["Input.City"] = "Berlin", ["Input.Country"] = "Duitsland", ["Input.KvkNumber"] = kvk ?? "", ["Input.VatNumber"] = vat ?? "",
+    };
+
+    // D-041: the asset address as five required fields.
+    private static Dictionary<string, string> Asset(int ownerId, string name) => new()
+    {
+        ["Input.OwnerId"] = ownerId.ToString(), ["Input.Type"] = "Building", ["Input.Name"] = name,
+        ["Input.Street"] = "Dorpsstraat", ["Input.HouseNumber"] = "1", ["Input.PostalCode"] = "1234 AB",
+        ["Input.City"] = "Ergens", ["Input.Country"] = "Nederland",
     };
 
     private static bool HasFieldError(string html, string field) =>

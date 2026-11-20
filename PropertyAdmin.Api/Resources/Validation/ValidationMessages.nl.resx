@@ -27,4 +27,7 @@
   <data name="This field can contain at most {1} characters." xml:space="preserve">
     <value>Dit veld mag maximaal {1} tekens bevatten.</value>
   </data>
+  <data name="Choose a valid value." xml:space="preserve">
+    <value>Kies een geldige waarde.</value>
+  </data>
 </root>
