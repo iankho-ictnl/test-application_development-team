@@ -109,6 +109,9 @@ public class ApiClient(HttpClient http)
             if (root.TryGetProperty("message", out var m)) return m.GetString() ?? "";
             if (root.TryGetProperty("errors", out var errors))
                 return string.Join(" ", errors.EnumerateObject().SelectMany(p => p.Value.EnumerateArray().Select(v => v.GetString())));
+            // Problem Details: the detail says why (BUG-10, e.g. an owner that still has assets); the title is only the kind of error.
+            if (root.TryGetProperty("detail", out var d) && d.ValueKind == JsonValueKind.String && !string.IsNullOrWhiteSpace(d.GetString()))
+                return d.GetString()!;
             if (root.TryGetProperty("title", out var t)) return t.GetString() ?? "";
         }
         catch (JsonException)
