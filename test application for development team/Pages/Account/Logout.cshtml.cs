@@ -10,8 +10,17 @@ namespace test_application_for_development_team.Pages.Account;
 /// POST api/auth/logout, so the token in the cookie is refused from then on, then the cookie goes.
 /// The cookie always goes, also when the token was already refused (401) or the API cannot be reached.
 /// </summary>
-public class LogoutModel(ApiClient api, SignInService signIn, ILogger<LogoutModel> logger) : PageModel
+public partial class LogoutModel(ApiClient api, SignInService signIn, ILogger<LogoutModel> logger) : PageModel
 {
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Sign-out: the API answered {Status} to auth/logout; the cookie is removed anyway.")]
+    private static partial void LogLogoutRefused(ILogger logger, int status);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Sign-out: the API could not be reached for auth/logout; the cookie is removed anyway.")]
+    private static partial void LogLogoutUnreachable(ILogger logger, Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Sign-out: auth/logout timed out; the cookie is removed anyway.")]
+    private static partial void LogLogoutTimedOut(ILogger logger, Exception exception);
+
     public IActionResult OnGet() => RedirectToPage("/Index");
 
     public async Task<IActionResult> OnPostAsync()
@@ -20,7 +29,7 @@ public class LogoutModel(ApiClient api, SignInService signIn, ILogger<LogoutMode
         {
             var r = await api.PostAsync("api/auth/logout", null);
             if (!r.Ok && r.Status != System.Net.HttpStatusCode.Unauthorized)
-                logger.LogWarning("Sign-out: the API answered {Status} to auth/logout; the cookie is removed anyway.", (int)r.Status);
+                LogLogoutRefused(logger, (int)r.Status);
         }
         catch (ApiUnauthorizedException)
         {
@@ -28,11 +37,11 @@ public class LogoutModel(ApiClient api, SignInService signIn, ILogger<LogoutMode
         }
         catch (HttpRequestException ex)
         {
-            logger.LogWarning(ex, "Sign-out: the API could not be reached for auth/logout; the cookie is removed anyway.");
+            LogLogoutUnreachable(logger, ex);
         }
         catch (TaskCanceledException ex) when (!HttpContext.RequestAborted.IsCancellationRequested)
         {
-            logger.LogWarning(ex, "Sign-out: auth/logout timed out; the cookie is removed anyway.");
+            LogLogoutTimedOut(logger, ex);
         }
         await signIn.SignOutAsync();
         return RedirectToPage("Login");

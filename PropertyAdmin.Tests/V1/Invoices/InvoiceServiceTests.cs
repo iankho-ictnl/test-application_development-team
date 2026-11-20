@@ -55,9 +55,30 @@ public sealed class InvoiceServiceTests
             service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, InvoiceDate, 14), CancellationToken.None));
         Assert.Equal("Er zijn geen te factureren activiteiten of kosten voor deze eigenaar.", nothingLeft.Message);
 
-        var second = await service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, new DateOnly(2026, 4, 30), 30), CancellationToken.None);
+        var second = await service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, new DateOnly(2026, 4, 30), 14), CancellationToken.None);
         Assert.Equal("2026-0002", second.Number);
         Assert.Equal(75m, second.TotalExclVat);
+        Assert.Equal(new DateOnly(2026, 5, 14), second.DueDate);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(13)]
+    [InlineData(30)]
+    public async Task Create_refuses_a_payment_term_other_than_14_days_BUG6(int paymentTermDays)
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var asset = await SeedAssetAsync(database.Context, "Owner");
+        AddActivity(database.Context, asset, new DateOnly(2026, 3, 2), 200m);
+        await database.Context.SaveChangesAsync();
+        var service = new InvoiceService(database.Context);
+
+        var error = await Assert.ThrowsAsync<BusinessRuleException>(() =>
+            service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, InvoiceDate, paymentTermDays), CancellationToken.None));
+
+        Assert.Equal(InvoiceService.InvalidPaymentTerm, error.Message);
+        database.Context.ChangeTracker.Clear();
+        Assert.Empty(database.Context.Invoices);
     }
 
     [Fact]
@@ -129,6 +150,82 @@ public sealed class InvoiceServiceTests
         var uninvoiced = await service.GetUninvoicedAsync(ownerId, CancellationToken.None);
         Assert.Single(uninvoiced.Activities);
         Assert.Single(uninvoiced.Expenses);
+    }
+
+    [Fact]
+    public async Task Delete_allows_only_the_most_recent_open_invoice_and_reuses_its_number_D056()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var asset = await SeedAssetAsync(database.Context, "Owner");
+        AddActivity(database.Context, asset, new DateOnly(2026, 3, 2), 200m);
+        await database.Context.SaveChangesAsync();
+        var service = new InvoiceService(database.Context);
+        var older = await service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, InvoiceDate, 14), CancellationToken.None);
+        AddActivity(database.Context, asset, new DateOnly(2026, 4, 2), 50m);
+        await database.Context.SaveChangesAsync();
+        var newest = await service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, new DateOnly(2026, 4, 30), 14), CancellationToken.None);
+        Assert.Equal("2026-0002", newest.Number);
+
+        var refused = await Assert.ThrowsAsync<BusinessRuleException>(() => service.DeleteAsync(older.Id, CancellationToken.None));
+        Assert.Equal(InvoiceService.OnlyMostRecentDeletable, refused.Message);
+        Assert.NotNull(await service.GetByIdAsync(older.Id, null, CancellationToken.None));
+
+        Assert.True(await service.DeleteAsync(newest.Id, CancellationToken.None));
+        var again = await service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, new DateOnly(2026, 4, 30), 14), CancellationToken.None);
+        Assert.Equal("2026-0002", again.Number);
+    }
+
+    [Fact]
+    public async Task Delete_refuses_an_open_invoice_of_an_earlier_year_D056()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var asset = await SeedAssetAsync(database.Context, "Owner");
+        AddActivity(database.Context, asset, new DateOnly(2025, 12, 2), 200m);
+        await database.Context.SaveChangesAsync();
+        var service = new InvoiceService(database.Context);
+        var lastYear = await service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, new DateOnly(2025, 12, 31), 14), CancellationToken.None);
+        AddActivity(database.Context, asset, new DateOnly(2026, 1, 2), 50m);
+        await database.Context.SaveChangesAsync();
+        var thisYear = await service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, new DateOnly(2026, 1, 31), 14), CancellationToken.None);
+        Assert.Equal("2026-0001", thisYear.Number);
+
+        var refused = await Assert.ThrowsAsync<BusinessRuleException>(() => service.DeleteAsync(lastYear.Id, CancellationToken.None));
+        Assert.Equal(InvoiceService.OnlyMostRecentDeletable, refused.Message);
+        Assert.True(await service.DeleteAsync(thisYear.Id, CancellationToken.None));
+        Assert.True(await service.DeleteAsync(lastYear.Id, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task Delete_refuses_an_older_open_invoice_when_the_most_recent_is_paid_D056()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var asset = await SeedAssetAsync(database.Context, "Owner");
+        AddActivity(database.Context, asset, new DateOnly(2026, 3, 2), 200m);
+        await database.Context.SaveChangesAsync();
+        var service = new InvoiceService(database.Context);
+        var older = await service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, InvoiceDate, 14), CancellationToken.None);
+        AddActivity(database.Context, asset, new DateOnly(2026, 4, 2), 50m);
+        await database.Context.SaveChangesAsync();
+        var newest = await service.CreateAsync(new InvoiceCreateModel(asset.OwnerId, new DateOnly(2026, 4, 30), 14), CancellationToken.None);
+        Assert.True(await service.MarkPaidAsync(newest.Id, new DateOnly(2026, 5, 1), CancellationToken.None));
+
+        var paid = await Assert.ThrowsAsync<BusinessRuleException>(() => service.DeleteAsync(newest.Id, CancellationToken.None));
+        Assert.Equal("Een betaalde factuur kan niet worden verwijderd.", paid.Message);
+        var refused = await Assert.ThrowsAsync<BusinessRuleException>(() => service.DeleteAsync(older.Id, CancellationToken.None));
+        Assert.Equal(InvoiceService.OnlyMostRecentDeletable, refused.Message);
+    }
+
+    [Fact]
+    public async Task Delete_passes_a_cancellation_through_and_keeps_the_invoice()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        var invoice = await SeedInvoiceAsync(database.Context);
+        var service = new InvoiceService(database.Context);
+        using var cancellation = new CancellationTokenSource();
+        await cancellation.CancelAsync();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => service.DeleteAsync(invoice.Id, cancellation.Token));
+        Assert.NotNull(await service.GetByIdAsync(invoice.Id, null, CancellationToken.None));
     }
 
     [Fact]
@@ -231,6 +328,30 @@ public sealed class InvoiceServiceTests
 
         Assert.Equal(["Owner", "Nieuweweg 7", "4321 BA Gouda", "Nederland", "KvK: 87654321"],
             PropertyAdmin.Logic.V1.Invoices.GetPdf.InvoicePdfRenderer.OwnerBlockLines(model));
+    }
+
+    [Theory]
+    [InlineData("Npgsql.EntityFrameworkCore.PostgreSQL", true)]
+    [InlineData("Microsoft.EntityFrameworkCore.Sqlite", false)]
+    [InlineData("Microsoft.EntityFrameworkCore.InMemory", false)]
+    [InlineData(null, false)]
+    public void Year_lock_is_taken_only_on_PostgreSQL_Q118(string? providerName, bool expected) =>
+        Assert.Equal(expected, InvoiceService.UsesYearLock(providerName));
+
+    [Fact]
+    public async Task Create_and_delete_skip_the_year_lock_on_SQLite_and_reuse_the_freed_number_Q118()
+    {
+        await using var database = await MasterDataTestDatabase.CreateAsync();
+        Assert.False(InvoiceService.UsesYearLock(database.Context.Database.ProviderName));
+        var invoice = await SeedInvoiceAsync(database.Context);
+        var service = new InvoiceService(database.Context);
+
+        Assert.True(await service.DeleteAsync(invoice.Id, CancellationToken.None));
+        database.Context.ChangeTracker.Clear();
+        var again = await service.CreateAsync(new InvoiceCreateModel(invoice.OwnerId, InvoiceDate, 14), CancellationToken.None);
+
+        Assert.Equal(invoice.Number, again.Number);
+        Assert.False(await service.DeleteAsync(invoice.Id, CancellationToken.None));
     }
 
     private static async Task<Asset> SeedAssetAsync(AppDbContext context, string ownerName)
