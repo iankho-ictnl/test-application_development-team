@@ -8,19 +8,25 @@ namespace PropertyAdmin.Tests.V1.Invoices;
 [Collection(ApiCollection.Name)]
 public sealed class InvoicesApiTests(ApiFactory api)
 {
+    /// <summary>
+    /// BUG-6 retest (REQ-009 US-9.4, D-057, T-163 TC-16.1): on both routes a payment term other than 14 days is refused with
+    /// 400 and the reason in the requested language; 14 days is accepted and the due date is the invoice date + 14.
+    /// </summary>
     [Theory]
-    [InlineData("nl-NL", "De betalingstermijn is 14 dagen.")]
-    [InlineData("en-US", "The payment term is 14 days.")]
-    public async Task Create_refuses_another_payment_term_than_14_days_in_lang_BUG6(string lang, string message)
+    [InlineData("/api/v1/invoices", "nl-NL", "De betalingstermijn is 14 dagen.")]
+    [InlineData("/api/v1/invoices", "en-US", "The payment term is 14 days.")]
+    [InlineData("/api/invoices", "nl-NL", "De betalingstermijn is 14 dagen.")]
+    [InlineData("/api/invoices", "en-US", "The payment term is 14 days.")]
+    public async Task Create_refuses_another_payment_term_than_14_days_in_lang_BUG6(string route, string lang, string message)
     {
         var admin = await api.As("Admin");
         var ownerId = await admin.CreateOwner(api.Unique("BUG-6 owner"));
         await admin.CreateActivity(await admin.CreateAsset(ownerId, api.Unique("BUG-6 house")));
 
-        var problem = await ExpectProblem(await admin.PostAsJsonAsync($"/api/v1/invoices?lang={lang}", new { ownerId, date = "2026-03-31", paymentTermDays = 30 }), HttpStatusCode.BadRequest);
+        var problem = await ExpectProblem(await admin.PostAsJsonAsync($"{route}?lang={lang}", new { ownerId, date = "2026-03-31", paymentTermDays = 30 }), HttpStatusCode.BadRequest);
         Assert.Equal(message, problem.GetProperty("detail").GetString());
 
-        var created = await Expect(await admin.PostAsJsonAsync($"/api/v1/invoices?lang={lang}", new { ownerId, date = "2026-03-31", paymentTermDays = 14 }), HttpStatusCode.Created);
+        var created = await Expect(await admin.PostAsJsonAsync($"{route}?lang={lang}", new { ownerId, date = "2026-03-31", paymentTermDays = 14 }), HttpStatusCode.Created);
         Assert.Equal("2026-04-14", created.GetProperty("dueDate").GetString());
     }
 
