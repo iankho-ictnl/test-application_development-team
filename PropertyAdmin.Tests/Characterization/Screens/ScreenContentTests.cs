@@ -104,7 +104,6 @@ public sealed class ScreenContentTests(FrontendFactory web)
 
         Assert.Contains("Inspectie dak", page);
         Assert.Contains("€ 242,00", page);
-        Assert.Contains("name=\"PaymentTermDays\"", page);
     }
 
     [Fact]

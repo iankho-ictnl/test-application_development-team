@@ -110,7 +110,7 @@ public sealed class ScreenValidationTests(FrontendFactory web)
         await admin.CreateActivity(await admin.CreateAsset(ownerId, web.Api.Unique("Formpand")));
         var browser = await web.SignInAs("Admin");
 
-        var response = await browser.Submit($"/Invoices/Create?OwnerId={ownerId}", new() { ["OwnerId"] = $"{ownerId}", ["Date"] = "", ["PaymentTermDays"] = "14" }, "/Invoices/Create");
+        var response = await browser.Submit($"/Invoices/Create?OwnerId={ownerId}", new() { ["OwnerId"] = $"{ownerId}", ["Date"] = "" }, "/Invoices/Create");
 
         await Browser.ExpectSummaryError(response);
         var invoices = await Http.Expect(await admin.GetAsync("/api/invoices"), HttpStatusCode.OK);

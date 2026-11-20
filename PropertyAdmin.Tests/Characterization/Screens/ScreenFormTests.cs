@@ -205,7 +205,7 @@ public sealed class ScreenFormTests(FrontendFactory web)
         await admin.CreateActivity(await admin.CreateAsset(ownerId, web.Api.Unique("Formpand")));
         var browser = await web.SignInAs("Admin");
 
-        var response = await browser.Submit($"/Invoices/Create?OwnerId={ownerId}", new() { ["OwnerId"] = $"{ownerId}", ["Date"] = "2026-04-30", ["PaymentTermDays"] = "14" }, "/Invoices/Create");
+        var response = await browser.Submit($"/Invoices/Create?OwnerId={ownerId}", new() { ["OwnerId"] = $"{ownerId}", ["Date"] = "2026-04-30" }, "/Invoices/Create");
 
         var location = Browser.ExpectRedirectPrefix(response, "/Invoices/Details/");
         var id = int.Parse(location.AbsolutePath[(location.AbsolutePath.LastIndexOf('/') + 1)..], System.Globalization.CultureInfo.InvariantCulture);
