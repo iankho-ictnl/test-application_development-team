@@ -13,13 +13,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
     public DbSet<Invoice> Invoices => Set<Invoice>();
     public DbSet<InvoiceLine> InvoiceLines => Set<InvoiceLine>();
 
-    protected override void OnModelCreating(ModelBuilder b)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(b);
+        base.OnModelCreating(builder);
 
-        b.Entity<ApplicationUser>().HasOne(u => u.Owner).WithMany().HasForeignKey(u => u.OwnerId).OnDelete(DeleteBehavior.SetNull);
+        builder.Entity<ApplicationUser>().HasOne(u => u.Owner).WithMany().HasForeignKey(u => u.OwnerId).OnDelete(DeleteBehavior.SetNull);
 
-        b.Entity<Owner>(e =>
+        builder.Entity<Owner>(e =>
         {
             e.Property(x => x.Name).HasMaxLength(200).IsRequired();
             e.Property(x => x.Email).HasMaxLength(200);
@@ -33,7 +33,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
             e.Property(x => x.VatNumber).HasMaxLength(14);
         });
 
-        b.Entity<Asset>(e =>
+        builder.Entity<Asset>(e =>
         {
             e.HasOne(x => x.Owner).WithMany(o => o.Assets).HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Restrict);
             e.Property(x => x.Name).HasMaxLength(200).IsRequired();
@@ -43,14 +43,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
             e.Property(x => x.Type).HasConversion<string>().HasMaxLength(20);
         });
 
-        b.Entity<VatRate>(e =>
+        builder.Entity<VatRate>(e =>
         {
             e.Property(x => x.Name).HasMaxLength(50).IsRequired();
             e.Property(x => x.Percentage).HasPrecision(5, 2);
             e.HasIndex(x => new { x.Name, x.ValidFrom }).IsUnique();
         });
 
-        b.Entity<Expense>(e =>
+        builder.Entity<Expense>(e =>
         {
             e.HasOne(x => x.Asset).WithMany().HasForeignKey(x => x.AssetId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(x => x.Invoice).WithMany().HasForeignKey(x => x.InvoiceId).OnDelete(DeleteBehavior.Restrict);
@@ -62,7 +62,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
             e.HasIndex(x => new { x.AssetId, x.Date });
         });
 
-        b.Entity<Activity>(e =>
+        builder.Entity<Activity>(e =>
         {
             e.HasOne(x => x.Asset).WithMany().HasForeignKey(x => x.AssetId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(x => x.Invoice).WithMany().HasForeignKey(x => x.InvoiceId).OnDelete(DeleteBehavior.Restrict);
@@ -78,7 +78,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
             e.HasIndex(x => new { x.AssetId, x.Date });
         });
 
-        b.Entity<Invoice>(e =>
+        builder.Entity<Invoice>(e =>
         {
             e.HasOne(x => x.Owner).WithMany().HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Restrict);
             e.HasMany(x => x.Lines).WithOne().HasForeignKey(l => l.InvoiceId).OnDelete(DeleteBehavior.Cascade);
@@ -87,7 +87,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
             e.Property(x => x.Status).HasConversion<string>().HasMaxLength(20);
         });
 
-        b.Entity<InvoiceLine>(e =>
+        builder.Entity<InvoiceLine>(e =>
         {
             e.Property(x => x.Description).HasMaxLength(600).IsRequired();
             e.Property(x => x.AmountExclVat).HasPrecision(18, 2);
