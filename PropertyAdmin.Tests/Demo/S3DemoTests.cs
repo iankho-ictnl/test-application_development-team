@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -53,7 +54,7 @@ public sealed class S3DemoTests(DemoStack stack)
         // TC-DEMO-S3-4 (US-3.1, D-041): saving with only a name gives a field error at every address field.
         await browser.PostFormAsync("/Assets/Edit", new Dictionary<string, string>
         {
-            ["Input.OwnerId"] = ownerId.ToString(), ["Input.Type"] = "Building", ["Input.Name"] = asset,
+            ["Input.OwnerId"] = ownerId.ToString(CultureInfo.InvariantCulture), ["Input.Type"] = "Building", ["Input.Name"] = asset,
         });
         Assert.StartsWith("/Assets/Edit", browser.Path);
         foreach (var field in new[] { "Street", "HouseNumber", "PostalCode", "City", "Country" })
@@ -72,7 +73,7 @@ public sealed class S3DemoTests(DemoStack stack)
         var activity = $"Onderhoud dak S3 {tag}";
         await browser.PostFormAsync("/Activities/Edit", new Dictionary<string, string>
         {
-            ["Input.AssetId"] = assetId.ToString(), ["Input.Kind"] = "Maintenance", ["Input.Description"] = activity,
+            ["Input.AssetId"] = assetId.ToString(CultureInfo.InvariantCulture), ["Input.Kind"] = "Maintenance", ["Input.Description"] = activity,
             ["Input.PricingType"] = "Fixed", ["Input.FixedPrice"] = "250", ["Input.VatRateName"] = "Hoog",
         });
         Assert.Equal($"/Assets/Details/{assetId}", browser.Path);
@@ -90,7 +91,7 @@ public sealed class S3DemoTests(DemoStack stack)
         Assert.DoesNotContain(WebUtility.HtmlEncode(activity), await browser.GetAsync($"/Invoices/Create?OwnerId={ownerId}"));
         await browser.PostFormAsync("/Invoices/Create", new Dictionary<string, string>
         {
-            ["OwnerId"] = newOwnerId.ToString(), ["PaymentTermDays"] = "14",
+            ["OwnerId"] = newOwnerId.ToString(CultureInfo.InvariantCulture), ["PaymentTermDays"] = "14",
         });
         Assert.Matches("^/Invoices/Details/\\d+$", browser.Path);
         Assert.Contains(WebUtility.HtmlEncode(newOwner), browser.Html);
@@ -107,7 +108,7 @@ public sealed class S3DemoTests(DemoStack stack)
     // D-041: the asset address as five required fields.
     private static Dictionary<string, string> Asset(int ownerId, string name, string country) => new()
     {
-        ["Input.OwnerId"] = ownerId.ToString(), ["Input.Type"] = "Building", ["Input.Name"] = name,
+        ["Input.OwnerId"] = ownerId.ToString(CultureInfo.InvariantCulture), ["Input.Type"] = "Building", ["Input.Name"] = name,
         ["Input.Street"] = "Hauptstrasse", ["Input.HouseNumber"] = "5", ["Input.PostalCode"] = "10115",
         ["Input.City"] = "Berlin", ["Input.Country"] = country,
     };
@@ -120,6 +121,6 @@ public sealed class S3DemoTests(DemoStack stack)
     {
         var m = Regex.Match(html, $"href=\"/{feature}/Details/(\\d+)\">{Regex.Escape(WebUtility.HtmlEncode(name))}<");
         Assert.True(m.Success, $"no link to {name} in /{feature}");
-        return int.Parse(m.Groups[1].Value);
+        return int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture);
     }
 }
