@@ -73,6 +73,17 @@ builder.Services.Configure<PropertyAdmin.Logic.V1.Invoices.GetPdf.CompanyOptions
 // generic message per JSON path, never a .NET type name or exception text (D-022).
 builder.Services.AddControllers()
     .AddJsonOptions(o => o.AllowInputFormatterExceptionMessages = false);
+// REQ-011 (T-114): validation messages in the request language from Accept-Language (nl-NL default,
+// en-US); only the UI culture changes, number and date formatting keep the process culture.
+builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
+builder.Services.Configure<Microsoft.AspNetCore.Builder.RequestLocalizationOptions>(o =>
+{
+    var culture = System.Globalization.CultureInfo.CurrentCulture;
+    o.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture(culture, new System.Globalization.CultureInfo("nl-NL"));
+    o.SupportedCultures = [culture];
+    o.SupportedUICultures = [new System.Globalization.CultureInfo("nl-NL"), new System.Globalization.CultureInfo("en-US")];
+    o.RequestCultureProviders = [new Microsoft.AspNetCore.Localization.AcceptLanguageHeaderRequestCultureProvider()];
+});
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<PropertyAdmin.Api.ApiExceptionHandler>();
@@ -95,6 +106,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();
+app.UseRequestLocalization();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
