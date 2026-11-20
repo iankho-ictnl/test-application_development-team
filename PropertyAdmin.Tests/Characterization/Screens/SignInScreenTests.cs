@@ -87,8 +87,7 @@ public sealed class SignInScreenTests(FrontendFactory web)
         await web.Api.CreateUserAsync(userName, "Staff");
         var api = web.Api.WithToken(await web.Api.LoginAsync(userName, ApiFactory.Password));
         var sharedKey = (await Http.Expect(await api.GetAsync("/api/auth/2fa"), HttpStatusCode.OK)).GetProperty("sharedKey").GetString()!;
-        // The first set-up changes the security stamp (see AuthUsersTests), so sign in to the API again.
-        api = web.Api.WithToken(await web.Api.LoginAsync(userName, ApiFactory.Password));
+        // BUG-13 (D-058): the first set-up keeps the session, so the same token enables 2FA.
         await Http.Expect(await api.PostAsJsonAsync("/api/auth/2fa/enable", new { code = AuthTests.CreateAuthenticatorCode(sharedKey) }), HttpStatusCode.OK);
         var browser = web.NewBrowser();
 
@@ -136,7 +135,7 @@ public sealed class SignInScreenTests(FrontendFactory web)
 
     [Fact]
     [Trait("Requirement", "REQ-013")]
-    public async Task Profile_shows_the_two_factor_set_up_and_its_first_visit_ends_the_api_session()
+    public async Task Profile_shows_the_two_factor_set_up_and_the_user_stays_signed_in()
     {
         var userName = web.Api.Unique("screen.profile");
         await web.Api.CreateUserAsync(userName, "Viewer");
@@ -145,13 +144,11 @@ public sealed class SignInScreenTests(FrontendFactory web)
         var page = await browser.Page("/Profile");
         Assert.Contains("data:image/png;base64,", page);
 
-        // Current behaviour of BUG-13 (testing.md), not the expected behaviour: the first set-up
-        // creates the authenticator key and changes the security stamp, so the next API call is
-        // 401 and the frontend signs the user out. When BUG-13 is fixed, this line changes to
-        // await browser.Page("/Owners").
-        Browser.ExpectRedirect(await browser.GetAsync("/Owners"), "/Account/Login");
-        browser = await web.SignIn(userName);
-        await browser.Page("/Profile");
+        // BUG-13 (D-058): the first visit to /Profile creates the authenticator key without
+        // ending the session, so the user stays signed in on the next screens.
+        await browser.Page("/Owners");
+        var again = await browser.Page("/Profile");
+        Assert.Contains("data:image/png;base64,", again);
         await browser.Page("/Owners");
     }
 }

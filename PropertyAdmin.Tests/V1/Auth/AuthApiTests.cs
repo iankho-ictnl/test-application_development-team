@@ -27,8 +27,12 @@ public sealed class AuthApiTests(ApiFactory api)
 
         var setup = await Expect(await client.GetAsync("/api/v1/auth/2fa"), HttpStatusCode.OK);
         Assert.False(setup.GetProperty("enabled").GetBoolean());
-        // The first set-up creates the authenticator key, which renews the security stamp (as on /api/auth).
-        await ExpectStatus(await client.PostAsync("/api/v1/auth/2fa/disable", null), HttpStatusCode.Unauthorized);
+        // BUG-13 (D-058): creating the first authenticator key keeps the security stamp, so the token still works.
+        var again = await Expect(await client.GetAsync("/api/v1/auth/2fa"), HttpStatusCode.OK);
+        Assert.Equal(setup.GetProperty("sharedKey").GetString(), again.GetProperty("sharedKey").GetString());
+        // Signing out renews the stamp, after which the same token is refused.
+        await ExpectStatus(await client.PostAsync("/api/v1/auth/logout", null), HttpStatusCode.NoContent);
+        await ExpectStatus(await client.GetAsync("/api/v1/auth/2fa"), HttpStatusCode.Unauthorized);
     }
 
     [Fact]

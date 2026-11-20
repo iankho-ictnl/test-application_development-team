@@ -26,9 +26,10 @@ public sealed class ScreenAccessTests(FrontendFactory web)
         ["Owner"] = [],
     };
 
-    // null: every signed-in user. Profile is last because of BUG-13 (testing.md): its first visit ends the API session.
+    // null: every signed-in user. BUG-13 (D-058): /Profile comes first, the screens after it must still be reachable.
     private static readonly (string Url, string? Permission)[] Screens =
     [
+        ("/Profile", null),
         ("/", null),
         ("/Owners", ReadAll), ("/Owners/Details/{owner}", ReadAll), ("/Owners/Edit", OwnersAssets), ("/Owners/Edit/{owner}", OwnersAssets),
         ("/Assets", ReadAll), ("/Assets/Details/{asset}", ReadAll), ("/Assets/Edit", OwnersAssets), ("/Assets/Edit/{asset}", OwnersAssets),
@@ -38,7 +39,6 @@ public sealed class ScreenAccessTests(FrontendFactory web)
         ("/Invoices", ReadAll), ("/Invoices/Details/{invoice}", ReadAll), ("/Invoices/Create", Invoices), ("/Invoices/Details/{invoice}?handler=Pdf", ReadAll),
         ("/Reports", Reports),
         ("/Admin/Users", Users), ("/Admin/Users/Edit", Users), ("/Admin/Roles", Users),
-        ("/Profile", null),
     ];
 
     public static TheoryData<string> Roles => new(FrontendFactory.Roles);

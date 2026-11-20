@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using PropertyAdmin.Logic;
 using PropertyAdmin.Logic.V1.Auth;
 using PropertyAdmin.Logic.V1.Auth.Models;
@@ -102,6 +103,38 @@ public sealed class AuthServiceTests
     }
 
     [Fact]
+    public async Task Two_factor_setup_creates_a_missing_key_without_changing_the_security_stamp()
+    {
+        // BUG-13 (D-058): opening /Profile must not end the session.
+        await using var host = await IdentityTestHost.CreateAsync();
+        var user = await host.CreateUserAsync("nostamp");
+        var stamp = await host.Users.GetSecurityStampAsync(user);
+
+        var setup = (await Service(host).GetTwoFactorAsync(user.Id, CancellationToken.None))!;
+
+        Assert.False(string.IsNullOrEmpty(setup.SharedKey));
+        Assert.Equal(stamp, await host.Users.GetSecurityStampAsync(user));
+        host.Db.ChangeTracker.Clear();
+        var stored = (await host.Users.FindByIdAsync(user.Id))!;
+        Assert.Equal(setup.SharedKey, await host.Users.GetAuthenticatorKeyAsync(stored));
+        Assert.Equal(stamp, await host.Users.GetSecurityStampAsync(stored));
+    }
+
+    [Fact]
+    public async Task Two_factor_setup_with_a_cancelled_request_passes_the_cancellation_through_and_creates_no_key()
+    {
+        await using var host = await IdentityTestHost.CreateAsync();
+        var user = await host.CreateUserAsync("setupcancel");
+        using var cancellation = new CancellationTokenSource();
+        await cancellation.CancelAsync();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => Service(host).GetTwoFactorAsync(user.Id, cancellation.Token));
+
+        host.Db.ChangeTracker.Clear();
+        Assert.Null(await host.Users.GetAuthenticatorKeyAsync((await host.Users.FindByIdAsync(user.Id))!));
+    }
+
+    [Fact]
     public async Task Two_factor_setup_hides_the_key_and_uri_once_two_factor_is_on()
     {
         await using var host = await IdentityTestHost.CreateAsync();
@@ -123,11 +156,13 @@ public sealed class AuthServiceTests
         await using var host = await IdentityTestHost.CreateAsync();
         var user = await TwoFactorUserAsync(host, "disable");
         var oldKey = await host.Users.GetAuthenticatorKeyAsync(user);
+        var oldStamp = await host.Users.GetSecurityStampAsync(user);
         var handler = new PropertyAdmin.Logic.V1.Auth.DisableTwoFactor.DisableTwoFactorHandler(Service(host));
 
         Assert.True((await handler.HandleAsync(new(user.Id, IdentityTestHost.Password, null), CancellationToken.None)).Found);
         Assert.False(await host.Users.GetTwoFactorEnabledAsync(user));
         Assert.NotEqual(oldKey, await host.Users.GetAuthenticatorKeyAsync(user));
+        Assert.NotEqual(oldStamp, await host.Users.GetSecurityStampAsync(user));
         Assert.False((await handler.HandleAsync(new("unknown", IdentityTestHost.Password, null), CancellationToken.None)).Found);
     }
 
@@ -265,7 +300,8 @@ public sealed class AuthServiceTests
             PropertyAdmin.Api.V1.Auth.Login.Mapping.ToCommand(new PropertyAdmin.Api.V1.Auth.Login.Request("user", "secret")));
     }
 
-    private static AuthService Service(IdentityTestHost host) => new(host.Users, host.Roles, host.Tokens);
+    private static AuthService Service(IdentityTestHost host) =>
+        new(host.Users, host.Roles, host.Tokens, host.Services.GetRequiredService<Microsoft.AspNetCore.Identity.IUserStore<PropertyAdmin.Data.ApplicationUser>>());
 
     private sealed class CountingPasswordHasher(Microsoft.AspNetCore.Identity.IPasswordHasher<PropertyAdmin.Data.ApplicationUser> inner)
         : Microsoft.AspNetCore.Identity.IPasswordHasher<PropertyAdmin.Data.ApplicationUser>

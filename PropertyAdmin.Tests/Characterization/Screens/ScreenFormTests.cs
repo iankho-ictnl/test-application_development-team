@@ -282,10 +282,6 @@ public sealed class ScreenFormTests(FrontendFactory web)
         var userName = web.Api.Unique("screen.profile2fa");
         await web.Api.CreateUserAsync(userName, "Viewer");
         var browser = await web.SignIn(userName);
-        await browser.Page("/Profile");
-        // Current behaviour of BUG-13 (testing.md): the first visit to /Profile ends the API session,
-        // so sign in again before the form is used. When BUG-13 is fixed, this line can go.
-        browser = await web.SignIn(userName);
         var page = await browser.Page("/Profile");
         var sharedKey = System.Text.RegularExpressions.Regex.Match(page, "font-monospace\">([A-Za-z0-9 ]+)</span>").Groups[1].Value;
         Assert.False(string.IsNullOrWhiteSpace(sharedKey), "The profile page shows no authenticator key");
