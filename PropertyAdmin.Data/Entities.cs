@@ -17,6 +17,8 @@ public class Owner
     public string? Address { get; set; }
     public string? PostalCode { get; set; }
     public string? City { get; set; }
+    /// <summary>Owners are never deleted (Q-026); the 7-year anonymization term counts from this date (REQ-024).</summary>
+    public DateOnly? InactiveSince { get; set; }
     public List<Asset> Assets { get; set; } = [];
 }
 
