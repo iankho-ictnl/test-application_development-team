@@ -9,7 +9,7 @@ namespace PropertyAdmin.Tests.Demo;
 /// S2 demo: "/Owners: save with only a name gives field errors; a foreign address and DE123456789 are accepted,
 /// XX123 is refused; delete an owner without assets: gone from the list, still on its invoices; owner with assets:
 /// refused". Traces: REQ-002 (US-2.1, US-2.1a, US-2.1b, US-2.1d, US-2.3, D-041, D-045), REQ-011, REQ-030.
-/// The API message texts (D-049) are checked once F8 is merged; until then the steps check where the error is shown.
+/// The API message texts (D-049: the frontend sends lang, the API answers in that language) are checked in both languages.
 /// </summary>
 [Collection(DemoCollection.Name)]
 [Trait("Category", "Demo")]
@@ -54,6 +54,8 @@ public sealed partial class S2DemoTests(DemoStack stack)
         await browser.PostFormAsync("/Owners/Edit", Owner($"Ongeldig btw {tag}", vat: "XX123"));
         Assert.StartsWith("/Owners/Edit", browser.Path);
         Assert.True(HasFieldError(browser.Html, "VatNumber"), $"XX123 not refused at the VAT field ({culture})");
+        // TC-DEMO-S2-9 (D-049, REQ-011): the API's VAT message in the screen's language, at the VAT field.
+        Assert.Matches(FieldErrorText("VatNumber", Text(lang, "Btw-nummer heeft geen geldig EU-formaat.", "The VAT number is not in a valid EU format.")), browser.Html);
         Assert.DoesNotContain(WebUtility.HtmlEncode($"Ongeldig btw {tag}"), await browser.GetAsync("/Owners"));
 
         // Prepare step 4: an owner with an invoice and no assets left (its asset moves to the foreign owner).
@@ -86,6 +88,8 @@ public sealed partial class S2DemoTests(DemoStack stack)
         await browser.PostFormAsync("/Owners", new Dictionary<string, string>(), $"/Owners?id={leavingId}&handler=Delete");
         Assert.Equal(HttpStatusCode.OK, browser.Status);
         Assert.Contains("validation-summary-errors", browser.Html);
+        // TC-DEMO-S2-10 (US-2.3, D-049, REQ-011): the refusal says why, in the screen's language.
+        Assert.Contains(WebUtility.HtmlEncode(Text(lang, "Eigenaar heeft nog objecten en kan niet worden verwijderd.", "The owner still has assets and cannot be deleted.")), browser.Html);
         Assert.Contains(WebUtility.HtmlEncode(leaving), await browser.GetAsync("/Owners"));
 
         // Move the asset away (invoiced lines only), so the owner has no assets left.
@@ -122,6 +126,11 @@ public sealed partial class S2DemoTests(DemoStack stack)
 
     private static bool HasFieldError(string html, string field) =>
         Regex.IsMatch(html, $"class=\"[^\"]*field-validation-error[^\"]*\" data-valmsg-for=\"Input.{field}\"");
+
+    private static string Text(string lang, string dutch, string english) => lang == "nl" ? dutch : english;
+
+    private static string FieldErrorText(string field, string text) =>
+        $"data-valmsg-for=\"Input.{field}\"[^>]*>(<span[^>]*>)?{Regex.Escape(WebUtility.HtmlEncode(text))}<";
 
     private static int OwnerId(string html, string name) => LinkId(html, "Owners", name);
 
