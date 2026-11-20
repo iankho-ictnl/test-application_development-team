@@ -155,4 +155,5 @@
   <data name="KvK number (optional)" xml:space="preserve"><value>KvK number (optional)</value></data>
   <data name="VAT number" xml:space="preserve"><value>VAT number</value></data>
   <data name="VAT number (optional)" xml:space="preserve"><value>VAT number (optional)</value></data>
+  <data name="Eigenaar heeft nog objecten en kan niet worden verwijderd." xml:space="preserve"><value>The owner still has assets and cannot be deleted.</value></data>
 </root>
