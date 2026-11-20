@@ -1,3 +1,4 @@
+using System.Globalization;
 using PropertyAdmin.Data;
 using PropertyAdmin.Logic;
 using PropertyAdmin.Logic.V1.VatRates;
@@ -39,7 +40,7 @@ public sealed class VatRateServiceTests
         await using var database = await MasterDataTestDatabase.CreateAsync();
         await SeedRatesAsync(database.Context);
 
-        var percentage = await new VatRateService(database.Context).GetPercentageAsync("Hoog", DateOnly.Parse(date), CancellationToken.None);
+        var percentage = await new VatRateService(database.Context).GetPercentageAsync("Hoog", DateOnly.Parse(date, CultureInfo.InvariantCulture), CancellationToken.None);
 
         Assert.Equal(expected, percentage);
     }
@@ -54,7 +55,7 @@ public sealed class VatRateServiceTests
         await SeedRatesAsync(database.Context);
 
         var exception = await Assert.ThrowsAsync<BusinessRuleException>(
-            () => new VatRateService(database.Context).GetPercentageAsync(name, DateOnly.Parse(date), CancellationToken.None));
+            () => new VatRateService(database.Context).GetPercentageAsync(name, DateOnly.Parse(date, CultureInfo.InvariantCulture), CancellationToken.None));
 
         Assert.StartsWith($"Er is geen btw-tarief '{name}' geldig op ", exception.Message);
     }

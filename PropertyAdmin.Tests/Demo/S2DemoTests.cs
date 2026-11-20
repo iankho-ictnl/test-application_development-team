@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -66,20 +67,20 @@ public sealed partial class S2DemoTests(DemoStack stack)
         var asset = $"Pand {tag}";
         await browser.PostFormAsync("/Assets/Edit", new Dictionary<string, string>
         {
-            ["Input.OwnerId"] = leavingId.ToString(), ["Input.Type"] = "Building", ["Input.Name"] = asset,
+            ["Input.OwnerId"] = leavingId.ToString(CultureInfo.InvariantCulture), ["Input.Type"] = "Building", ["Input.Name"] = asset,
             ["Input.Address"] = "Dorpsstraat 1", ["Input.PostalCode"] = "1234 AB", ["Input.City"] = "Ergens",
         });
         Assert.Equal("/Assets", browser.Path);
         var assetId = LinkId(browser.Html, "Assets", asset);
         await browser.PostFormAsync("/Activities/Edit", new Dictionary<string, string>
         {
-            ["Input.AssetId"] = assetId.ToString(), ["Input.Kind"] = "Administration", ["Input.Description"] = "Jaarafrekening",
+            ["Input.AssetId"] = assetId.ToString(CultureInfo.InvariantCulture), ["Input.Kind"] = "Administration", ["Input.Description"] = "Jaarafrekening",
             ["Input.PricingType"] = "Fixed", ["Input.FixedPrice"] = "100", ["Input.VatRateName"] = "Hoog",
         });
         Assert.Equal($"/Assets/Details/{assetId}", browser.Path);
         await browser.PostFormAsync("/Invoices/Create", new Dictionary<string, string>
         {
-            ["OwnerId"] = leavingId.ToString(), ["PaymentTermDays"] = "14",
+            ["OwnerId"] = leavingId.ToString(CultureInfo.InvariantCulture), ["PaymentTermDays"] = "14",
         });
         var invoice = InvoicePath().Match(browser.Path);
         Assert.True(invoice.Success, $"invoice not created ({culture}): {browser.Path}");
@@ -95,7 +96,7 @@ public sealed partial class S2DemoTests(DemoStack stack)
         // Move the asset away (invoiced lines only), so the owner has no assets left.
         await browser.PostFormAsync($"/Assets/Edit/{assetId}", new Dictionary<string, string>
         {
-            ["Input.OwnerId"] = foreignId.ToString(), ["Input.Type"] = "Building", ["Input.Name"] = asset,
+            ["Input.OwnerId"] = foreignId.ToString(CultureInfo.InvariantCulture), ["Input.Type"] = "Building", ["Input.Name"] = asset,
             ["Input.Address"] = "Dorpsstraat 1", ["Input.PostalCode"] = "1234 AB", ["Input.City"] = "Ergens",
         });
         Assert.Equal("/Assets", browser.Path);
@@ -138,7 +139,7 @@ public sealed partial class S2DemoTests(DemoStack stack)
     {
         var m = Regex.Match(html, $"href=\"/{feature}/Details/(\\d+)\">{Regex.Escape(WebUtility.HtmlEncode(name))}<");
         Assert.True(m.Success, $"no link to {name} in /{feature}");
-        return int.Parse(m.Groups[1].Value);
+        return int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture);
     }
 
     [GeneratedRegex("^/Invoices/Details/\\d+$")]

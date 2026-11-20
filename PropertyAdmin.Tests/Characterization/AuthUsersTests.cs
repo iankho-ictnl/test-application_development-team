@@ -135,6 +135,14 @@ public class AuthTests(ApiFactory api)
 [Collection(ApiCollection.Name)]
 public class UsersTests(ApiFactory api)
 {
+    // Request bodies as static readonly arrays (CA1861); the JSON sent is unchanged.
+    private static readonly string[] StaffRole = ["Staff"];
+    private static readonly string[] ViewerRole = ["Viewer"];
+    private static readonly string[] NoSuchRole = ["NoSuchRole"];
+    private static readonly string[] ReportsPermission = ["Reports"];
+    private static readonly string[] UnknownPermission = ["Unknown"];
+    private static readonly string[] ReportsAndReadAllPermissions = ["Reports", "ReadAll"];
+
     [Fact]
     public async Task Anonymous_is_401_and_without_permission_is_403()
     {
@@ -160,12 +168,12 @@ public class UsersTests(ApiFactory api)
     {
         var admin = await api.As("Admin");
         var userName = api.Unique("nieuw");
-        var response = await admin.PostAsJsonAsync("/api/users", new { userName, email = $"{userName}@example.test", password = ApiFactory.Password, roles = new[] { "Staff" } });
+        var response = await admin.PostAsJsonAsync("/api/users", new { userName, email = $"{userName}@example.test",         password = ApiFactory.Password, roles = StaffRole });
         var created = await Expect(response, HttpStatusCode.Created);
         HasShape(created, UserShape);
         var id = created.GetProperty("id").GetString();
 
-        var updated = await Expect(await admin.PutAsJsonAsync($"/api/users/{id}", new { email = $"{userName}@example.test", roles = new[] { "Viewer" }, lockedOut = true }), HttpStatusCode.OK);
+        var updated = await Expect(await admin.PutAsJsonAsync($"/api/users/{id}", new { email = $"{userName}@example.test", roles = ViewerRole, lockedOut = true }), HttpStatusCode.OK);
         Assert.True(updated.GetProperty("lockedOut").GetBoolean());
         Assert.Equal(["Viewer"], updated.GetProperty("roles").EnumerateArray().Select(r => r.GetString()));
 
@@ -179,9 +187,9 @@ public class UsersTests(ApiFactory api)
     public async Task Invalid_creates_are_400()
     {
         var admin = await api.As("Admin");
-        await ExpectProblem(await admin.PostAsJsonAsync("/api/users", new { userName = api.Unique("u"), email = "u@example.test", password = ApiFactory.Password, roles = new[] { "NoSuchRole" } }), HttpStatusCode.BadRequest, DomainTitle);
-        await ExpectProblem(await admin.PostAsJsonAsync("/api/users", new { userName = api.Unique("u"), email = "u2@example.test", password = "short", roles = new[] { "Staff" } }), HttpStatusCode.BadRequest, DomainTitle);
-        await ExpectValidationProblem(await admin.PostAsJsonAsync("/api/users", new { userName = api.Unique("u"), email = "not-an-email", password = ApiFactory.Password, roles = new[] { "Staff" } }));
+        await ExpectProblem(await admin.PostAsJsonAsync("/api/users", new { userName = api.Unique("u"), email = "u@example.test",         password = ApiFactory.Password, roles = NoSuchRole }), HttpStatusCode.BadRequest, DomainTitle);
+                await ExpectProblem(await admin.PostAsJsonAsync("/api/users", new { userName = api.Unique("u"), email = "u2@example.test", password = "short", roles = StaffRole }), HttpStatusCode.BadRequest, DomainTitle);
+                await ExpectValidationProblem(await admin.PostAsJsonAsync("/api/users", new { userName = api.Unique("u"), email = "not-an-email", password = ApiFactory.Password, roles = StaffRole }));
     }
 
     [Fact]
@@ -201,7 +209,7 @@ public class UsersTests(ApiFactory api)
         var adminIds = list.EnumerateArray().Where(u => u.GetProperty("roles").EnumerateArray().Any(r => r.GetString() == "Admin") && !u.GetProperty("lockedOut").GetBoolean()).ToList();
         Assert.Single(adminIds);
         var id = adminIds[0].GetProperty("id").GetString();
-        await ExpectProblem(await admin.PutAsJsonAsync($"/api/users/{id}", new { email = "admin.test@example.test", roles = new[] { "Viewer" }, lockedOut = false }), HttpStatusCode.BadRequest, DomainTitle);
+        await ExpectProblem(await admin.PutAsJsonAsync($"/api/users/{id}", new { email = "admin.test@example.test", roles = ViewerRole, lockedOut = false }), HttpStatusCode.BadRequest, DomainTitle);
         await ExpectProblem(await admin.DeleteAsync($"/api/users/{id}"), HttpStatusCode.BadRequest, DomainTitle);
     }
 
@@ -214,10 +222,10 @@ public class UsersTests(ApiFactory api)
         HasShape(adminRole, "name", "permissions", "userCount");
 
         var name = api.Unique("Rol");
-        await ExpectStatus(await admin.PostAsJsonAsync("/api/roles", new { name, permissions = new[] { "Reports" } }), HttpStatusCode.NoContent);
-        await ExpectProblem(await admin.PostAsJsonAsync("/api/roles", new { name, permissions = new[] { "Reports" } }), HttpStatusCode.BadRequest, DomainTitle);
-        await ExpectProblem(await admin.PostAsJsonAsync("/api/roles", new { name = api.Unique("Rol"), permissions = new[] { "Unknown" } }), HttpStatusCode.BadRequest, DomainTitle);
-        await ExpectStatus(await admin.PutAsJsonAsync($"/api/roles/{name}", new { name, permissions = new[] { "Reports", "ReadAll" } }), HttpStatusCode.NoContent);
+        await ExpectStatus(await admin.PostAsJsonAsync("/api/roles", new { name, permissions = ReportsPermission }), HttpStatusCode.NoContent);
+        await ExpectProblem(await admin.PostAsJsonAsync("/api/roles", new { name, permissions = ReportsPermission }), HttpStatusCode.BadRequest, DomainTitle);
+        await ExpectProblem(await admin.PostAsJsonAsync("/api/roles", new { name = api.Unique("Rol"), permissions = UnknownPermission }), HttpStatusCode.BadRequest, DomainTitle);
+        await ExpectStatus(await admin.PutAsJsonAsync($"/api/roles/{name}", new { name, permissions = ReportsAndReadAllPermissions }), HttpStatusCode.NoContent);
         await ExpectStatus(await admin.PutAsJsonAsync("/api/roles/NoSuchRole", new { name = "X", permissions = Array.Empty<string>() }), HttpStatusCode.NotFound);
         await ExpectProblem(await admin.DeleteAsync("/api/roles/Admin"), HttpStatusCode.BadRequest, DomainTitle);
         await ExpectStatus(await admin.DeleteAsync($"/api/roles/{name}"), HttpStatusCode.NoContent);

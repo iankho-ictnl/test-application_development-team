@@ -20,7 +20,7 @@ namespace PropertyAdmin.Tests.Demo;
 /// frontend host whose ApiClient calls that API host. Every password is generated per run and handed over in
 /// memory only (C4); the Testcontainers resource reaper stays on (C7). Data is fictitious (C5).
 /// </summary>
-public sealed class DemoStack : IAsyncLifetime
+public sealed class DemoStack : IAsyncLifetime, IDisposable
 {
     public const string PostgresImage = "postgres:18-trixie";
 
@@ -73,9 +73,17 @@ public sealed class DemoStack : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        _frontend?.Dispose();
-        _api?.Dispose();
+        Dispose();
         await _db.DisposeAsync();
+    }
+
+    /// <summary>Stops the frontend and API hosts (CA1001); xUnit also calls it after DisposeAsync, then it does nothing.</summary>
+    public void Dispose()
+    {
+        _frontend?.Dispose();
+        _frontend = null;
+        _api?.Dispose();
+        _api = null;
     }
 
     private static string Secret() => Convert.ToHexString(RandomNumberGenerator.GetBytes(24));
