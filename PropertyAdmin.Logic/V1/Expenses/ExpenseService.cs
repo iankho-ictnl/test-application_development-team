@@ -7,12 +7,12 @@ namespace PropertyAdmin.Logic.V1.Expenses;
 
 public sealed class ExpenseService(AppDbContext db, IVatRateService vatRates) : IExpenseService
 {
-    public async Task<IReadOnlyList<ExpenseModel>> GetAllAsync(int? ownerScopeId, int? assetId, DateOnly? from, DateOnly? to, CancellationToken cancellationToken) =>
+    public async Task<IReadOnlyList<ExpenseModel>> GetAllAsync(int? ownerScopeId, int? assetId, DateOnly? from, DateOnly? toDate, CancellationToken cancellationToken) =>
         await db.Expenses.AsNoTracking()
             .Where(expense => (ownerScopeId == null || expense.Asset.OwnerId == ownerScopeId)
                 && (assetId == null || expense.AssetId == assetId)
                 && (from == null || expense.Date >= from)
-                && (to == null || expense.Date <= to))
+                && (toDate == null || expense.Date <= toDate))
             .OrderByDescending(expense => expense.Date).ThenByDescending(expense => expense.Id)
             .Select(expense => new ExpenseModel(expense.Id, expense.AssetId, expense.Asset.Name, expense.Date, expense.Description,
                 expense.Category, expense.AmountExclVat, expense.VatRateName, expense.VatPercentage, expense.Reinvoiceable, expense.InvoiceId))

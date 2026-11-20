@@ -8,6 +8,17 @@ namespace PropertyAdmin.Tests.V1.Users;
 [Collection(ApiCollection.Name)]
 public sealed class UsersApiTests(ApiFactory api)
 {
+    // Request bodies as static readonly arrays (CA1861); the JSON sent is unchanged.
+    private static readonly string[] StaffRole = ["Staff"];
+    private static readonly string[] ViewerRole = ["Viewer"];
+    private static readonly string[] NoSuchRole = ["NoSuchRole"];
+    private static readonly string[] ReportsPermission = ["Reports"];
+    private static readonly string[] NoSuchPermission = ["NoSuchPermission"];
+    private static readonly string[] ReadAllPermission = ["ReadAll"];
+    private static readonly string[] ReadOwnAndReportsPermissions = ["ReadOwn", "Reports"];
+    private static readonly string[] ReadAllAndReadOwnPermissions = ["ReadAll", "ReadOwn"];
+    private static readonly string[] ReadOwnAndInvoicesPermissions = ["ReadOwn", "Invoices"];
+
     [Fact]
     public async Task Users_and_roles_v1_refuse_anonymous_callers_and_callers_without_the_users_permission()
     {
@@ -25,14 +36,14 @@ public sealed class UsersApiTests(ApiFactory api)
     {
         var admin = await api.As("Admin");
         var userName = api.Unique("v1user");
-        var created = await Expect(await admin.PostAsJsonAsync("/api/v1/users", new { userName, email = $"{userName}@example.test", password = ApiFactory.Password, roles = new[] { "Staff" } }), HttpStatusCode.Created);
+        var created = await Expect(await admin.PostAsJsonAsync("/api/v1/users", new { userName, email = $"{userName}@example.test", password = ApiFactory.Password, roles = StaffRole }), HttpStatusCode.Created);
         var id = created.GetProperty("id").GetString();
 
         var found = await Expect(await admin.GetAsync($"/api/v1/users/{id}"), HttpStatusCode.OK);
         Assert.Equal(userName, found.GetProperty("userName").GetString());
-        var updated = await Expect(await admin.PutAsJsonAsync($"/api/v1/users/{id}", new { email = $"{userName}@example.test", roles = new[] { "Viewer" }, lockedOut = false }), HttpStatusCode.OK);
+        var updated = await Expect(await admin.PutAsJsonAsync($"/api/v1/users/{id}", new { email = $"{userName}@example.test", roles = ViewerRole, lockedOut = false }), HttpStatusCode.OK);
         Assert.Equal(["Viewer"], updated.GetProperty("roles").EnumerateArray().Select(role => role.GetString()));
-        await ExpectProblem(await admin.PostAsJsonAsync("/api/v1/users", new { userName = api.Unique("v1user"), email = "v1@example.test", password = ApiFactory.Password, roles = new[] { "NoSuchRole" } }), HttpStatusCode.BadRequest);
+        await ExpectProblem(await admin.PostAsJsonAsync("/api/v1/users", new { userName = api.Unique("v1user"), email = "v1@example.test", password = ApiFactory.Password, roles = NoSuchRole }), HttpStatusCode.BadRequest);
 
         await ExpectStatus(await admin.PostAsync($"/api/v1/users/{id}/reset-2fa", null), HttpStatusCode.NoContent);
         await ExpectStatus(await admin.DeleteAsync($"/api/v1/users/{id}"), HttpStatusCode.NoContent);
@@ -44,17 +55,17 @@ public sealed class UsersApiTests(ApiFactory api)
     {
         var admin = await api.As("Admin");
         var name = api.Unique("V1Rol");
-        await ExpectStatus(await admin.PostAsJsonAsync("/api/v1/roles", new { name, permissions = new[] { "Reports" } }), HttpStatusCode.NoContent);
-        await ExpectProblem(await admin.PostAsJsonAsync("/api/v1/roles", new { name, permissions = new[] { "NoSuchPermission" } }), HttpStatusCode.BadRequest);
+        await ExpectStatus(await admin.PostAsJsonAsync("/api/v1/roles", new { name, permissions = ReportsPermission }), HttpStatusCode.NoContent);
+        await ExpectProblem(await admin.PostAsJsonAsync("/api/v1/roles", new { name, permissions = NoSuchPermission }), HttpStatusCode.BadRequest);
 
         var roles = await Expect(await admin.GetAsync("/api/v1/roles"), HttpStatusCode.OK);
         var role = roles.EnumerateArray().Single(r => r.GetProperty("name").GetString() == name);
         Assert.Equal(0, role.GetProperty("userCount").GetInt32());
 
-        await ExpectStatus(await admin.PutAsJsonAsync($"/api/v1/roles/{name}", new { name, permissions = new[] { "ReadAll" } }), HttpStatusCode.NoContent);
-        await ExpectProblem(await admin.PostAsJsonAsync("/api/v1/roles", new { name = api.Unique("V1Rol"), permissions = new[] { "ReadOwn", "Reports" } }), HttpStatusCode.BadRequest);
-        await ExpectProblem(await admin.PutAsJsonAsync($"/api/v1/roles/{name}", new { name, permissions = new[] { "ReadAll", "ReadOwn" } }), HttpStatusCode.BadRequest);
-        await ExpectProblem(await admin.PostAsJsonAsync("/api/roles", new { name = api.Unique("Rol"), permissions = new[] { "ReadOwn", "Invoices" } }), HttpStatusCode.BadRequest);
+        await ExpectStatus(await admin.PutAsJsonAsync($"/api/v1/roles/{name}", new { name, permissions = ReadAllPermission }), HttpStatusCode.NoContent);
+        await ExpectProblem(await admin.PostAsJsonAsync("/api/v1/roles", new { name = api.Unique("V1Rol"), permissions = ReadOwnAndReportsPermissions }), HttpStatusCode.BadRequest);
+        await ExpectProblem(await admin.PutAsJsonAsync($"/api/v1/roles/{name}", new { name, permissions = ReadAllAndReadOwnPermissions }), HttpStatusCode.BadRequest);
+        await ExpectProblem(await admin.PostAsJsonAsync("/api/roles", new { name = api.Unique("Rol"), permissions = ReadOwnAndInvoicesPermissions }), HttpStatusCode.BadRequest);
         await ExpectStatus(await admin.DeleteAsync($"/api/v1/roles/{name}"), HttpStatusCode.NoContent);
         await ExpectStatus(await admin.DeleteAsync($"/api/v1/roles/{name}"), HttpStatusCode.NotFound);
     }

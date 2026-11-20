@@ -12,6 +12,9 @@ namespace PropertyAdmin.Tests.V1.Auth;
 [Collection(ApiCollection.Name)]
 public sealed class AuthApiTests(ApiFactory api)
 {
+    // Request body as a static readonly array (CA1861); the JSON sent is unchanged.
+    private static readonly string[] ViewerRole = ["Viewer"];
+
     [Fact]
     public async Task Login_v1_returns_a_token_that_the_own_account_endpoints_accept_until_the_stamp_changes()
     {
@@ -79,7 +82,7 @@ public sealed class AuthApiTests(ApiFactory api)
             await ExpectValidationProblem(await signedIn.PostAsJsonAsync($"{route}/password", new { currentPassword = ApiFactory.Password, newPassword = password129 }));
         }
         await ExpectValidationProblem(await admin.PostAsJsonAsync("/api/v1/users",
-            new { userName = api.Unique("longpw"), email = "longpw@example.test", password = password129, ownerId = (int?)null, roles = new[] { "Viewer" } }));
+            new { userName = api.Unique("longpw"), email = "longpw@example.test", password = password129, ownerId = (int?)null, roles = ViewerRole }));
     }
 
     [Theory]

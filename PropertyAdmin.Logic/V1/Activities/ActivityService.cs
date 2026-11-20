@@ -15,12 +15,12 @@ public sealed class ActivityService(AppDbContext db, IVatRateService vatRates) :
         _ => throw new BusinessRuleException("Vul een vaste prijs in."),
     };
 
-    public async Task<IReadOnlyList<ActivityModel>> GetAllAsync(int? ownerScopeId, int? assetId, DateOnly? from, DateOnly? to, CancellationToken cancellationToken) =>
+    public async Task<IReadOnlyList<ActivityModel>> GetAllAsync(int? ownerScopeId, int? assetId, DateOnly? from, DateOnly? toDate, CancellationToken cancellationToken) =>
         await db.Activities.AsNoTracking()
             .Where(activity => (ownerScopeId == null || activity.Asset.OwnerId == ownerScopeId)
                 && (assetId == null || activity.AssetId == assetId)
                 && (from == null || activity.Date >= from)
-                && (to == null || activity.Date <= to))
+                && (toDate == null || activity.Date <= toDate))
             .OrderByDescending(activity => activity.Date).ThenByDescending(activity => activity.Id)
             .Select(activity => new ActivityModel(activity.Id, activity.AssetId, activity.Asset.Name, activity.Date, activity.Kind,
                 activity.Description, activity.PricingType, activity.Hours, activity.HourlyRate, activity.FixedPrice,

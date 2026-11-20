@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Frontend::test_application_for_development_team;
 using OwnerInput = Frontend::test_application_for_development_team.Pages.OwnerInput;
+using DateInputAttribute = Frontend::test_application_for_development_team.Pages.DateInputAttribute;
 
 namespace PropertyAdmin.Tests.Frontend;
 
@@ -22,7 +23,12 @@ namespace PropertyAdmin.Tests.Frontend;
 /// </summary>
 public sealed class ValidationMessageTests
 {
-    /// <summary>Every validation attribute on a property of a frontend type, except data types (they never fail).</summary>
+    /// <summary>
+    /// Every validation attribute on a property of a frontend type. Only a data type that keeps the base
+    /// <see cref="DataTypeAttribute.IsValid(object)"/> (always true; for example <c>[DataType(DataType.Password)]</c> or
+    /// <c>[DateInput]</c>) is left out: it never fails, so it never shows a message. The data types that do validate
+    /// (<see cref="EmailAddressAttribute"/>, <see cref="PhoneAttribute"/>, <see cref="UrlAttribute"/>, ...) are checked.
+    /// </summary>
     public static TheoryData<string, string> Attributes()
     {
         var data = new TheoryData<string, string>();
@@ -31,14 +37,29 @@ public sealed class ValidationMessageTests
         foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
         foreach (var attribute in property.GetCustomAttributes<ValidationAttribute>(inherit: true))
         {
-            if (attribute is DataTypeAttribute) continue;
+            if (NeverFails(attribute)) continue;
             data.Add($"{type.Name}.{property.Name} {attribute.GetType().Name}", attribute.ErrorMessage ?? "");
         }
         return data;
     }
 
+    private static bool NeverFails(ValidationAttribute attribute) =>
+        attribute is DataTypeAttribute
+        && attribute.GetType().GetMethod(nameof(ValidationAttribute.IsValid), [typeof(object)])!.DeclaringType == typeof(DataTypeAttribute);
+
     [Fact]
     public void The_frontend_has_validation_attributes_to_check() => Assert.True(Attributes().Count > 20);
+
+    [Fact]
+    public void Data_types_that_validate_are_checked_and_data_types_that_never_fail_are_not()
+    {
+        Assert.False(NeverFails(new EmailAddressAttribute()));
+        Assert.False(NeverFails(new PhoneAttribute()));
+        Assert.False(NeverFails(new UrlAttribute()));
+        Assert.True(NeverFails(new DataTypeAttribute(DataType.Password)));
+        Assert.True(NeverFails(new DateInputAttribute()));
+        Assert.Contains(Attributes(), row => ((string)row[0]).EndsWith(" EmailAddressAttribute", StringComparison.Ordinal));
+    }
 
     [Theory]
     [MemberData(nameof(Attributes))]
