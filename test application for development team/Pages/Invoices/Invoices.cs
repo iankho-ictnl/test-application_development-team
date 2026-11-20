@@ -29,7 +29,7 @@ public class IndexModel(ApiClient api, IStringLocalizer<SharedResource> l) : Api
 public class DetailsModel(ApiClient api, IStringLocalizer<SharedResource> l) : ApiPageModel(api, l)
 {
     public InvoiceDto Invoice { get; set; } = null!;
-    [BindProperty] public DateOnly PaidDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    [BindProperty, DateInput] public DateOnly PaidDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
 
     public async Task OnGetAsync(int id) => Invoice = await Api.GetAsync<InvoiceDto>($"api/invoices/{id}");
 
@@ -77,7 +77,7 @@ public class CreateModel(ApiClient api, IStringLocalizer<SharedResource> l) : Ap
     [BindProperty(SupportsGet = true), Range(1, int.MaxValue, ErrorMessage = "Required"), Display(Name = "Owner")]
     public int OwnerId { get; set; }
 
-    [BindProperty, Display(Name = "Invoice date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    [BindProperty, DateInput, Display(Name = "Invoice date")] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
     [BindProperty, Range(0, 365), Display(Name = "Payment term (days)")] public int PaymentTermDays { get; set; } = 14;
 
     public async Task OnGetAsync() => await LoadAsync();
