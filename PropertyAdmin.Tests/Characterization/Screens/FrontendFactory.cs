@@ -2,8 +2,10 @@ extern alias Frontend;
 
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Mvc.Testing.Handlers;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using FrontendApiClient = Frontend::test_application_for_development_team.Services.ApiClient;
@@ -31,14 +33,57 @@ public sealed class FrontendFactory : WebApplicationFactory<Frontend::Program>
         // Not Development: the cookies are Secure as in production, so the browser uses https.
         builder.UseEnvironment("Testing");
         builder.UseSetting("Api:BaseUrl", "http://api.test/");
-        builder.ConfigureTestServices(services => services
-            .AddHttpClient<FrontendApiClient>()
-            .ConfigurePrimaryHttpMessageHandler(() => Api.Server.CreateHandler()));
+        builder.ConfigureTestServices(services =>
+        {
+            services.AddHttpClient<FrontendApiClient>().ConfigurePrimaryHttpMessageHandler(() => Api.Server.CreateHandler());
+            services.AddSingleton<IStartupFilter, TestClientIpStartupFilter>();
+        });
     }
 
-    /// <summary>A new browser: own cookies, no automatic redirects.</summary>
-    public HttpClient NewBrowser() =>
-        CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false });
+    private int _lastClient;
+
+    /// <summary>
+    /// A new browser: own cookies, no automatic redirects, and its own client IP address (test host only), so the
+    /// sign-in rate limit (D-044, per client IP) counts each test browser apart as it counts real users apart.
+    /// </summary>
+    public HttpClient NewBrowser(IPAddress? clientIp = null)
+    {
+        var n = Interlocked.Increment(ref _lastClient);
+        clientIp ??= new IPAddress([10, 77, (byte)(n / 250), (byte)(n % 250 + 1)]);
+        var client = CreateDefaultClient(new Uri("https://localhost"), new CookieContainerHandler(), new TestClientIpHandler(clientIp));
+        return client;
+    }
+
+    /// <summary>Carries the browser's client IP address to the in-memory frontend in a test-only header.</summary>
+    private sealed class TestClientIpHandler(IPAddress ip) : DelegatingHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            request.Headers.Remove(TestClientIpStartupFilter.Header);
+            request.Headers.Add(TestClientIpStartupFilter.Header, ip.ToString());
+            return base.SendAsync(request, cancellationToken);
+        }
+    }
+
+    /// <summary>Test host only: sets the connection's remote address from the test header, before the app's own middleware.</summary>
+    private sealed class TestClientIpStartupFilter : IStartupFilter
+    {
+        public const string Header = "X-Test-Client-Ip";
+
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+        {
+            app.Use(async (context, nextMiddleware) =>
+            {
+                if (IPAddress.TryParse(context.Request.Headers[Header].ToString(), out var ip))
+                {
+                    context.Connection.RemoteIpAddress = ip;
+                    context.Request.Headers.Remove(Header);
+                }
+                await nextMiddleware();
+            });
+            next(app);
+        };
+    }
 
     /// <summary>Signs in through the Login page and returns the browser with the sign-in cookie.</summary>
     public async Task<HttpClient> SignIn(string userName, string password = ApiFactory.Password)

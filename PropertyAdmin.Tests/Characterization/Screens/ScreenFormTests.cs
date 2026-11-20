@@ -68,25 +68,28 @@ public sealed class ScreenFormTests(FrontendFactory web)
 
     [Fact]
     [Trait("Requirement", "REQ-003")]
-    [Trait("Differs", "BUG-7")]
-    public async Task Asset_create_is_refused_by_the_API_because_the_type_is_sent_as_text()
+    public async Task Asset_create_and_edit_save_through_the_API()
     {
+        // BUG-7 fixed: the type travels as a number. The D-041 address fields (street, house number, country) are added after T-066.
         var admin = await web.Api.As("Admin");
         var ownerId = await admin.CreateOwner(web.Api.Unique("Formeigenaar"));
         var name = web.Api.Unique("Formpand");
         var browser = await web.SignInAs("Admin");
-
-        var response = await browser.Submit("/Assets/Edit", new()
+        var fields = new Dictionary<string, string>
         {
             ["Input.OwnerId"] = $"{ownerId}", ["Input.Type"] = "Home", ["Input.Name"] = name,
             ["Input.Address"] = "Pandweg 4", ["Input.PostalCode"] = "1234 GH", ["Input.City"] = "Pandstad",
-        });
+        };
 
-        // Current behaviour; BUG-7: expected a redirect to /Assets and the asset saved.
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("validation-summary-errors", await response.Content.ReadAsStringAsync());
-        var assets = await Http.Expect(await admin.GetAsync($"/api/assets?ownerId={ownerId}"), HttpStatusCode.OK);
-        Assert.DoesNotContain(assets.EnumerateArray(), a => a.GetProperty("name").GetString() == name);
+        Browser.ExpectRedirect(await browser.Submit("/Assets/Edit", fields), "/Assets");
+        var asset = Named(await Http.Expect(await admin.GetAsync($"/api/assets?ownerId={ownerId}"), HttpStatusCode.OK), "name", name);
+        Assert.Equal("Pandstad", asset.GetProperty("city").GetString());
+        Assert.Equal("1234 GH", asset.GetProperty("postalCode").GetString());
+        var id = asset.GetProperty("id").GetInt32();
+
+        fields["Input.City"] = "Andere stad";
+        Browser.ExpectRedirect(await browser.Submit($"/Assets/Edit/{id}", fields), "/Assets");
+        Assert.Equal("Andere stad", (await Http.Expect(await admin.GetAsync($"/api/assets/{id}"), HttpStatusCode.OK)).GetProperty("city").GetString());
     }
 
     [Fact]
@@ -112,9 +115,9 @@ public sealed class ScreenFormTests(FrontendFactory web)
 
     [Fact]
     [Trait("Requirement", "REQ-005")]
-    [Trait("Differs", "BUG-7")]
-    public async Task Activity_create_is_refused_by_the_API_because_the_kind_is_sent_as_text()
+    public async Task Activity_create_saves_through_the_API_with_hours_times_rate_and_VAT()
     {
+        // BUG-7 fixed: kind and pricing type travel as numbers.
         var admin = await web.Api.As("Admin");
         var assetId = await admin.CreateAsset(await admin.CreateOwner(web.Api.Unique("Formeigenaar")), web.Api.Unique("Formpand"));
         var description = web.Api.Unique("Cv-ketel onderhoud");
@@ -126,11 +129,11 @@ public sealed class ScreenFormTests(FrontendFactory web)
             ["Input.PricingType"] = "Hourly", ["Input.Hours"] = "2", ["Input.HourlyRate"] = "50", ["Input.VatRateName"] = "Hoog",
         });
 
-        // Current behaviour; BUG-7: expected a redirect to the asset, saved with 2 x 50 = 100.00 excl. and 121.00 incl. VAT.
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("validation-summary-errors", await response.Content.ReadAsStringAsync());
-        var activities = await Http.Expect(await admin.GetAsync($"/api/activities?assetId={assetId}"), HttpStatusCode.OK);
-        Assert.DoesNotContain(activities.EnumerateArray(), a => a.GetProperty("description").GetString() == description);
+        Browser.ExpectRedirect(response, $"/Assets/Details/{assetId}");
+        var activity = Named(await Http.Expect(await admin.GetAsync($"/api/activities?assetId={assetId}"), HttpStatusCode.OK), "description", description);
+        Assert.Equal("2026-04-01", activity.GetProperty("date").GetString());
+        Assert.Equal(100.00m, activity.GetProperty("amountExclVat").GetDecimal());
+        Assert.Equal(121.00m, activity.GetProperty("amountInclVat").GetDecimal());
     }
 
     [Fact]

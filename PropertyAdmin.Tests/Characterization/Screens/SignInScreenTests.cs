@@ -53,6 +53,25 @@ public sealed class SignInScreenTests(FrontendFactory web)
     }
 
     [Fact]
+    [Trait("Requirement", "REQ-019")]
+    public async Task Eleventh_sign_in_attempt_from_one_client_ip_in_a_minute_is_refused_with_429()
+    {
+        // D-044 (S-17): 10 attempts per minute per client IP; the eleventh gets the localized 429 page.
+        var browser = web.NewBrowser(System.Net.IPAddress.Parse("10.99.0.1"));
+        var form = new Dictionary<string, string> { ["UserName"] = "screen.ratelimit", ["Password"] = "Not-the-password-1!" };
+        for (var i = 0; i < 10; i++)
+        {
+            Assert.Equal(HttpStatusCode.OK, (await browser.Submit("/Account/Login", form)).StatusCode);
+        }
+
+        var refused = await browser.Submit("/Account/Login", form);
+
+        Assert.Equal(HttpStatusCode.TooManyRequests, refused.StatusCode);
+        // Another client IP is not affected.
+        Assert.Equal(HttpStatusCode.OK, (await web.NewBrowser().Submit("/Account/Login", form)).StatusCode);
+    }
+
+    [Fact]
     public async Task Sign_in_ignores_a_return_url_to_another_site()
     {
         var response = await web.NewBrowser().Submit("/Account/Login?ReturnUrl=https%3A%2F%2Fevil.example%2F", new() { ["UserName"] = ApiFactory.AdminUserName, ["Password"] = ApiFactory.Password });
