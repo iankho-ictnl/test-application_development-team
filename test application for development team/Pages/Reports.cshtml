@@ -4,10 +4,11 @@
     ViewData["Title"] = L["Reports"];
 }
 <h1 class="h3 mb-3">@L["Reports"]</h1>
-<form method="get" class="row g-2 mb-3 align-items-end">
-    <div class="col-auto"><label asp-for="From" class="form-label">@L["From"]</label><input asp-for="From" class="form-control" /></div>
-    <div class="col-auto"><label asp-for="To" class="form-label">@L["To"]</label><input asp-for="To" class="form-control" /></div>
-    <div class="col-auto"><button type="submit" class="btn btn-outline-primary">@L["Filter"]</button></div>
+<form method="get" class="row g-2 mb-3 align-items-start">
+    <div asp-validation-summary="ModelOnly" class="text-danger col-12"></div>
+    <div class="col-auto"><label asp-for="From" class="form-label">@L["From"]</label><input asp-for="From" class="form-control" /><span asp-validation-for="From" class="text-danger small d-block"></span></div>
+    <div class="col-auto"><label asp-for="To" class="form-label">@L["To"]</label><input asp-for="To" class="form-control" /><span asp-validation-for="To" class="text-danger small d-block"></span></div>
+    <div class="col-auto align-self-end"><button type="submit" class="btn btn-outline-primary">@L["Filter"]</button></div>
 </form>
 
 <h2 class="h5">@L["Result per asset"]</h2>

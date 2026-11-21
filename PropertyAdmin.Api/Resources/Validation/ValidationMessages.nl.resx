@@ -30,4 +30,10 @@
   <data name="Choose a valid value." xml:space="preserve">
     <value>Kies een geldige waarde.</value>
   </data>
+  <data name="Enter a valid date as yyyy-MM-dd." xml:space="preserve">
+    <value>Vul een geldige datum in als jjjj-mm-dd.</value>
+  </data>
+  <data name="The end date cannot be before the start date." xml:space="preserve">
+    <value>De einddatum mag niet voor de begindatum liggen.</value>
+  </data>
 </root>
