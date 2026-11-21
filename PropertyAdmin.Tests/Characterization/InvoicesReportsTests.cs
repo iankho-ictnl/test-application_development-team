@@ -154,11 +154,16 @@ public class ReportsTests(ApiFactory api)
     }
 
     [Fact]
-    public async Task Missing_period_currently_returns_200_with_zero_totals()
+    public async Task Missing_period_returns_400_at_from_and_to()
     {
-        // Current behaviour (Q-044): without from/to both default to 0001-01-01, so every total is 0.
-        var json = await Expect(await (await api.As("Viewer")).GetAsync("/api/reports/asset-results"), HttpStatusCode.OK);
-        Assert.All(json.EnumerateArray(), r => Assert.Equal(0m, r.GetProperty("income").GetDecimal()));
+        // D-033 (T-161, T-164): the period is required; the old 200 with zero totals (Q-044) is gone on purpose.
+        var viewer = await api.As("Viewer");
+        foreach (var route in new[] { "/api/reports/asset-results", "/api/reports/owner-overview" })
+        {
+            var errors = (await ExpectProblem(await viewer.GetAsync(route), HttpStatusCode.BadRequest)).GetProperty("errors");
+            Assert.Equal("Dit veld is verplicht.", errors.GetProperty("from")[0].GetString());
+            Assert.Equal("Dit veld is verplicht.", errors.GetProperty("to")[0].GetString());
+        }
     }
 
     [Fact]
@@ -183,9 +188,13 @@ public class ReportsTests(ApiFactory api)
 
         var overview = await Expect(await viewer.GetAsync("/api/reports/owner-overview?from=2025-01-01&to=2025-12-31"), HttpStatusCode.OK);
         var o = overview.EnumerateArray().Single(r => r.GetProperty("ownerId").GetInt32() == ownerId);
-        HasShape(o, "ownerId", "ownerName", "assetCount", "income", "expenses", "openInvoiceCount", "openInvoiceAmount");
+        // Q-120: openInvoices is a planned addition of REQ-009 (B23), not a change in behaviour.
+        HasShape(o, "ownerId", "ownerName", "assetCount", "income", "expenses", "openInvoiceCount", "openInvoiceAmount", "openInvoices");
         Assert.Equal(1, o.GetProperty("assetCount").GetInt32());
         Assert.Equal(1, o.GetProperty("openInvoiceCount").GetInt32());
         Assert.Equal(363m, o.GetProperty("openInvoiceAmount").GetDecimal());
+        var open = Assert.Single(o.GetProperty("openInvoices").EnumerateArray().ToList());
+        HasShape(open, "id", "number", "date", "dueDate", "totalInclVat", "overdue");
+        Assert.Equal(363m, open.GetProperty("totalInclVat").GetDecimal());
     }
 }

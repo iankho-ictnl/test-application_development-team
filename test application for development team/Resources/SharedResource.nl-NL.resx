@@ -89,6 +89,7 @@
   <data name="Open amount" xml:space="preserve"><value>Openstaand bedrag</value></data>
   <data name="Open invoices" xml:space="preserve"><value>Openstaande facturen</value></data>
   <data name="over" xml:space="preserve"><value>over</value></data>
+  <data name="Overdue" xml:space="preserve"><value>Vervallen</value></data>
   <data name="Overview per owner" xml:space="preserve"><value>Overzicht per eigenaar</value></data>
   <data name="Owner" xml:space="preserve"><value>Eigenaar</value></data>
   <data name="Owners" xml:space="preserve"><value>Eigenaren</value></data>
@@ -141,6 +142,7 @@
   <data name="The code is invalid or has expired. Sign in again." xml:space="preserve"><value>De code is ongeldig of verlopen. Meld u opnieuw aan.</value></data>
   <data name="The code is invalid." xml:space="preserve"><value>De code is ongeldig.</value></data>
   <data name="To" xml:space="preserve"><value>Tot en met</value></data>
+  <data name="'To' must not be before 'From'" xml:space="preserve"><value>'Tot en met' mag niet vóór 'Van' liggen</value></data>
   <data name="To change a rate, end the current period and add a new rate with the same name from the next day." xml:space="preserve"><value>Wilt u een tarief wijzigen, beëindig dan de huidige periode en voeg vanaf de volgende dag een nieuw tarief met dezelfde naam toe.</value></data>
   <data name="Toggle navigation" xml:space="preserve"><value>Navigatie tonen of verbergen</value></data>
   <data name="Total" xml:space="preserve"><value>Totaal</value></data>

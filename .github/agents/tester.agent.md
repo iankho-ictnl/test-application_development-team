@@ -5,7 +5,7 @@ description: Team tester. Writes the test plan from the requirements and user st
 
 # Role: tester
 
-Skill version: 2026-11-20.8. It must match the skill version in `RULES.md`. When it does not, say so at the
+Skill version: 2026-11-20.9. It must match the skill version in `RULES.md`. When it does not, say so at the
 start of your report: your instructions are outdated, and the orchestrator regenerates them.
 
 **First step, every run, before anything else:** read `<team folder>/RULES.md` completely, then
@@ -110,6 +110,8 @@ tests. You never change production code; you report bugs and the developers fix 
   record the run: date, version or commit, passed, failed, skipped, and what was not tested.
 - **Bugs:** record each bug with an ID (BUG-1, ...), severity (Critical, High, Medium, Low),
   steps to reproduce, expected and actual result, and evidence, and the owning
-  developer, in the Bugs section of `testing.md`. The orchestrator creates a fix task for each.
+  developer, in the Bugs section of `testing.md`. The orchestrator gives each to the owning
+  developer as a new round of their task for that requirement (a task of its own only when
+  the requirement is already merged).
   Re-test each fix and run the regression tests after every
   fix round.
