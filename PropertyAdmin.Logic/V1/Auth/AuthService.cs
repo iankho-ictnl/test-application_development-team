@@ -8,7 +8,8 @@ namespace PropertyAdmin.Logic.V1.Auth;
 public sealed class AuthService(
     UserManager<ApplicationUser> users,
     RoleManager<IdentityRole> roles,
-    ITokenIssuer tokens) : IAuthService
+    ITokenIssuer tokens,
+    IUserStore<ApplicationUser> userStore) : IAuthService
 {
     private const string Issuer = "PropertyAdmin";
     public const string ReauthenticationRequired = "Geef je huidige wachtwoord of een code uit je authenticator-app.";
@@ -63,10 +64,7 @@ public sealed class AuthService(
         if (await users.GetTwoFactorEnabledAsync(user)) return new TwoFactorSetupModel(null, null, true);
         var key = await users.GetAuthenticatorKeyAsync(user);
         if (string.IsNullOrEmpty(key))
-        {
-            await users.ResetAuthenticatorKeyAsync(user);
-            key = await users.GetAuthenticatorKeyAsync(user);
-        }
+            key = await CreateAuthenticatorKeyAsync(user, cancellationToken);
         var issuer = UrlEncoder.Default.Encode(Issuer);
         var uri = $"otpauth://totp/{issuer}:{UrlEncoder.Default.Encode(user.UserName!)}?secret={key}&issuer={issuer}&digits=6";
         return new TwoFactorSetupModel(key!, uri, false);
@@ -142,6 +140,21 @@ public sealed class AuthService(
                 if (claim.Type == Permissions.ClaimType) permissions.Add(claim.Value);
         }
         return new TokenSubjectModel(user.Id, user.UserName ?? "", user.SecurityStamp ?? "", user.OwnerId, roleNames.ToList(), permissions);
+    }
+
+    // BUG-13 (D-058): a first key is created without ResetAuthenticatorKeyAsync, because that also renews the
+    // security stamp and so ends the session that only opened its profile. No older key or session exists to revoke.
+    // Replacing an existing key (2fa/disable, the Admin reset) still uses ResetAuthenticatorKeyAsync with its stamp change.
+    private async Task<string> CreateAuthenticatorKeyAsync(ApplicationUser user, CancellationToken cancellationToken)
+    {
+        if (userStore is not IUserAuthenticatorKeyStore<ApplicationUser> keyStore)
+            throw new NotSupportedException("The user store does not support authenticator keys.");
+        var key = users.GenerateNewAuthenticatorKey();
+        await keyStore.SetAuthenticatorKeyAsync(user, key, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        var result = await users.UpdateAsync(user);
+        if (!result.Succeeded) throw new InvalidOperationException("The authenticator key could not be stored.");
+        return key;
     }
 
     // S-23: an unknown or locked-out user name costs the same hash check as a wrong password.
