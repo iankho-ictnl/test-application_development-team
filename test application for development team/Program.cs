@@ -31,6 +31,7 @@ builder.Services.AddRazorPages(o =>
     .AddMvcOptions(o => o.Filters.Add<ApiExceptionPageFilter>())
     .AddViewLocalization()
     .AddDataAnnotationsLocalization(o => o.DataAnnotationLocalizerProvider = (_, f) => f.Create(typeof(SharedResource)));
+builder.Services.AddSingleton<Microsoft.Extensions.Options.IConfigureOptions<Microsoft.AspNetCore.Mvc.MvcOptions>, ModelBindingMessages>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>

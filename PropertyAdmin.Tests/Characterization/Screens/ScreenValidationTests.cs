@@ -6,12 +6,16 @@ namespace PropertyAdmin.Tests.Characterization.Screens;
 /// <summary>
 /// TC-13 (REQ-030 criterion 4): per form one invalid post. The form is shown again (200) with the
 /// field error (at the field where the screen has a field message, otherwise in the validation
-/// summary), and nothing is saved.
+/// summary with the expected message of the invalid field, Q-119), and nothing is saved. The screens run in the
+/// default culture nl-NL.
 /// </summary>
 [Collection(FrontendCollection.Name)]
 [Trait("TestCase", "TC-13")]
 public sealed class ScreenValidationTests(FrontendFactory web)
 {
+    /// <summary>The Dutch text of the "Required" validation message (SharedResource.nl-NL.resx).</summary>
+    private const string Required = "Verplicht";
+
     private static bool Has(JsonElement list, string property, string value) =>
         list.EnumerateArray().Any(e => e.GetProperty(property).GetString() == value);
 
@@ -65,7 +69,7 @@ public sealed class ScreenValidationTests(FrontendFactory web)
             ["Input.AmountExclVat"] = "50", ["Input.VatRateName"] = "Hoog",
         });
 
-        await Browser.ExpectSummaryError(response);
+        Assert.Contains(Required, await Browser.ExpectSummaryError(response), StringComparison.Ordinal);
         Assert.Empty((await Http.Expect(await admin.GetAsync($"/api/expenses?assetId={assetId}"), HttpStatusCode.OK)).EnumerateArray());
     }
 
@@ -83,7 +87,7 @@ public sealed class ScreenValidationTests(FrontendFactory web)
             ["Input.PricingType"] = "Hourly", ["Input.Hours"] = "2", ["Input.HourlyRate"] = "50", ["Input.VatRateName"] = "Hoog",
         });
 
-        await Browser.ExpectSummaryError(response);
+        Assert.Contains(Required, await Browser.ExpectSummaryError(response), StringComparison.Ordinal);
         Assert.Empty((await Http.Expect(await admin.GetAsync($"/api/activities?assetId={assetId}"), HttpStatusCode.OK)).EnumerateArray());
     }
 
@@ -97,7 +101,7 @@ public sealed class ScreenValidationTests(FrontendFactory web)
 
         var response = await browser.Submit("/VatRates", new() { ["Input.Name"] = "", ["Input.Percentage"] = "5", ["Input.ValidFrom"] = "2026-01-01" });
 
-        await Browser.ExpectSummaryError(response);
+        Assert.Contains(Required, await Browser.ExpectSummaryError(response), StringComparison.Ordinal);
         Assert.Equal(before, (await Http.Expect(await admin.GetAsync("/api/vatrates"), HttpStatusCode.OK)).GetArrayLength());
     }
 
@@ -118,6 +122,21 @@ public sealed class ScreenValidationTests(FrontendFactory web)
     }
 
     [Fact]
+    [Trait("Requirement", "REQ-011")]
+    [Trait("Bug", "BUG-14")]
+    public async Task Invoice_form_without_a_date_shows_the_Dutch_required_message()
+    {
+        var admin = await web.Api.As("Admin");
+        var ownerId = await admin.CreateOwner(web.Api.Unique("Formeigenaar"));
+        await admin.CreateActivity(await admin.CreateAsset(ownerId, web.Api.Unique("Formpand")));
+        var browser = await web.SignInAs("Admin");
+
+        var response = await browser.Submit($"/Invoices/Create?OwnerId={ownerId}", new() { ["OwnerId"] = $"{ownerId}", ["Date"] = "" }, "/Invoices/Create");
+
+        Assert.Contains(Required, await Browser.ExpectSummaryError(response), StringComparison.Ordinal);
+    }
+
+    [Fact]
     [Trait("Requirement", "REQ-012")]
     public async Task Role_form_without_a_name_shows_the_error_and_saves_nothing()
     {
@@ -127,7 +146,7 @@ public sealed class ScreenValidationTests(FrontendFactory web)
 
         var response = await browser.Submit("/Admin/Roles", new() { ["Name"] = "", ["SelectedPermissions"] = "Reports" });
 
-        await Browser.ExpectSummaryError(response);
+        Assert.Contains(Required, await Browser.ExpectSummaryError(response), StringComparison.Ordinal);
         Assert.Equal(before, (await Http.Expect(await admin.GetAsync("/api/roles"), HttpStatusCode.OK)).GetArrayLength());
     }
 
@@ -143,7 +162,7 @@ public sealed class ScreenValidationTests(FrontendFactory web)
             ["UserName"] = userName, ["Email"] = "no-email", ["Password"] = ApiFactory.Password, ["Roles"] = "Viewer",
         });
 
-        await Browser.ExpectSummaryError(response);
+        Assert.Contains("Ongeldig e-mailadres", await Browser.ExpectSummaryError(response), StringComparison.Ordinal);
         Assert.False(Has(await Http.Expect(await (await web.Api.As("Admin")).GetAsync("/api/users"), HttpStatusCode.OK), "userName", userName));
     }
 }
