@@ -1,4 +1,7 @@
-.team/
+# Team folder: the documents are committed; checked copies, locks and each agent's private notes stay local
+.team/archive/
+.team/locks/
+.team/agents/
 .worktrees/
 .tmp/
 TestResults/
