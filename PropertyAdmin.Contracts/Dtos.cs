@@ -72,6 +72,8 @@ public record MarkPaidRequest(DateOnly PaidDate);
 
 // Reports
 public record AssetResultDto(int AssetId, string AssetName, string OwnerName, decimal Income, decimal Expenses, decimal Result);
-public record OwnerOverviewDto(int OwnerId, string OwnerName, int AssetCount, decimal Income, decimal Expenses, int OpenInvoiceCount, decimal OpenInvoiceAmount);
+// B23/F12 (REQ-009, Q-115 a): the open invoices per owner; Overdue is decided by the API (due date before today, D-046).
+public record OpenInvoiceDto(int Id, string Number, DateOnly Date, DateOnly DueDate, decimal TotalInclVat, bool Overdue);
+public record OwnerOverviewDto(int OwnerId, string OwnerName, int AssetCount, decimal Income, decimal Expenses, int OpenInvoiceCount, decimal OpenInvoiceAmount, IReadOnlyList<OpenInvoiceDto>? OpenInvoices = null);
 
 public record ProblemMessage(string Message);

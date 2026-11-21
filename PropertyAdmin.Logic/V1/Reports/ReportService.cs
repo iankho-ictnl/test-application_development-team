@@ -4,7 +4,7 @@ using PropertyAdmin.Logic.V1.Reports.Models;
 
 namespace PropertyAdmin.Logic.V1.Reports;
 
-public sealed class ReportService(AppDbContext db) : IReportService
+public sealed class ReportService(AppDbContext db, TimeProvider time) : IReportService
 {
     public async Task<IReadOnlyList<AssetResultModel>> GetAssetResultsAsync(DateOnly from, DateOnly toDate, int? ownerScopeId, CancellationToken cancellationToken)
     {
@@ -36,19 +36,42 @@ public sealed class ReportService(AppDbContext db) : IReportService
             .OrderBy(owner => owner.Name)
             .Select(owner => new { owner.Id, owner.Name, AssetCount = owner.Assets.Count })
             .ToListAsync(cancellationToken);
-        var assetResults = await GetAssetResultsAsync(from, toDate, ownerScopeId, cancellationToken);
+        // Q-112 b, Q-113: an invoiced line counts under the invoice's owner, an uninvoiced line under the
+        // asset's current owner. The owner scope filters on that same per-line owner (T-143).
+        var income = await db.Activities.AsNoTracking()
+            .Where(activity => activity.Date >= from && activity.Date <= toDate)
+            .Select(activity => new { OwnerId = activity.InvoiceId != null ? activity.Invoice!.OwnerId : activity.Asset.OwnerId, activity.AmountExclVat })
+            .Where(line => ownerScopeId == null || line.OwnerId == ownerScopeId)
+            .ToListAsync(cancellationToken);
+        var expenses = await db.Expenses.AsNoTracking()
+            .Where(expense => expense.Date >= from && expense.Date <= toDate)
+            .Select(expense => new { OwnerId = expense.InvoiceId != null ? expense.Invoice!.OwnerId : expense.Asset.OwnerId, expense.AmountExclVat })
+            .Where(line => ownerScopeId == null || line.OwnerId == ownerScopeId)
+            .ToListAsync(cancellationToken);
+        var incomePerOwner = income.GroupBy(line => line.OwnerId).ToDictionary(group => group.Key, group => group.Sum(line => line.AmountExclVat));
+        var expensesPerOwner = expenses.GroupBy(line => line.OwnerId).ToDictionary(group => group.Key, group => group.Sum(line => line.AmountExclVat));
         var openInvoices = await db.Invoices.AsNoTracking()
             .Where(invoice => invoice.Status == InvoiceStatus.Open && (ownerScopeId == null || invoice.OwnerId == ownerScopeId))
-            .Select(invoice => new { invoice.OwnerId, Lines = invoice.Lines.Select(line => new { line.AmountExclVat, line.VatPercentage }).ToList() })
+            .OrderBy(invoice => invoice.Date).ThenBy(invoice => invoice.Number)
+            .Select(invoice => new
+            {
+                invoice.Id, invoice.OwnerId, invoice.Number, invoice.Date, invoice.DueDate,
+                Lines = invoice.Lines.Select(line => new { line.AmountExclVat, line.VatPercentage }).ToList(),
+            })
             .ToListAsync(cancellationToken);
+        // D-046: today is the local date of the system; an invoice is overdue when its due date is before today.
+        var today = DateOnly.FromDateTime(time.GetLocalNow().DateTime);
+        var openPerOwner = openInvoices
+            .GroupBy(invoice => invoice.OwnerId)
+            .ToDictionary(group => group.Key, group => group.Select(invoice => new OpenInvoiceModel(invoice.Id, invoice.Number, invoice.Date, invoice.DueDate,
+                InvoiceTotals.TotalInclVat(invoice.Lines.Select(line => (line.AmountExclVat, line.VatPercentage))), invoice.DueDate < today)).ToList());
 
-        return owners.Select(owner =>
+        // US-9.5: an owner without open invoices is not listed.
+        return owners.Where(owner => openPerOwner.ContainsKey(owner.Id)).Select(owner =>
         {
-            var results = assetResults.Where(result => result.OwnerId == owner.Id).ToList();
-            var open = openInvoices.Where(invoice => invoice.OwnerId == owner.Id).ToList();
-            return new OwnerOverviewModel(owner.Id, owner.Name, owner.AssetCount, results.Sum(result => result.Income),
-                results.Sum(result => result.Expenses), open.Count,
-                open.Sum(invoice => InvoiceTotals.TotalInclVat(invoice.Lines.Select(line => (line.AmountExclVat, line.VatPercentage)))));
+            var open = openPerOwner[owner.Id];
+            return new OwnerOverviewModel(owner.Id, owner.Name, owner.AssetCount, incomePerOwner.GetValueOrDefault(owner.Id),
+                expensesPerOwner.GetValueOrDefault(owner.Id), open.Count, open.Sum(invoice => invoice.TotalInclVat), open);
         }).ToList();
     }
 }

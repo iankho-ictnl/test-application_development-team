@@ -8,5 +8,7 @@ public static class Mapping
 
     public static IReadOnlyList<Response> ToResponse(this Result result) =>
         result.Owners.Select(owner => new Response(owner.OwnerId, owner.OwnerName, owner.AssetCount, owner.Income, owner.Expenses,
-            owner.OpenInvoiceCount, owner.OpenInvoiceAmount)).ToList();
+            owner.OpenInvoiceCount, owner.OpenInvoiceAmount,
+            owner.OpenInvoices.Select(invoice => new OpenInvoiceResponse(invoice.Id, invoice.Number, invoice.Date, invoice.DueDate,
+                invoice.TotalInclVat, invoice.Overdue)).ToList())).ToList();
 }

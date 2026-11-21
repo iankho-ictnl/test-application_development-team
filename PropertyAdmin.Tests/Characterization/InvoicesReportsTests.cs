@@ -183,9 +183,13 @@ public class ReportsTests(ApiFactory api)
 
         var overview = await Expect(await viewer.GetAsync("/api/reports/owner-overview?from=2025-01-01&to=2025-12-31"), HttpStatusCode.OK);
         var o = overview.EnumerateArray().Single(r => r.GetProperty("ownerId").GetInt32() == ownerId);
-        HasShape(o, "ownerId", "ownerName", "assetCount", "income", "expenses", "openInvoiceCount", "openInvoiceAmount");
+        // Q-120: openInvoices is a planned addition of REQ-009 (B23), not a change in behaviour.
+        HasShape(o, "ownerId", "ownerName", "assetCount", "income", "expenses", "openInvoiceCount", "openInvoiceAmount", "openInvoices");
         Assert.Equal(1, o.GetProperty("assetCount").GetInt32());
         Assert.Equal(1, o.GetProperty("openInvoiceCount").GetInt32());
         Assert.Equal(363m, o.GetProperty("openInvoiceAmount").GetDecimal());
+        var open = Assert.Single(o.GetProperty("openInvoices").EnumerateArray().ToList());
+        HasShape(open, "id", "number", "date", "dueDate", "totalInclVat", "overdue");
+        Assert.Equal(363m, open.GetProperty("totalInclVat").GetDecimal());
     }
 }

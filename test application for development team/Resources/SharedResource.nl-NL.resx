@@ -89,6 +89,7 @@
   <data name="Open amount" xml:space="preserve"><value>Openstaand bedrag</value></data>
   <data name="Open invoices" xml:space="preserve"><value>Openstaande facturen</value></data>
   <data name="over" xml:space="preserve"><value>over</value></data>
+  <data name="Overdue" xml:space="preserve"><value>Vervallen</value></data>
   <data name="Overview per owner" xml:space="preserve"><value>Overzicht per eigenaar</value></data>
   <data name="Owner" xml:space="preserve"><value>Eigenaar</value></data>
   <data name="Owners" xml:space="preserve"><value>Eigenaren</value></data>

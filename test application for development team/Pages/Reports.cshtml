@@ -32,6 +32,22 @@
         @foreach (var o in Model.Owners)
         {
             <tr><td><a asp-page="/Owners/Details" asp-route-id="@o.OwnerId">@o.OwnerName</a></td><td class="text-end">@o.AssetCount</td><td class="text-end">@o.Income.ToString("C")</td><td class="text-end">@o.Expenses.ToString("C")</td><td class="text-end">@o.OpenInvoiceCount</td><td class="text-end">@o.OpenInvoiceAmount.ToString("C")</td></tr>
+            @if (o.OpenInvoices is { Count: > 0 } invoices)
+            {
+                <tr class="owner-open-invoices">
+                    <td colspan="6" class="ps-4">
+                        <table class="table table-sm mb-0" aria-label="@L["Open invoices"]: @o.OwnerName">
+                            <thead><tr><th>@L["Number"]</th><th>@L["Date"]</th><th>@L["Due date"]</th><th class="text-end">@L["Total incl. VAT"]</th><th></th></tr></thead>
+                            <tbody>
+                                @foreach (var i in invoices)
+                                {
+                                    <tr><td><a asp-page="/Invoices/Details" asp-route-id="@i.Id">@i.Number</a></td><td>@i.Date.ToShortDateString()</td><td>@i.DueDate.ToShortDateString()</td><td class="text-end">@i.TotalInclVat.ToString("C")</td><td>@if (i.Overdue) { <span class="badge bg-danger">@L["Overdue"]</span> }</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            }
         }
     </tbody>
 </table>

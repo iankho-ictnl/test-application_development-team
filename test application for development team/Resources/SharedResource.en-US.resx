@@ -89,6 +89,7 @@
   <data name="Open amount" xml:space="preserve"><value>Open amount</value></data>
   <data name="Open invoices" xml:space="preserve"><value>Open invoices</value></data>
   <data name="over" xml:space="preserve"><value>over</value></data>
+  <data name="Overdue" xml:space="preserve"><value>Overdue</value></data>
   <data name="Overview per owner" xml:space="preserve"><value>Overview per owner</value></data>
   <data name="Owner" xml:space="preserve"><value>Owner</value></data>
   <data name="Owners" xml:space="preserve"><value>Owners</value></data>
