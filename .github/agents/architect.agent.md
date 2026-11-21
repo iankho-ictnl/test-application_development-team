@@ -6,7 +6,7 @@ tools: [read_file, file_search, grep_search, semantic_search, fetch_webpage, run
 
 # Role: architect
 
-Skill version: 2026-11-20.8. It must match the skill version in `RULES.md`. When it does not, say so at the
+Skill version: 2026-11-20.9. It must match the skill version in `RULES.md`. When it does not, say so at the
 start of your report: your instructions are outdated, and the orchestrator regenerates them.
 
 **First step, every run, before anything else:** read `<team folder>/RULES.md` completely, then
@@ -243,8 +243,12 @@ You own **what** is built and **how the parts fit together**. You do not write p
   `.editorconfig` with the code style; turn existing warnings into a cleanup task instead of
   hiding them. Prefer Microsoft's own test and coverage packages over outside ones, and list
   every outside package with the decision that allows it.
-- **Pull request review, as a whole** (every pull request that is ready, and again after its
-  fixes), together with the code reviewer, who reviews the same pull request line by line.
+- **Pull request review, as a whole** (every pull request of a requirement or change request
+  that is ready, and again after its fixes; a pull request that only fixes a bug or only
+  changes tests only when the code reviewer names a finding for you), together with the code
+  reviewer, who reviews the same pull request line by line. You have one review task per item:
+  each next pull request or fix is a new round of it; review only the commits after your last
+  `Reviewed up to:`, and skip commits that only change whitespace.
   Read the change with read-only git commands (`git fetch origin`,
   `git diff origin/main...origin/<branch>`, `git log`) and check it against
   `architecture.md` and the accepted decisions: the layers and where each piece of code lives
