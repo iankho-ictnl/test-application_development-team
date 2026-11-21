@@ -8,19 +8,19 @@ namespace PropertyAdmin.Tests.Demo;
 /// Rule 15, D-047, T-166: the S4 demo of plan.md, step by step in its order, through the real screens, the real API
 /// and a real PostgreSQL 18, signed in through /Account/Login as the seed admin, in Dutch and in English.
 /// S4 demo: "/Invoices/Create twice: consecutive numbers, due date + 14 days; only the most recent unpaid invoice can be
-/// deleted (Q-083)". Traces: REQ-007 (D-056, D-057, BUG-6), REQ-024 criterion 1 (D-056), REQ-011.
-/// Still to come in this test (T-166): the /Reports step ("to" before "from": field error) once REQ-008 is in this branch,
-/// and the other S4 demo steps with their requirements.
+/// deleted (Q-083); /Reports with "to" before "from": field error". Traces: REQ-007 (D-056, D-057, BUG-6), REQ-024
+/// criterion 1 (D-056), REQ-008 (D-033), REQ-011.
+/// Still to come in this test: the other S4 demo steps (owner overview, /Profile) once their requirements are in this branch.
 /// </summary>
 [Collection(DemoCollection.Name)]
 [Trait("Category", "Demo")]
-public sealed class S4DemoTests(DemoStack stack)
+public sealed partial class S4DemoTests(DemoStack stack)
 {
     [Theory]
-    [InlineData("nl-NL", "nl", "Alleen de meest recente onbetaalde factuur kan worden verwijderd.")]
-    [InlineData("en-US", "en", "Only the most recent unpaid invoice can be deleted.")]
-    public async Task S4_demo_invoices_are_numbered_without_gaps_with_a_14_day_term_and_only_the_most_recent_can_be_deleted(
-        string culture, string lang, string refusal)
+    [InlineData("nl-NL", "nl", "Alleen de meest recente onbetaalde factuur kan worden verwijderd.", "'Tot en met' mag niet vóór 'Van' liggen")]
+    [InlineData("en-US", "en", "Only the most recent unpaid invoice can be deleted.", "'To' must not be before 'From'")]
+    public async Task S4_demo_invoices_are_numbered_without_gaps_with_a_14_day_term_only_the_most_recent_can_be_deleted_and_reports_need_a_valid_period(
+        string culture, string lang, string refusal, string periodError)
     {
         using var browser = stack.NewBrowser();
         var tag = lang.ToUpperInvariant();
@@ -72,7 +72,31 @@ public sealed class S4DemoTests(DemoStack stack)
         Assert.DoesNotContain(second.Number, browser.Html);
         Assert.Contains(first.Number, browser.Html);
         Assert.Equal(HttpStatusCode.NotFound, await StatusOfAsync(browser, $"/Invoices/Details/{second.Id}"));
+
+        // Step 4 (TC-DEMO-S4-6, REQ-008, D-033): /Reports with "to" before "from" gives the field error at To in the chosen
+        // language, shows no report and keeps the dates as entered (nothing swapped).
+        await browser.GetAsync("/Reports?From=2025-12-31&To=2025-01-01");
+        Assert.Equal(HttpStatusCode.OK, browser.Status);
+        Assert.Equal(periodError, FieldError(browser.Html, "To"));
+        Assert.Null(FieldError(browser.Html, "From"));
+        Assert.Contains("value=\"2025-12-31\"", browser.Html);
     }
+
+    /// <summary>The text of the shown validation error of a form field, or null when the field has none.</summary>
+    private static string? FieldError(string html, string field)
+    {
+        foreach (Match span in SpanRegex().Matches(html))
+        {
+            var tag = span.Groups[1].Value;
+            if (tag.Contains($"data-valmsg-for=\"{field}\"", StringComparison.Ordinal)
+                && tag.Contains("field-validation-error", StringComparison.Ordinal))
+                return WebUtility.HtmlDecode(span.Groups[2].Value).Trim();
+        }
+        return null;
+    }
+
+    [GeneratedRegex("<span([^>]*)>(.*?)</span>", RegexOptions.Singleline)]
+    private static partial Regex SpanRegex();
 
     private sealed record CreatedInvoice(int Id, string Number, int Year, int Sequence);
 
